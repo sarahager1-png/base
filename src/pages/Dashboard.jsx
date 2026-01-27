@@ -6,6 +6,10 @@ import Sidebar from '../components/Sidebar';
 import ManagementDashboard from '../components/dashboard/ManagementDashboard';
 import StaffDashboard from '../components/dashboard/StaffDashboard';
 import HRDashboard from '../components/dashboard/HRDashboard';
+import SecretaryDashboard from '../components/dashboard/SecretaryDashboard';
+import MaintenanceDashboard from '../components/dashboard/MaintenanceDashboard';
+import CoordinatorDashboard from '../components/dashboard/CoordinatorDashboard';
+import SubstituteDashboard from '../components/dashboard/SubstituteDashboard';
 
 const HEBREW_DATE = "כ״ח טבת תשפ״ו";
 const GREGORIAN_DATE = new Date().toLocaleDateString('he-IL');
@@ -141,9 +145,14 @@ export default function Dashboard() {
                 </div>
               )}
               
-              {['teacher', 'assistant', 'vice_principal', 'coordinator'].includes(user.role) && (
+              {['teacher', 'assistant', 'vice_principal'].includes(user.role) && (
                 <StaffDashboard user={user} setView={setCurrentView} />
               )}
+
+              {user.role === 'secretary' && <SecretaryDashboard />}
+              {user.role === 'maintenance' && <MaintenanceDashboard />}
+              {user.role === 'coordinator' && <CoordinatorDashboard />}
+              {user.role === 'substitute' && <SubstituteDashboard user={user} />}
             </>
           )}
 
