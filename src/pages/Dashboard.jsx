@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+import { useQuery } from '@tanstack/react-query';
 import { Shield, Menu } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import ManagementDashboard from '../components/dashboard/ManagementDashboard';
@@ -12,6 +13,7 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [currentView, setCurrentView] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [demoMode, setDemoMode] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -20,6 +22,18 @@ export default function Dashboard() {
   const loadUser = async () => {
     const currentUser = await base44.auth.me();
     setUser(currentUser);
+  };
+
+  const { data: allUsers = [] } = useQuery({
+    queryKey: ['allUsers'],
+    queryFn: () => base44.entities.User.list(),
+  });
+
+  const switchUser = (selectedUser) => {
+    setUser(selectedUser);
+    setCurrentView('dashboard');
+    setSidebarOpen(false);
+    setDemoMode(true);
   };
 
   const handleLogout = async () => {
@@ -58,6 +72,21 @@ export default function Dashboard() {
           </div>
           
           <div className="flex items-center gap-6">
+            {/* User Switcher for Demo */}
+            {allUsers.length > 0 && (
+              <div className="hidden md:flex items-center gap-2 bg-slate-100 p-1 rounded-lg overflow-x-auto max-w-md">
+                {allUsers.map(u => (
+                  <button
+                    key={u.id}
+                    onClick={() => switchUser(u)}
+                    className={`px-3 py-1 text-xs rounded-md whitespace-nowrap transition-all ${user.id === u.id ? 'bg-white shadow-sm text-blue-700 font-bold' : 'text-slate-500 hover:text-slate-700'}`}
+                  >
+                    {u.full_name?.split(' ')[1] || u.full_name || u.email.split('@')[0]}
+                  </button>
+                ))}
+              </div>
+            )}
+
             <div className="flex flex-col items-end">
               <div className="text-sm font-bold text-blue-900 flex items-center gap-3">
                 <div className="text-right leading-tight hidden sm:block">
