@@ -5,6 +5,7 @@ import { Shield, Menu } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import ManagementDashboard from '../components/dashboard/ManagementDashboard';
 import StaffDashboard from '../components/dashboard/StaffDashboard';
+import HRDashboard from '../components/dashboard/HRDashboard';
 
 const HEBREW_DATE = "כ״ח טבת תשפ״ו";
 const GREGORIAN_DATE = new Date().toLocaleDateString('he-IL');
@@ -73,7 +74,7 @@ export default function Dashboard() {
           
           <div className="flex items-center gap-6">
             {/* User Switcher for Demo */}
-            {allUsers.length > 0 && (
+            {allUsers.length > 1 && (
               <div className="hidden md:flex items-center gap-2 bg-slate-100 p-1 rounded-lg overflow-x-auto max-w-md">
                 {allUsers.map(u => (
                   <button
@@ -81,9 +82,15 @@ export default function Dashboard() {
                     onClick={() => switchUser(u)}
                     className={`px-3 py-1 text-xs rounded-md whitespace-nowrap transition-all ${user.id === u.id ? 'bg-white shadow-sm text-blue-700 font-bold' : 'text-slate-500 hover:text-slate-700'}`}
                   >
-                    {u.full_name?.split(' ')[1] || u.full_name || u.email.split('@')[0]}
+                    {u.full_name?.split(' ')[0] || u.full_name || u.email.split('@')[0]}
                   </button>
                 ))}
+              </div>
+            )}
+
+            {allUsers.length <= 1 && user.role === 'admin' && (
+              <div className="hidden md:block text-xs bg-amber-50 text-amber-700 px-3 py-1.5 rounded-lg border border-amber-200">
+                💡 הזמן משתמשים נוספים דרך "ניהול צוות"
               </div>
             )}
 
@@ -140,7 +147,11 @@ export default function Dashboard() {
             </>
           )}
 
-          {currentView !== 'dashboard' && (
+          {currentView === 'hr' && (
+            <HRDashboard />
+          )}
+
+          {currentView !== 'dashboard' && currentView !== 'hr' && (
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-10 text-center">
               <h2 className="text-2xl font-bold text-slate-800">עמוד בבנייה: {currentView}</h2>
               <p className="text-slate-500 mt-2">המודול בפיתוח</p>
