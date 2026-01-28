@@ -13,6 +13,7 @@ export default function ManagementDashboard({ user }) {
   const [showAddMeeting, setShowAddMeeting] = useState(false);
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [messageText, setMessageText] = useState('');
+  const [editingMessageId, setEditingMessageId] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: absences = [] } = useQuery({
@@ -50,6 +51,9 @@ export default function ManagementDashboard({ user }) {
 
   const createMessage = useMutation({
     mutationFn: async (content) => {
+      if (editingMessageId) {
+        return base44.entities.DailyMessage.update(editingMessageId, { content });
+      }
       // Deactivate previous messages
       const activeMessages = await base44.entities.DailyMessage.filter({ active: true });
       for (const msg of activeMessages) {
@@ -65,6 +69,7 @@ export default function ManagementDashboard({ user }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dailyMessage', 'allMessages'] });
       setMessageText('');
+      setEditingMessageId(null);
       setShowMessageModal(false);
     },
   });
@@ -101,7 +106,16 @@ export default function ManagementDashboard({ user }) {
                 <span>לוח הודעות יומי</span>
                 <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-normal">פעיל באתר</span>
               </h3>
-              <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mt-2">
+              <div 
+                onClick={() => {
+                  if (dailyMessage) {
+                    setEditingMessageId(dailyMessage.id);
+                    setMessageText(dailyMessage.content);
+                    setShowMessageModal(true);
+                  }
+                }}
+                className={`bg-white p-4 rounded-xl border border-slate-200 shadow-sm mt-2 ${dailyMessage ? 'cursor-pointer hover:border-blue-400 hover:shadow-md transition-all' : ''}`}
+              >
                 <p className="text-slate-800 font-serif text-lg leading-relaxed">
                   {dailyMessage?.content || 'אין הודעה פעילה כרגע'}
                 </p>
@@ -219,8 +233,14 @@ export default function ManagementDashboard({ user }) {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-lg max-w-md w-full p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold text-slate-800">הודעה חדשה לדשבורד</h3>
-              <button onClick={() => setShowMessageModal(false)} className="text-slate-400 hover:text-slate-600">
+              <h3 className="text-lg font-bold text-slate-800">
+                {editingMessageId ? 'עריכת הודעה' : 'הודעה חדשה לדשבורד'}
+              </h3>
+              <button onClick={() => {
+                setShowMessageModal(false);
+                setEditingMessageId(null);
+                setMessageText('');
+              }} className="text-slate-400 hover:text-slate-600">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -232,7 +252,11 @@ export default function ManagementDashboard({ user }) {
             />
             <div className="flex gap-2">
               <button
-                onClick={() => setShowMessageModal(false)}
+                onClick={() => {
+                  setShowMessageModal(false);
+                  setEditingMessageId(null);
+                  setMessageText('');
+                }}
                 className="flex-1 px-4 py-2 text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors font-medium"
               >
                 ביטול
@@ -242,7 +266,7 @@ export default function ManagementDashboard({ user }) {
                 disabled={!messageText.trim() || createMessage.isPending}
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-300 transition-colors font-medium"
               >
-                {createMessage.isPending ? 'שומר...' : 'פרסום'}
+                {createMessage.isPending ? 'שומר...' : editingMessageId ? 'עדכן' : 'פרסום'}
               </button>
             </div>
           </div>
