@@ -16,6 +16,16 @@ export default function ManagementDashboard({ user }) {
   const [editingMessageId, setEditingMessageId] = useState(null);
   const queryClient = useQueryClient();
 
+  const getGreetingByHour = () => {
+    const hour = new Date().getHours();
+    const greeting = 
+      hour >= 6 && hour < 12 ? `בוקר טוב ${user.full_name}` :
+      hour >= 12 && hour < 17 ? `צהריים טובים ${user.full_name}` :
+      hour >= 17 && hour < 19 ? `ערב טוב ${user.full_name}` :
+      `לילה טוב ${user.full_name}`;
+    return greeting;
+  };
+
   const { data: absences = [] } = useQuery({
     queryKey: ['absences', 'pending'],
     queryFn: () => base44.entities.Absence.filter({ status: 'pending' }),
@@ -131,7 +141,10 @@ export default function ManagementDashboard({ user }) {
                 </button>
               )}
               <button 
-                onClick={() => setShowMessageModal(true)}
+                onClick={() => {
+                  setMessageText(getGreetingByHour());
+                  setShowMessageModal(true);
+                }}
                 className="flex-1 md:flex-none text-xs bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-sm"
               >
                 הודעה חדשה
