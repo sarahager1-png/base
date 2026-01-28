@@ -9,7 +9,7 @@ import StaffDashboard from '../components/dashboard/StaffDashboard';
 import HRDashboard from '../components/dashboard/HRDashboard';
 import SecretaryDashboard from '../components/dashboard/SecretaryDashboard';
 import MaintenanceDashboard from '../components/dashboard/MaintenanceDashboard';
-import CoordinatorDashboard from '../components/dashboard/CoordinatorDashboard';
+
 import SubstituteDashboard from '../components/dashboard/SubstituteDashboard';
 import VicePrincipalDashboard from '../components/dashboard/VicePrincipalDashboard';
 import CounselorDashboard from '../components/dashboard/CounselorDashboard';
@@ -102,7 +102,6 @@ export default function Dashboard() {
                   { role: 'secretary', label: 'מזכירה' },
                   { role: 'teacher', label: 'עובדת הוראה' },
                   { role: 'counselor', label: 'יועצת' },
-                  { role: 'coordinator', label: 'רכזת' },
                   { role: 'maintenance', label: 'אב בית' },
                   { role: 'substitute', label: 'ממלאת מקום' },
                   { role: 'assistant', label: 'סייעת' },
@@ -177,10 +176,6 @@ export default function Dashboard() {
                 <MaintenanceDashboard />
               )}
               
-              {(viewAsRole === 'coordinator') && (
-                <CoordinatorDashboard />
-              )}
-              
               {(viewAsRole === 'substitute') && (
                 <SubstituteDashboard user={{...user, role: 'substitute'}} />
               )}
@@ -190,12 +185,11 @@ export default function Dashboard() {
               )}
               {!viewAsRole && user.role === 'secretary' && <SecretaryDashboard />}
               {!viewAsRole && user.role === 'maintenance' && <MaintenanceDashboard />}
-              {!viewAsRole && user.role === 'coordinator' && <CoordinatorDashboard />}
               {!viewAsRole && user.role === 'substitute' && <SubstituteDashboard user={user} />}
               {!viewAsRole && user.role === 'counselor' && (
                 <CounselorDashboard user={user} setView={setCurrentView} />
               )}
-              {!viewAsRole && ['teacher', 'assistant'].includes(user.role) && (
+              {!viewAsRole && ['teacher', 'assistant', 'coordinator'].includes(user.role) && (
                 <StaffDashboard user={user} setView={setCurrentView} />
               )}
             </>

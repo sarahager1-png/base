@@ -10,13 +10,13 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
     { id: 'notifications', label: 'התראות', icon: Bell, roles: ['all'] },
     { id: 'journal', label: 'יומן בית הספר', icon: Calendar, roles: ['all'] },
     { id: 'journal-management', label: 'ניהול יומן', icon: Calendar, roles: ['admin', 'vice_principal'] },
-    { id: 'schedule', label: 'לוח זמנים', icon: Calendar, roles: ['teacher', 'admin', 'vice_principal', 'secretary', 'coordinator', 'assistant', 'counselor'] },
+    { id: 'schedule', label: 'לוח זמנים', icon: Calendar, roles: ['teacher', 'admin', 'vice_principal', 'secretary', 'assistant', 'counselor', 'coordinator'] },
     { id: 'tasks', label: 'משימות ואישורים', icon: CheckSquare, roles: ['all'] },
-    { id: 'attendance', label: 'היעדרויות ודיווח', icon: Clock, roles: ['teacher', 'admin', 'vice_principal', 'secretary', 'coordinator', 'assistant', 'substitute', 'counselor'] },
+    { id: 'attendance', label: 'היעדרויות ודיווח', icon: Clock, roles: ['teacher', 'admin', 'vice_principal', 'secretary', 'assistant', 'substitute', 'counselor', 'coordinator'] },
     { id: 'hr', label: 'ניהול צוות', icon: Users, roles: ['admin', 'vice_principal', 'secretary'] },
     { id: 'onboarding', label: 'טפסי קליטה', icon: UserPlus, roles: ['substitute', 'admin', 'vice_principal'] },
-    { id: 'printing', label: 'מרכז צילומים', icon: Printer, roles: ['secretary', 'teacher', 'coordinator', 'assistant', 'vice_principal', 'counselor'] },
-    { id: 'maintenance', label: 'תפעול ורכש', icon: Settings, roles: ['admin', 'vice_principal', 'secretary', 'maintenance', 'teacher', 'coordinator', 'counselor'] },
+    { id: 'printing', label: 'מרכז צילומים', icon: Printer, roles: ['secretary', 'teacher', 'assistant', 'vice_principal', 'counselor', 'coordinator'] },
+    { id: 'maintenance', label: 'תפעול ורכש', icon: Settings, roles: ['admin', 'vice_principal', 'secretary', 'maintenance', 'teacher', 'counselor', 'coordinator'] },
     { id: 'community', label: 'קהילה והווי', icon: Heart, roles: ['all'] },
   ];
 
