@@ -12,6 +12,13 @@ import CoordinatorDashboard from '../components/dashboard/CoordinatorDashboard';
 import SubstituteDashboard from '../components/dashboard/SubstituteDashboard';
 import VicePrincipalDashboard from '../components/dashboard/VicePrincipalDashboard';
 import Journal from './Journal';
+import Schedule from './Schedule';
+import Tasks from './Tasks';
+import Attendance from './Attendance';
+import Community from './Community';
+import Maintenance from './Maintenance';
+import Printing from './Printing';
+import Onboarding from './Onboarding';
 
 const HEBREW_DATE = "כ״ח טבת תשפ״ו";
 const GREGORIAN_DATE = new Date().toLocaleDateString('he-IL');
@@ -184,11 +191,14 @@ export default function Dashboard() {
             <HRDashboard />
           )}
 
-          {currentView === 'journal' && (
-            <Journal />
-          )}
-
-
+          {currentView === 'journal' && <Journal />}
+          {currentView === 'schedule' && <Schedule />}
+          {currentView === 'tasks' && <Tasks />}
+          {currentView === 'attendance' && <Attendance />}
+          {currentView === 'community' && <Community />}
+          {currentView === 'maintenance' && <Maintenance />}
+          {currentView === 'printing' && <Printing />}
+          {currentView === 'onboarding' && <Onboarding />}
         </main>
       </div>
 

@@ -6,6 +6,7 @@ import Attendance from './pages/Attendance';
 import Community from './pages/Community';
 import Maintenance from './pages/Maintenance';
 import Printing from './pages/Printing';
+import Onboarding from './pages/Onboarding';
 
 
 export const PAGES = {
@@ -17,6 +18,7 @@ export const PAGES = {
     "Community": Community,
     "Maintenance": Maintenance,
     "Printing": Printing,
+    "Onboarding": Onboarding,
 }
 
 export const pagesConfig = {
