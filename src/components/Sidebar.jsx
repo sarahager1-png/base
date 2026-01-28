@@ -18,7 +18,7 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
     { id: 'printing', label: 'מרכז צילומים', icon: Printer, roles: ['secretary', 'teacher', 'assistant', 'vice_principal', 'counselor', 'coordinator'] },
     { id: 'maintenance', label: 'תפעול ורכש', icon: Settings, roles: ['admin', 'vice_principal', 'secretary', 'maintenance', 'teacher', 'counselor', 'coordinator'] },
     { id: 'duty-management', label: 'ניהול תורנויות', icon: ShieldIcon, roles: ['admin', 'vice_principal', 'coordinator'] },
-    { id: 'room-management', label: 'ניהול חדרים', icon: Home, roles: ['admin', 'vice_principal', 'secretary', 'teacher', 'coordinator'] },
+    { id: 'room-management', label: 'ניהול חדרים', icon: Home, roles: ['all'] },
     { id: 'community', label: 'קהילה והווי', icon: Heart, roles: ['all'] },
   ];
 
