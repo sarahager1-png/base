@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Mail, Heart, CheckCircle2, Trash2, Clock } from 'lucide-react';
+import { Mail, Heart, CheckCircle2, Trash2, Clock, MessageCircle, Lightbulb, ThumbsUp } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function MessagesCenter({ user }) {
   const [filter, setFilter] = useState('unread'); // unread, all
   const queryClient = useQueryClient();
+
+  const messageTypeConfig = {
+    personal: { icon: Heart, label: 'הודעה אישית', color: 'pink' },
+    feedback: { icon: ThumbsUp, label: 'משוב', color: 'blue' },
+    suggestion: { icon: Lightbulb, label: 'הצעה', color: 'amber' },
+  };
 
   const { data: messages = [] } = useQuery({
     queryKey: ['messages', user.email],
@@ -69,7 +75,11 @@ export default function MessagesCenter({ user }) {
       {/* Messages list */}
       <div className="space-y-3">
         {filteredMessages.length > 0 ? (
-          filteredMessages.map(message => (
+          filteredMessages.map(message => {
+            const typeConfig = messageTypeConfig[message.message_type] || messageTypeConfig.personal;
+            const TypeIcon = typeConfig.icon;
+            
+            return (
             <div
               key={message.id}
               className={`p-4 rounded-xl border-2 transition-all ${
@@ -78,10 +88,18 @@ export default function MessagesCenter({ user }) {
                   : 'bg-blue-50 border-blue-200 shadow-md'
               }`}
             >
-              <div className="flex items-start justify-between mb-2">
-                <div>
-                  <h4 className="font-bold text-slate-800">{message.sender_name}</h4>
-                  <p className="text-xs text-slate-500">{message.sender_role}</p>
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-start gap-3">
+                  <div className={`p-2 rounded-lg text-${typeConfig.color}-600 bg-${typeConfig.color}-50 border border-${typeConfig.color}-100 mt-1`}>
+                    <TypeIcon className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-800">{message.sender_name}</h4>
+                    <p className="text-xs text-slate-500">{message.sender_role}</p>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded mt-1 inline-block text-${typeConfig.color}-700 bg-${typeConfig.color}-100`}>
+                      {typeConfig.label}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
                   {!message.is_read && (
@@ -108,10 +126,11 @@ export default function MessagesCenter({ user }) {
                 {new Date(message.created_date).toLocaleDateString('he-IL')}
               </p>
             </div>
-          ))
+            );
+          })
         ) : (
           <div className="text-center py-8 text-slate-400">
-            <Heart className="h-8 w-8 mx-auto mb-2 opacity-50" />
+            <MessageCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
             <p>אין הודעות עדיין</p>
           </div>
         )}
