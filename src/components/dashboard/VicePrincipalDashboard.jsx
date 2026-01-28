@@ -99,6 +99,66 @@ export default function VicePrincipalDashboard({ user, setView }) {
 
       <DailyMessageBoard user={user} />
 
+      {/* Quick Actions - Top Priority */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+        <button onClick={() => setAbsenceModalOpen(true)} className="relative overflow-hidden flex flex-col items-center p-4 bg-gradient-to-br from-red-50 to-pink-50 rounded-xl shadow-sm border-2 border-red-200 hover:border-red-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+          <div className="absolute top-1 right-1 bg-red-500 text-[9px] text-white font-bold px-2 py-0.5 rounded-full shadow">חשוב</div>
+          <div className="p-2.5 bg-red-100 rounded-full text-red-600 group-hover:scale-110 transition-transform mb-2">
+            <Clock className="h-6 w-6" />
+          </div>
+          <span className="text-xs font-bold text-slate-700 leading-tight">העדרות</span>
+        </button>
+      
+        <button onClick={() => openFeature('substitute')} className="flex flex-col items-center p-4 bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl shadow-sm border-2 border-purple-200 hover:border-purple-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+          <div className="p-2.5 bg-purple-100 rounded-full text-purple-600 group-hover:scale-110 transition-transform mb-2">
+            <Users className="h-6 w-6" />
+          </div>
+          <span className="text-xs font-bold text-slate-700 leading-tight">מילוי מקום</span>
+        </button>
+
+        <button onClick={() => openFeature('overtime')} className="flex flex-col items-center p-4 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl shadow-sm border-2 border-yellow-200 hover:border-yellow-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+          <div className="p-2.5 bg-yellow-100 rounded-full text-yellow-700 group-hover:scale-110 transition-transform mb-2">
+            <Timer className="h-6 w-6" />
+          </div>
+          <span className="text-xs font-bold text-slate-700 leading-tight">שעות נוספות</span>
+        </button>
+
+        <button onClick={() => openFeature('external')} className="flex flex-col items-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-sm border-2 border-green-200 hover:border-green-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+          <div className="p-2.5 bg-green-100 rounded-full text-green-600 group-hover:scale-110 transition-transform mb-2">
+            <Map className="h-6 w-6" />
+          </div>
+          <span className="text-xs font-bold text-slate-700 leading-tight">פעילות חוץ</span>
+        </button>
+
+        <button onClick={() => openFeature('purchase')} className="flex flex-col items-center p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl shadow-sm border-2 border-amber-200 hover:border-amber-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+          <div className="p-2.5 bg-amber-100 rounded-full text-amber-600 group-hover:scale-110 transition-transform mb-2">
+            <ShoppingCart className="h-6 w-6" />
+          </div>
+          <span className="text-xs font-bold text-slate-700 leading-tight">רכש</span>
+        </button>
+
+        <button onClick={() => openFeature('maintenance_general')} className="flex flex-col items-center p-4 bg-gradient-to-br from-slate-50 to-gray-50 rounded-xl shadow-sm border-2 border-slate-200 hover:border-slate-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+          <div className="p-2.5 bg-slate-100 rounded-full text-slate-600 group-hover:scale-110 transition-transform mb-2">
+            <Wrench className="h-6 w-6" />
+          </div>
+          <span className="text-xs font-bold text-slate-700 leading-tight">תחזוקה כללית</span>
+        </button>
+
+        <button onClick={() => openFeature('maintenance_pc')} className="flex flex-col items-center p-4 bg-gradient-to-br from-cyan-50 to-teal-50 rounded-xl shadow-sm border-2 border-cyan-200 hover:border-cyan-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+          <div className="p-2.5 bg-cyan-100 rounded-full text-cyan-600 group-hover:scale-110 transition-transform mb-2">
+            <Monitor className="h-6 w-6" />
+          </div>
+          <span className="text-xs font-bold text-slate-700 leading-tight">תחזוקת מחשבים</span>
+        </button>
+
+        <button onClick={() => openFeature('special_overtime')} className="flex flex-col items-center p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl shadow-sm border-2 border-indigo-200 hover:border-indigo-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+          <div className="p-2.5 bg-indigo-100 rounded-full text-indigo-600 group-hover:scale-110 transition-transform mb-2">
+            <Sparkles className="h-6 w-6" />
+          </div>
+          <span className="text-xs font-bold text-slate-700 leading-tight">שעות מיוחדות</span>
+        </button>
+      </div>
+
       {/* Header Banner */}
       <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-3xl p-8 text-white shadow-lg border border-slate-600/20 relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]"></div>
@@ -149,7 +209,7 @@ export default function VicePrincipalDashboard({ user, setView }) {
       </div>
 
       {/* Daily Schedule */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow" style={{ order: 10 }}>
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-bold text-slate-800 flex items-center gap-2">
             <Calendar className="h-5 w-5 text-blue-600" />
@@ -216,63 +276,7 @@ export default function VicePrincipalDashboard({ user, setView }) {
         <DailyJournal date={new Date()} />
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-9 gap-3">
-        <button onClick={() => setAbsenceModalOpen(true)} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-red-300 hover:bg-red-50 transition-all group text-center h-24 justify-center">
-          <div className="p-3 bg-red-50 rounded-full text-red-500 group-hover:scale-110 transition-transform mb-2">
-            <Clock className="h-6 w-6" />
-          </div>
-          <span className="text-[11px] font-bold text-slate-700 leading-tight">דיווח היעדרות</span>
-        </button>
-        
-        <button onClick={() => openFeature('substitute')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-purple-300 hover:bg-purple-50 transition-all group text-center h-24 justify-center">
-          <div className="p-3 bg-purple-50 rounded-full text-purple-500 group-hover:scale-110 transition-transform mb-2">
-            <Calendar className="h-6 w-6" />
-          </div>
-          <span className="text-[11px] font-bold text-slate-700 leading-tight">מילוי מקום</span>
-        </button>
 
-        <button onClick={() => openFeature('external')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-green-300 hover:bg-green-50 transition-all group text-center h-24 justify-center">
-          <div className="p-3 bg-green-50 rounded-full text-green-500 group-hover:scale-110 transition-transform mb-2">
-            <Map className="h-6 w-6" />
-          </div>
-          <span className="text-[11px] font-bold text-slate-700 leading-tight">פעילות חוץ</span>
-        </button>
-
-        <button onClick={() => setPrintModalOpen(true)} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-blue-300 hover:bg-blue-50 transition-all group text-center h-24 justify-center">
-          <div className="p-3 bg-blue-50 rounded-full text-blue-500 group-hover:scale-110 transition-transform mb-2">
-            <Printer className="h-6 w-6" />
-          </div>
-          <span className="text-[11px] font-bold text-slate-700 leading-tight">צילום</span>
-        </button>
-
-        <button onClick={() => openFeature('purchase')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-amber-300 hover:bg-amber-50 transition-all group text-center h-24 justify-center">
-          <div className="p-3 bg-amber-50 rounded-full text-amber-500 group-hover:scale-110 transition-transform mb-2">
-            <ShoppingCart className="h-6 w-6" />
-          </div>
-          <span className="text-[11px] font-bold text-slate-700 leading-tight">רכש</span>
-        </button>
-
-        <button onClick={() => openFeature('maintenance_general')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-slate-400 hover:bg-slate-50 transition-all group text-center h-24 justify-center">
-          <Wrench className="h-6 w-6 text-slate-500 mb-1 group-hover:scale-110 transition-transform" />
-          <span className="text-[11px] font-bold text-slate-700 leading-tight">תחזוקה כללית</span>
-        </button>
-
-        <button onClick={() => openFeature('maintenance_pc')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-cyan-300 hover:bg-cyan-50 transition-all group text-center h-24 justify-center">
-          <Monitor className="h-6 w-6 text-cyan-500 mb-1 group-hover:scale-110 transition-transform" />
-          <span className="text-[11px] font-bold text-slate-700 leading-tight">תחזוקת מחשבים</span>
-        </button>
-
-        <button onClick={() => openFeature('overtime')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-amber-300 hover:bg-amber-50 transition-all group text-center h-24 justify-center">
-          <Timer className="h-6 w-6 text-amber-500 mb-1 group-hover:scale-110 transition-transform" />
-          <span className="text-[11px] font-bold text-slate-700 leading-tight">שעות נוספות</span>
-        </button>
-
-        <button onClick={() => openFeature('special_overtime')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-indigo-300 hover:bg-indigo-50 transition-all group text-center h-24 justify-center">
-          <Sparkles className="h-6 w-6 text-indigo-500 mb-1 group-hover:scale-110 transition-transform" />
-          <span className="text-[11px] font-bold text-slate-700 leading-tight">שעות מיוחדות</span>
-        </button>
-      </div>
 
       {/* Pending Approvals */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
