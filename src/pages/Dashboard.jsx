@@ -164,7 +164,7 @@ export default function Dashboard() {
                 <SecretaryDashboard />
               )}
 
-              {(['teacher', 'assistant'].includes(viewAsRole)) && (
+              {(['teacher', 'assistant', 'counselor'].includes(viewAsRole)) && (
                 <StaffDashboard user={{...user, role: viewAsRole}} setView={setCurrentView} />
               )}
               
@@ -187,7 +187,7 @@ export default function Dashboard() {
               {!viewAsRole && user.role === 'maintenance' && <MaintenanceDashboard />}
               {!viewAsRole && user.role === 'coordinator' && <CoordinatorDashboard />}
               {!viewAsRole && user.role === 'substitute' && <SubstituteDashboard user={user} />}
-              {!viewAsRole && ['teacher', 'assistant'].includes(user.role) && (
+              {!viewAsRole && ['teacher', 'assistant', 'counselor'].includes(user.role) && (
                 <StaffDashboard user={user} setView={setCurrentView} />
               )}
             </>
