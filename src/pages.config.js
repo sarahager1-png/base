@@ -8,6 +8,7 @@ import Maintenance from './pages/Maintenance';
 import Printing from './pages/Printing';
 import Onboarding from './pages/Onboarding';
 import JournalManagement from './pages/JournalManagement';
+import Notifications from './pages/Notifications';
 
 
 export const PAGES = {
@@ -21,6 +22,7 @@ export const PAGES = {
     "Printing": Printing,
     "Onboarding": Onboarding,
     "JournalManagement": JournalManagement,
+    "Notifications": Notifications,
 }
 
 export const pagesConfig = {

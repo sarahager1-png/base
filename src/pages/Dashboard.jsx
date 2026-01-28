@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Shield, Menu } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
+import NotificationBell from '../components/notifications/NotificationBell';
 import ManagementDashboard from '../components/dashboard/ManagementDashboard';
 import StaffDashboard from '../components/dashboard/StaffDashboard';
 import HRDashboard from '../components/dashboard/HRDashboard';
@@ -20,6 +21,7 @@ import Community from './Community';
 import Maintenance from './Maintenance';
 import Printing from './Printing';
 import Onboarding from './Onboarding';
+import Notifications from './Notifications';
 
 const HEBREW_DATE = "כ״ח טבת תשפ״ו";
 const GREGORIAN_DATE = new Date().toLocaleDateString('he-IL');
@@ -88,6 +90,8 @@ export default function Dashboard() {
           </div>
           
           <div className="flex items-center gap-6">
+            <NotificationBell userEmail={user.email} />
+            
             {/* Role Switcher for Admin */}
             {user.role === 'admin' && (
               <div className="hidden md:flex items-center gap-2 bg-slate-100 p-1 rounded-lg overflow-x-auto">
@@ -192,6 +196,7 @@ export default function Dashboard() {
             <HRDashboard />
           )}
 
+          {currentView === 'notifications' && <Notifications />}
           {currentView === 'journal' && <Journal />}
           {currentView === 'journal-management' && <JournalManagement />}
           {currentView === 'schedule' && <Schedule />}

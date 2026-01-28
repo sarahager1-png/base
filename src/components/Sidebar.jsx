@@ -1,12 +1,13 @@
 import React from 'react';
 import { 
   Home, Calendar, CheckSquare, Clock, Users, UserPlus,
-  Printer, Settings, Heart, LogOut, X
+  Printer, Settings, Heart, LogOut, X, Bell
 } from 'lucide-react';
 
 export default function Sidebar({ activeView, setView, user, isOpen, closeSidebar, onLogout }) {
   const menuItems = [
     { id: 'dashboard', label: 'לוח בקרה ראשי', icon: Home, roles: ['all'] },
+    { id: 'notifications', label: 'התראות', icon: Bell, roles: ['all'] },
     { id: 'journal', label: 'יומן בית הספר', icon: Calendar, roles: ['all'] },
     { id: 'journal-management', label: 'ניהול יומן', icon: Calendar, roles: ['admin', 'vice_principal'] },
     { id: 'schedule', label: 'לוח זמנים', icon: Calendar, roles: ['teacher', 'admin', 'vice_principal', 'secretary', 'coordinator', 'assistant'] },
