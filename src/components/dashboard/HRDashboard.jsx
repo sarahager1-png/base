@@ -42,6 +42,7 @@ export default function HRDashboard() {
     { value: 'vice_principal', label: 'סגנית מנהלת' },
     { value: 'secretary', label: 'מזכירה' },
     { value: 'teacher', label: 'מורה' },
+    { value: 'counselor', label: 'יועצת' },
     { value: 'coordinator', label: 'רכזת' },
     { value: 'assistant', label: 'סייעת' },
     { value: 'maintenance', label: 'אב בית' },
@@ -153,6 +154,7 @@ export default function HRDashboard() {
                           u.role === 'admin' ? 'bg-purple-100 text-purple-700' :
                           u.role === 'vice_principal' ? 'bg-indigo-100 text-indigo-700' :
                           u.role === 'secretary' ? 'bg-pink-100 text-pink-700' :
+                          u.role === 'counselor' ? 'bg-teal-100 text-teal-700' :
                           u.role === 'coordinator' ? 'bg-cyan-100 text-cyan-700' :
                           u.role === 'maintenance' ? 'bg-slate-100 text-slate-700' :
                           u.role === 'substitute' ? 'bg-orange-100 text-orange-700' :
@@ -162,6 +164,7 @@ export default function HRDashboard() {
                           {u.role === 'admin' ? 'מנהלת' :
                            u.role === 'vice_principal' ? 'סגנית' :
                            u.role === 'secretary' ? 'מזכירה' :
+                           u.role === 'counselor' ? 'יועצת' :
                            u.role === 'coordinator' ? 'רכזת' :
                            u.role === 'maintenance' ? 'אב בית' :
                            u.role === 'substitute' ? 'ממלאת מקום' :
