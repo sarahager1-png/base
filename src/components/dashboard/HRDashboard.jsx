@@ -38,8 +38,14 @@ export default function HRDashboard() {
   };
 
   const roleOptions = [
-    { value: 'user', label: 'מורה/צוות' },
-    { value: 'admin', label: 'מנהלת/סגנית' },
+    { value: 'admin', label: 'מנהלת' },
+    { value: 'vice_principal', label: 'סגנית מנהלת' },
+    { value: 'secretary', label: 'מזכירה' },
+    { value: 'teacher', label: 'מורה' },
+    { value: 'coordinator', label: 'רכזת' },
+    { value: 'assistant', label: 'סייעת' },
+    { value: 'maintenance', label: 'אב בית' },
+    { value: 'substitute', label: 'ממלאת מקום' },
   ];
 
   return (
@@ -143,8 +149,24 @@ export default function HRDashboard() {
                       <td className="p-3 text-slate-600">{u.email}</td>
                       <td className="p-3 text-slate-500">{u.title || '-'}</td>
                       <td className="p-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
-                          {u.role === 'admin' ? 'מנהל' : 'צוות'}
+                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                          u.role === 'admin' ? 'bg-purple-100 text-purple-700' :
+                          u.role === 'vice_principal' ? 'bg-indigo-100 text-indigo-700' :
+                          u.role === 'secretary' ? 'bg-pink-100 text-pink-700' :
+                          u.role === 'coordinator' ? 'bg-cyan-100 text-cyan-700' :
+                          u.role === 'maintenance' ? 'bg-slate-100 text-slate-700' :
+                          u.role === 'substitute' ? 'bg-orange-100 text-orange-700' :
+                          u.role === 'assistant' ? 'bg-green-100 text-green-700' :
+                          'bg-blue-100 text-blue-700'
+                        }`}>
+                          {u.role === 'admin' ? 'מנהלת' :
+                           u.role === 'vice_principal' ? 'סגנית' :
+                           u.role === 'secretary' ? 'מזכירה' :
+                           u.role === 'coordinator' ? 'רכזת' :
+                           u.role === 'maintenance' ? 'אב בית' :
+                           u.role === 'substitute' ? 'ממלאת מקום' :
+                           u.role === 'assistant' ? 'סייעת' :
+                           u.role === 'teacher' ? 'מורה' : 'צוות'}
                         </span>
                       </td>
                       <td className="p-3 text-slate-400 text-xs">
