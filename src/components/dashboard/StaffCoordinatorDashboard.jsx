@@ -11,6 +11,8 @@ import AbsenceReportModal from '../modals/AbsenceReportModal';
 import PrintRequestModal from '../modals/PrintRequestModal';
 import DailyJournal from '../journal/DailyJournal';
 import StatCard from '../StatCard';
+import MeetingsList from '../meetings/MeetingsList';
+import AddMeeting from '../meetings/AddMeeting';
 
 const TEACHER_BASE_SCHEDULE = {
   0: { 1: 'הסטוריה - ח׳2', 2: 'הסטוריה - ח׳2', 3: 'פרטני', 4: 'חלון', 5: 'אזרחות - ט׳1', 6: 'אזרחות - ט׳1' },
@@ -27,6 +29,7 @@ export default function StaffCoordinatorDashboard({ user, setView }) {
   const [absenceModalOpen, setAbsenceModalOpen] = useState(false);
   const [printModalOpen, setPrintModalOpen] = useState(false);
   const [showAddMeeting, setShowAddMeeting] = useState(false);
+  const { Plus } = require('lucide-react');
 
   const { data: myDuty } = useQuery({
     queryKey: ['duty', user.email, new Date().getDate()],
