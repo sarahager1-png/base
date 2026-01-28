@@ -64,48 +64,68 @@ export default function StaffDashboard({ user, setView }) {
       />
 
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-blue-900 to-indigo-800 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-32 h-32 bg-white opacity-5 rounded-full -translate-x-10 -translate-y-10"></div>
+      <div className="bg-gradient-to-br from-indigo-600 via-blue-600 to-purple-600 rounded-2xl p-8 text-white shadow-2xl relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30"></div>
         <div className="relative z-10">
-          <h2 className="text-3xl font-bold mb-2">בוקר טוב, {user.full_name}!</h2>
-          <p className="text-blue-100 text-lg opacity-90">"לכתחילה אריבער" - יום מוצלח ומלא עשייה.</p>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="h-16 w-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border-2 border-white/30">
+              <span className="text-3xl font-bold">{user.full_name?.charAt(0)}</span>
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold mb-1">שלום, {user.full_name}!</h2>
+              <p className="text-blue-100 text-sm opacity-90">{user.title || 'עובדת הוראה'}</p>
+            </div>
+          </div>
+          <p className="text-white/90 text-base">"לכתחילה אריבער" - יום מוצלח ומלא עשייה 🌟</p>
         </div>
       </div>
 
       {/* Daily Schedule */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-slate-800 flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-blue-600" />
-            מערכת שעות - {new Date().toLocaleDateString('he-IL', { weekday: 'long', day: '2-digit', month: '2-digit' })}
-          </h3>
+      <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-2xl shadow-lg border border-blue-100 p-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h3 className="font-bold text-slate-800 flex items-center gap-2 text-lg">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Calendar className="h-5 w-5 text-blue-600" />
+              </div>
+              מערכת השעות שלי
+            </h3>
+            <p className="text-sm text-slate-500 mt-1">{new Date().toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+          </div>
           <button 
             onClick={() => setView('schedule')}
-            className="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-1.5 rounded-lg transition-colors border border-blue-100"
+            className="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg transition-all border border-blue-200 shadow-sm"
           >
-            לצפייה ביומן חודשי מלא
+            📅 יומן חודשי מלא
           </button>
         </div>
         
-        <div className="flex gap-4 overflow-x-auto pb-2">
+        <div className="flex gap-3 overflow-x-auto pb-3 px-1">
           {[1, 2, 3, 4, 5, 6, 7].map(hour => {
             const lesson = TEACHER_BASE_SCHEDULE[dayIdx]?.[hour];
+            const isEmpty = !lesson || ['חלון', 'פרטני'].includes(lesson);
             
             return (
-              <div key={hour} className="min-w-[120px] flex-1">
-                <div className="text-center text-xs font-bold text-slate-400 mb-1">שעה {hour}</div>
-                <div className={`p-4 rounded-xl border text-center h-full flex flex-col justify-center items-center gap-1 shadow-sm transition-all hover:shadow-md ${lesson ? 'bg-white border-slate-200' : 'bg-slate-50 border-transparent'}`}>
+              <div key={hour} className="min-w-[130px] flex-1">
+                <div className="text-center text-xs font-bold text-slate-500 mb-2 bg-slate-100 py-1 rounded-t-lg">שעה {hour}</div>
+                <div className={`p-4 rounded-b-xl border-2 text-center h-24 flex flex-col justify-center items-center gap-1.5 transition-all ${
+                  lesson && !isEmpty
+                    ? 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-md hover:shadow-lg hover:scale-105' 
+                    : lesson 
+                    ? 'bg-slate-50 border-slate-200 opacity-60'
+                    : 'bg-white border-slate-200'
+                }`}>
                   {lesson ? (
                     <>
-                      <span className="font-bold text-slate-800 text-sm">{lesson.split('-')[0]?.trim()}</span>
+                      <span className="font-bold text-slate-800 text-sm leading-tight">{lesson.split('-')[0]?.trim()}</span>
                       {lesson.includes('-') && (
-                        <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                        <span className="text-xs text-indigo-600 bg-white px-2.5 py-0.5 rounded-full font-semibold border border-indigo-100">
                           {lesson.split('-')[1]?.trim()}
                         </span>
                       )}
                     </>
                   ) : (
-                    <span className="text-slate-300">-</span>
+                    <span className="text-slate-300 text-sm">ריק</span>
                   )}
                 </div>
               </div>
@@ -130,69 +150,89 @@ export default function StaffDashboard({ user, setView }) {
       )}
 
       {/* Today's Journal */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-        <h3 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-blue-500" />
-          יומן היום
+      <div className="bg-gradient-to-br from-white to-amber-50/30 rounded-2xl shadow-lg border border-amber-100 p-6">
+        <h3 className="text-xl font-bold text-slate-800 mb-5 flex items-center gap-2">
+          <div className="p-2 bg-amber-100 rounded-lg">
+            <Calendar className="h-5 w-5 text-amber-600" />
+          </div>
+          יומן בית הספר - היום
         </h3>
         <DailyJournal date={new Date()} />
       </div>
 
       {/* Action Icons Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-9 gap-3">
-        <button onClick={() => setAbsenceModalOpen(true)} className="relative overflow-hidden flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-red-300 hover:bg-red-50 transition-all group text-center h-24 justify-center">
-          <div className="absolute top-0 right-0 bg-red-100 text-[10px] text-red-700 font-bold px-2 py-0.5 rounded-bl-lg">לדיווח</div>
-          <div className="p-3 bg-red-50 rounded-full text-red-500 group-hover:scale-110 transition-transform mb-2">
-            <Stethoscope className="h-6 w-6" />
+      <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
+        <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <div className="h-8 w-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+            <span className="text-white text-sm">⚡</span>
           </div>
-          <span className="text-[11px] font-bold text-slate-700 leading-tight">דיווח היעדרות</span>
-        </button>
+          פעולות מהירות
+        </h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 gap-3">
+          <button onClick={() => setAbsenceModalOpen(true)} className="relative overflow-hidden flex flex-col items-center p-4 bg-gradient-to-br from-red-50 to-pink-50 rounded-xl shadow-sm border-2 border-red-200 hover:border-red-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+            <div className="absolute top-1 right-1 bg-red-500 text-[9px] text-white font-bold px-2 py-0.5 rounded-full shadow">חשוב</div>
+            <div className="p-2.5 bg-red-100 rounded-full text-red-600 group-hover:scale-110 transition-transform mb-2">
+              <Stethoscope className="h-6 w-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-700 leading-tight">דיווח היעדרות</span>
+          </button>
         
-        <button onClick={() => openFeature('substitute')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-purple-300 hover:bg-purple-50 transition-all group text-center h-24 justify-center">
-          <div className="p-3 bg-purple-50 rounded-full text-purple-500 group-hover:scale-110 transition-transform mb-2">
-            <Clock className="h-6 w-6" />
-          </div>
-          <span className="text-[11px] font-bold text-slate-700 leading-tight">מילוי מקום</span>
-        </button>
+          <button onClick={() => openFeature('substitute')} className="flex flex-col items-center p-4 bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl shadow-sm border-2 border-purple-200 hover:border-purple-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+            <div className="p-2.5 bg-purple-100 rounded-full text-purple-600 group-hover:scale-110 transition-transform mb-2">
+              <Clock className="h-6 w-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-700 leading-tight">מילוי מקום</span>
+          </button>
 
-        <button onClick={() => openFeature('external')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-green-300 hover:bg-green-50 transition-all group text-center h-24 justify-center">
-          <div className="p-3 bg-green-50 rounded-full text-green-500 group-hover:scale-110 transition-transform mb-2">
-            <Map className="h-6 w-6" />
-          </div>
-          <span className="text-[11px] font-bold text-slate-700 leading-tight">פעילות חוץ</span>
-        </button>
+          <button onClick={() => openFeature('external')} className="flex flex-col items-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-sm border-2 border-green-200 hover:border-green-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+            <div className="p-2.5 bg-green-100 rounded-full text-green-600 group-hover:scale-110 transition-transform mb-2">
+              <Map className="h-6 w-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-700 leading-tight">פעילות חוץ</span>
+          </button>
 
-        <button onClick={() => setPrintModalOpen(true)} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-blue-300 hover:bg-blue-50 transition-all group text-center h-24 justify-center">
-          <div className="p-3 bg-blue-50 rounded-full text-blue-500 group-hover:scale-110 transition-transform mb-2">
-            <Printer className="h-6 w-6" />
-          </div>
-          <span className="text-[11px] font-bold text-slate-700 leading-tight">צילום</span>
-        </button>
+          <button onClick={() => setPrintModalOpen(true)} className="flex flex-col items-center p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl shadow-sm border-2 border-blue-200 hover:border-blue-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+            <div className="p-2.5 bg-blue-100 rounded-full text-blue-600 group-hover:scale-110 transition-transform mb-2">
+              <Printer className="h-6 w-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-700 leading-tight">צילום</span>
+          </button>
 
-        <button onClick={() => openFeature('purchase')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-amber-300 hover:bg-amber-50 transition-all group text-center h-24 justify-center">
-          <ShoppingCart className="h-6 w-6 text-amber-500 mb-1 group-hover:scale-110 transition-transform" />
-          <span className="text-[11px] font-bold text-slate-700 leading-tight">רכש</span>
-        </button>
+          <button onClick={() => openFeature('purchase')} className="flex flex-col items-center p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl shadow-sm border-2 border-amber-200 hover:border-amber-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+            <div className="p-2.5 bg-amber-100 rounded-full text-amber-600 group-hover:scale-110 transition-transform mb-2">
+              <ShoppingCart className="h-6 w-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-700 leading-tight">רכש</span>
+          </button>
 
-        <button onClick={() => openFeature('maintenance_general')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-slate-400 hover:bg-slate-50 transition-all group text-center h-24 justify-center">
-          <Wrench className="h-6 w-6 text-slate-500 mb-1 group-hover:scale-110 transition-transform" />
-          <span className="text-[11px] font-bold text-slate-700 leading-tight">תחזוקה כללית</span>
-        </button>
+          <button onClick={() => openFeature('maintenance_general')} className="flex flex-col items-center p-4 bg-gradient-to-br from-slate-50 to-gray-50 rounded-xl shadow-sm border-2 border-slate-200 hover:border-slate-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+            <div className="p-2.5 bg-slate-100 rounded-full text-slate-600 group-hover:scale-110 transition-transform mb-2">
+              <Wrench className="h-6 w-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-700 leading-tight">תחזוקה כללית</span>
+          </button>
 
-        <button onClick={() => openFeature('maintenance_pc')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-cyan-300 hover:bg-cyan-50 transition-all group text-center h-24 justify-center">
-          <Monitor className="h-6 w-6 text-cyan-500 mb-1 group-hover:scale-110 transition-transform" />
-          <span className="text-[11px] font-bold text-slate-700 leading-tight">תחזוקת מחשבים</span>
-        </button>
+          <button onClick={() => openFeature('maintenance_pc')} className="flex flex-col items-center p-4 bg-gradient-to-br from-cyan-50 to-teal-50 rounded-xl shadow-sm border-2 border-cyan-200 hover:border-cyan-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+            <div className="p-2.5 bg-cyan-100 rounded-full text-cyan-600 group-hover:scale-110 transition-transform mb-2">
+              <Monitor className="h-6 w-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-700 leading-tight">תחזוקת מחשבים</span>
+          </button>
 
-        <button onClick={() => openFeature('overtime')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-amber-300 hover:bg-amber-50 transition-all group text-center h-24 justify-center">
-          <Timer className="h-6 w-6 text-amber-500 mb-1 group-hover:scale-110 transition-transform" />
-          <span className="text-[11px] font-bold text-slate-700 leading-tight">שעות נוספות</span>
-        </button>
+          <button onClick={() => openFeature('overtime')} className="flex flex-col items-center p-4 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl shadow-sm border-2 border-yellow-200 hover:border-yellow-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+            <div className="p-2.5 bg-yellow-100 rounded-full text-yellow-700 group-hover:scale-110 transition-transform mb-2">
+              <Timer className="h-6 w-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-700 leading-tight">שעות נוספות</span>
+          </button>
 
-        <button onClick={() => openFeature('special_overtime')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-indigo-300 hover:bg-indigo-50 transition-all group text-center h-24 justify-center">
-          <Sparkles className="h-6 w-6 text-indigo-500 mb-1 group-hover:scale-110 transition-transform" />
-          <span className="text-[11px] font-bold text-slate-700 leading-tight">שעות מיוחדות</span>
-        </button>
+          <button onClick={() => openFeature('special_overtime')} className="flex flex-col items-center p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl shadow-sm border-2 border-indigo-200 hover:border-indigo-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+            <div className="p-2.5 bg-indigo-100 rounded-full text-indigo-600 group-hover:scale-110 transition-transform mb-2">
+              <Sparkles className="h-6 w-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-700 leading-tight">שעות מיוחדות</span>
+          </button>
+        </div>
       </div>
     </div>
   );
