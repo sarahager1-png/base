@@ -58,45 +58,52 @@ export default function AttendancePage() {
     other: 'אחר'
   };
 
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-blue-900 mb-2">היעדרויות ודיווח</h1>
-          <p className="text-slate-600">
-            {isManager ? 'צפייה וניהול כל דיווחי ההיעדרות ומילויי המקום' : 'דיווחי ההיעדרות ומילויי המקום שלי'}
-          </p>
-        </div>
+    <div className="space-y-6 animate-fade-in">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-slate-800 mb-2">היעדרויות ודיווח</h1>
+        <p className="text-slate-600 text-sm">
+          {isManager ? 'צפייה וניהול כל דיווחי ההיעדרות ומילויי המקום' : 'דיווחי ההיעדרות ומילויי המקום שלי'}
+        </p>
+      </div>
 
-        {/* Tabs */}
-        <div className="mb-6 flex gap-2 bg-white p-2 rounded-xl shadow-sm border border-slate-100">
-          <button
-            onClick={() => setActiveTab('absences')}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-bold transition-all ${
-              activeTab === 'absences' 
-                ? 'bg-blue-600 text-white shadow-sm' 
-                : 'text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            <Clock className="h-5 w-5" />
-            היעדרויות
-          </button>
-          <button
-            onClick={() => setActiveTab('substitutes')}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-bold transition-all ${
-              activeTab === 'substitutes' 
-                ? 'bg-purple-600 text-white shadow-sm' 
-                : 'text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            <Users className="h-5 w-5" />
-            מילויי מקום
-          </button>
-        </div>
+      {/* Tabs */}
+      <div className="mb-6 flex gap-2 bg-white p-1 rounded-xl shadow-sm border border-slate-200">
+        <button
+          onClick={() => setActiveTab('absences')}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-semibold transition-all text-sm ${
+            activeTab === 'absences' 
+              ? 'bg-slate-800 text-white shadow-sm' 
+              : 'text-slate-600 hover:bg-slate-50'
+          }`}
+        >
+          <Clock className="h-4 w-4" />
+          היעדרויות
+        </button>
+        <button
+          onClick={() => setActiveTab('substitutes')}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-semibold transition-all text-sm ${
+            activeTab === 'substitutes' 
+              ? 'bg-slate-800 text-white shadow-sm' 
+              : 'text-slate-600 hover:bg-slate-50'
+          }`}
+        >
+          <Users className="h-4 w-4" />
+          מילויי מקום
+        </button>
+      </div>
 
-        {activeTab === 'absences' && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+      {activeTab === 'absences' && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-3">
                 <div className="p-3 bg-amber-100 rounded-full">
                   <Clock className="h-6 w-6 text-amber-600" />
@@ -124,9 +131,9 @@ export default function AttendancePage() {
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-red-100 rounded-full">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-red-100 rounded-full">
                   <XCircle className="h-6 w-6 text-red-600" />
                 </div>
                 <div>
@@ -138,9 +145,9 @@ export default function AttendancePage() {
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-orange-100 rounded-full">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-orange-100 rounded-full">
                   <AlertCircle className="h-6 w-6 text-orange-600" />
                 </div>
                 <div>
@@ -154,9 +161,9 @@ export default function AttendancePage() {
           </div>
         )}
 
-        {activeTab === 'substitutes' && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+      {activeTab === 'substitutes' && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-3">
                 <div className="p-3 bg-blue-100 rounded-full">
                   <Clock className="h-6 w-6 text-blue-600" />
@@ -170,21 +177,21 @@ export default function AttendancePage() {
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-green-100 rounded-full">
-                  <CheckCircle className="h-6 w-6 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">מאושרים</p>
-                  <p className="text-2xl font-bold text-slate-800">
-                    {displaySubstitutes.filter(s => s.status === 'approved').length}
-                  </p>
-                </div>
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-green-100 rounded-full">
+                <CheckCircle className="h-6 w-6 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm text-slate-500">מאושרים</p>
+                <p className="text-2xl font-bold text-slate-800">
+                  {displaySubstitutes.filter(s => s.status === 'approved').length}
+                </p>
               </div>
             </div>
+          </div>
 
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-3">
                 <div className="p-3 bg-purple-100 rounded-full">
                   <CheckCircle className="h-6 w-6 text-purple-600" />
@@ -200,14 +207,16 @@ export default function AttendancePage() {
           </div>
         )}
 
-        {activeTab === 'absences' && (
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100">
-            <div className="p-6 border-b border-slate-100">
-              <h2 className="text-xl font-bold text-blue-900 flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-blue-500" />
-                רשימת היעדרויות
-              </h2>
-            </div>
+      {activeTab === 'absences' && (
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200">
+          <div className="p-6 border-b border-slate-100">
+            <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
+              <div className="p-2 bg-blue-50 rounded-xl border border-blue-100">
+                <Calendar className="h-4 w-4 text-blue-600" />
+              </div>
+              רשימת היעדרויות
+            </h2>
+          </div>
             <div className="p-6">
               <div className="space-y-3">
                 {displayAbsences.length > 0 ? (
@@ -254,14 +263,16 @@ export default function AttendancePage() {
           </div>
         )}
 
-        {activeTab === 'substitutes' && (
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100">
-            <div className="p-6 border-b border-slate-100">
-              <h2 className="text-xl font-bold text-blue-900 flex items-center gap-2">
-                <Users className="h-5 w-5 text-purple-500" />
-                רשימת מילויי מקום
-              </h2>
-            </div>
+      {activeTab === 'substitutes' && (
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200">
+          <div className="p-6 border-b border-slate-100">
+            <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
+              <div className="p-2 bg-purple-50 rounded-xl border border-purple-100">
+                <Users className="h-4 w-4 text-purple-600" />
+              </div>
+              רשימת מילויי מקום
+            </h2>
+          </div>
             <div className="p-6">
               <div className="space-y-3">
                 {displaySubstitutes.length > 0 ? (
@@ -312,7 +323,6 @@ export default function AttendancePage() {
             </div>
           </div>
         )}
-      </div>
     </div>
   );
 }
