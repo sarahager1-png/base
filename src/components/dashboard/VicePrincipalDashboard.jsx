@@ -3,9 +3,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import StatCard from '../StatCard';
 import ReportingModal from '../modals/ReportingModal';
+import AddMeeting from '../meetings/AddMeeting';
+import MeetingsList from '../meetings/MeetingsList';
 import { 
   AlertTriangle, UserCheck, Clock, ShoppingCart, Shield,
-  CheckCircle, XCircle, Calendar, Printer, Map
+  CheckCircle, XCircle, Calendar, Printer, Map, Users, Plus
 } from 'lucide-react';
 
 export default function VicePrincipalDashboard({ user, setView }) {
@@ -202,29 +204,26 @@ export default function VicePrincipalDashboard({ user, setView }) {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-          <h3 className="text-xl font-bold text-blue-900 mb-6 flex items-center gap-2">
-            <UserCheck className="h-5 w-5 text-purple-500" />
-            טפסי קליטה לאישור
-          </h3>
-          <div className="space-y-3">
-            {onboardingDocs.length > 0 ? (
-              onboardingDocs.map(doc => (
-                <div key={doc.id} className="p-4 bg-purple-50 rounded-xl border border-purple-200 flex justify-between items-center">
-                  <div>
-                    <p className="font-bold text-purple-900">{doc.user_name}</p>
-                    <p className="text-sm text-purple-700">{doc.document_type}</p>
-                  </div>
-                  <button className="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 shadow-sm font-medium">
-                    צפייה ואישור
-                  </button>
-                </div>
-              ))
-            ) : (
-              <p className="text-slate-400 text-center py-8">אין טפסים לאישור</p>
-            )}
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-bold text-blue-900 flex items-center gap-2">
+              <Users className="h-5 w-5 text-blue-500" />
+              יומן פגישות
+            </h3>
+            <button
+              onClick={() => setShowAddMeeting(true)}
+              className="px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1 shadow-sm"
+            >
+              <Plus className="h-4 w-4" />
+              פגישה חדשה
+            </button>
           </div>
+          <MeetingsList user={user} />
         </div>
       </div>
+
+      {showAddMeeting && (
+        <AddMeeting user={user} onClose={() => setShowAddMeeting(false)} />
+      )}
     </div>
   );
 }
