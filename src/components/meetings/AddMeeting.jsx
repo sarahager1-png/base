@@ -1,11 +1,20 @@
-import React, { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import React, { useState, useEffect } from 'react';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { X, Users, Loader2 } from 'lucide-react';
+import { X, Users, Loader2, Clock } from 'lucide-react';
 import { toast } from 'sonner';
+
+const TEACHER_BASE_SCHEDULE = {
+  0: { 1: 'הסטוריה - ח׳2', 2: 'הסטוריה - ח׳2', 3: 'פרטני', 4: 'חלון', 5: 'אזרחות - ט׳1' },
+  1: { 1: 'חלון', 2: 'הסטוריה - ח׳3', 3: 'הסטוריה - ח׳3', 4: 'ישיבת צוות', 5: 'הסטוריה - ח׳2' },
+  2: { 1: 'אזרחות - ט׳1', 2: 'אזרחות - ט׳1', 3: 'הסטוריה - ח׳2', 4: 'חלון', 5: 'שהייה' },
+  3: { 1: 'הסטוריה - ח׳3', 2: 'הסטוריה - ח׳3', 3: 'חלון', 4: 'פרטני', 5: 'חינוך - ח׳2' },
+  4: { 1: 'חלון', 2: 'חלון', 3: 'הסטוריה - ח׳2', 4: 'הסטוריה - ח׳2', 5: 'אזרחות - ט׳1' },
+  5: { 1: 'סיכום שבוע - ח׳2', 2: 'פרטני' },
+};
 
 export default function AddMeeting({ user, onClose }) {
   const [formData, setFormData] = useState({
@@ -21,7 +30,48 @@ export default function AddMeeting({ user, onClose }) {
     status: 'scheduled'
   });
 
+  const [suggestedTimes, setSuggestedTimes] = useState([]);
+
   const queryClient = useQueryClient();
+
+  // Fetch meetings for the selected date
+  const { data: existingMeetings = [] } = useQuery({
+    queryKey: ['meetings-on-date', formData.meeting_date, user.email],
+    queryFn: () => base44.entities.Meeting.filter({ user_email: user.email }),
+    enabled: !!formData.meeting_date
+  });
+
+  // Calculate available times
+  useEffect(() => {
+    if (!formData.meeting_date) {
+      setSuggestedTimes([]);
+      return;
+    }
+
+    const date = new Date(formData.meeting_date);
+    const dayOfWeek = date.getDay();
+    const schedule = TEACHER_BASE_SCHEDULE[dayOfWeek] || {};
+
+    const available = [];
+
+    // First priority: חלון (break/window)
+    for (let hour = 1; hour <= 5; hour++) {
+      const lesson = schedule[hour];
+      if (lesson === 'חלון') {
+        available.push(`${String(hour + 7).padStart(2, '0')}:00`);
+      }
+    }
+
+    // Second priority: פרטני (personal time)
+    for (let hour = 1; hour <= 5; hour++) {
+      const lesson = schedule[hour];
+      if (lesson === 'פרטני') {
+        available.push(`${String(hour + 7).padStart(2, '0')}:00`);
+      }
+    }
+
+    setSuggestedTimes(available);
+  }, [formData.meeting_date]);
 
   const createMeeting = useMutation({
     mutationFn: async (data) => {
@@ -80,20 +130,43 @@ export default function AddMeeting({ user, onClose }) {
               <Input
                 type="date"
                 value={formData.meeting_date}
-                onChange={(e) => setFormData({...formData, meeting_date: e.target.value})}
+                onChange={(e) => setFormData({...formData, meeting_date: e.target.value, meeting_time: ''})}
                 required
               />
             </div>
             <div>
               <label className="text-xs font-bold text-slate-600 block mb-2">שעה</label>
-              <Input
-                type="time"
-                value={formData.meeting_time}
-                onChange={(e) => setFormData({...formData, meeting_time: e.target.value})}
-                required
-              />
+              {suggestedTimes.length > 0 ? (
+                <select
+                  className="w-full p-2 border border-slate-300 rounded-lg"
+                  value={formData.meeting_time}
+                  onChange={(e) => setFormData({...formData, meeting_time: e.target.value})}
+                  required
+                >
+                  <option value="">בחר שעה פנויה</option>
+                  {suggestedTimes.map(time => (
+                    <option key={time} value={time}>
+                      {time} (חלון/פרטני)
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <Input
+                  type="time"
+                  value={formData.meeting_time}
+                  onChange={(e) => setFormData({...formData, meeting_time: e.target.value})}
+                  required
+                />
+              )}
             </div>
           </div>
+
+          {suggestedTimes.length > 0 && (
+            <div className="p-3 bg-blue-50 rounded-lg border border-blue-200 text-xs text-blue-800 flex items-start gap-2">
+              <Clock className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <span>המערכת מצאה {suggestedTimes.length} שעות פנויות (חלונות/זמן אישי)</span>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <div>
