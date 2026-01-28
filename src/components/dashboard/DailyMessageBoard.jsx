@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Shield, Megaphone, X } from 'lucide-react';
+import { Shield, Megaphone, X, Bell, Edit2 } from 'lucide-react';
 
 export default function DailyMessageBoard({ user }) {
   const [showMessageModal, setShowMessageModal] = useState(false);
@@ -131,21 +131,26 @@ export default function DailyMessageBoard({ user }) {
                     e.stopPropagation();
                     updateMessageStatus.mutate({ id: dailyMessage.id, active: false });
                   }}
-                  className="flex-1 md:flex-none text-xs bg-white text-red-600 px-4 py-2 rounded-lg font-bold border border-red-200 hover:bg-red-50 transition-colors"
+                  className="flex-1 md:flex-none text-xs bg-white text-red-600 px-4 py-2 rounded-lg font-bold border border-red-200 hover:bg-red-50 transition-colors flex items-center justify-center gap-1"
                 >
-                  ביטול הודעה
+                  ❌ ביטול
                 </button>
               )}
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
-                  setMessageText('');
-                  setEditingMessageId(null);
+                  if (dailyMessage) {
+                    setEditingMessageId(dailyMessage.id);
+                    setMessageText(dailyMessage.content);
+                  } else {
+                    setMessageText('');
+                    setEditingMessageId(null);
+                  }
                   setShowMessageModal(true);
                 }}
-                className="flex-1 md:flex-none text-xs bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-sm"
+                className="flex-1 md:flex-none text-xs bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-sm flex items-center justify-center gap-1"
               >
-                הודעה חדשה
+                {dailyMessage ? <><Edit2 className="h-3 w-3" /> ערוך</> : <><Bell className="h-3 w-3" /> הודעה חדשה</>}
               </button>
             </div>
           </div>
@@ -156,7 +161,8 @@ export default function DailyMessageBoard({ user }) {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-lg max-w-md w-full p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold text-slate-800">
+              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <Bell className="h-5 w-5 text-blue-600" />
                 {editingMessageId ? 'עריכת הודעה' : 'הודעה חדשה לדשבורד'}
               </h3>
               <button onClick={() => {
