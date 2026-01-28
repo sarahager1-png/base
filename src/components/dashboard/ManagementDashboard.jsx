@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import StatCard from '../StatCard';
+import AddMeeting from '../meetings/AddMeeting';
+import MeetingsList from '../meetings/MeetingsList';
 import { 
   AlertTriangle, UserCheck, Users, ShoppingCart, 
-  Shield, Megaphone, UserPlus, Clock 
+  Shield, Megaphone, UserPlus, Clock, Plus
 } from 'lucide-react';
 
 export default function ManagementDashboard({ user }) {
