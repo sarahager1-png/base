@@ -67,11 +67,11 @@ export default function NotificationBell({ userEmail }) {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 hover:bg-slate-100 rounded-lg transition-colors"
+        className="relative p-2 hover:bg-blue-50 rounded-lg transition-colors"
       >
-        <Bell className="h-5 w-5 text-slate-600" />
+        <Bell className="h-6 w-6 text-blue-600" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+          <span className="absolute -top-2 -right-2 h-6 w-6 bg-red-500 text-white text-sm font-bold rounded-full flex items-center justify-center shadow-lg ring-2 ring-white">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}

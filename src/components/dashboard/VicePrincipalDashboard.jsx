@@ -107,7 +107,7 @@ export default function VicePrincipalDashboard({ user, setView }) {
             <h2 className="text-2xl font-bold mb-2 text-white">שלום, {user.full_name}</h2>
             <p className="text-slate-300 text-sm flex items-center gap-2">
               <Shield className="h-4 w-4" />
-              סגנית מנהלת - "לכתחילה אריבער"
+              סגנית מנהלת
             </p>
           </div>
           <div className="h-16 w-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/20">
