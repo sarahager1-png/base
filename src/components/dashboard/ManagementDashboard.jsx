@@ -98,13 +98,30 @@ export default function ManagementDashboard({ user }) {
       {/* Daily Message Board */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="bg-gradient-to-r from-blue-900 to-indigo-800 p-8 text-white">
-          <div className="flex justify-between items-start mb-4">
+          <div className="flex justify-between items-start">
             <div className="flex-1">
-              <div className="w-16 h-16 bg-white/20 rounded-lg flex items-center justify-center border border-white/30 mb-4">
-                <Shield className="h-8 w-8 text-blue-200" />
+              <div className="w-20 h-20 bg-white/10 rounded-lg flex items-center justify-center border border-white/30 cursor-pointer hover:bg-white/20 transition-colors">
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  className="hidden" 
+                  id="logoUpload"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        // TODO: Save logo to storage
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+                <label htmlFor="logoUpload" className="cursor-pointer flex items-center justify-center w-full h-full">
+                  <Shield className="h-8 w-8 text-blue-100" />
+                </label>
               </div>
-              <h1 className="text-3xl font-bold">מערכת ניהול בית הספר</h1>
-              <p className="text-blue-100 text-sm mt-2">רשת חינוך חב״ד • {new Date().toLocaleDateString('he-IL', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+              <p className="text-blue-100 text-xs mt-2">לחץ להעלאת לוגו</p>
             </div>
             <div className="text-right">
               <p className="text-blue-100 text-sm">ברוך הבא,</p>
