@@ -1,17 +1,21 @@
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import StatCard from '../StatCard';
 import MeetingsList from '../meetings/MeetingsList';
 import { useState } from 'react';
 import AddMeeting from '../meetings/AddMeeting';
+import DailyMessageBoard from './DailyMessageBoard';
 import {
   Users, AlertTriangle, Clock, ShoppingCart, FileText,
-  Wrench, BarChart3, TrendingUp, Plus
+  Wrench, BarChart3, TrendingUp, Plus, Calendar, Send
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function AdminDashboard() {
   const [showAddMeeting, setShowAddMeeting] = useState(false);
+  const [messageContent, setMessageContent] = useState('');
+  const queryClient = useQueryClient();
 
   // Fetch all data
   const { data: users = [] } = useQuery({
@@ -49,6 +53,27 @@ export default function AdminDashboard() {
     queryFn: () => base44.entities.SubstituteReport.list('-created_date', 100),
   });
 
+  const { data: dailyMessages = [] } = useQuery({
+    queryKey: ['daily-messages'],
+    queryFn: () => base44.entities.DailyMessage.list('-created_date', 5),
+  });
+
+  const createMessage = useMutation({
+    mutationFn: async (content) => {
+      const user = await base44.auth.me();
+      return base44.entities.DailyMessage.create({
+        content,
+        active: true,
+        created_by_name: user.full_name
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['daily-messages'] });
+      toast.success('ההודעה פורסמה בהצלחה');
+      setMessageContent('');
+    },
+  });
+
   // Calculate stats
   const pendingAbsences = absences.filter(a => a.status === 'pending').length;
   const pendingPurchases = purchaseRequests.filter(p => p.status === 'pending').length;
@@ -72,6 +97,8 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8 animate-fade-in">
+      <DailyMessageBoard user={{ email: 'admin' }} />
+
       {/* Header */}
       <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-3xl p-8 text-white shadow-lg border border-slate-600/20">
         <div className="flex items-center justify-between">
@@ -80,6 +107,62 @@ export default function AdminDashboard() {
             <p className="text-slate-300">סקירת מערכת כוללת</p>
           </div>
           <BarChart3 className="h-12 w-12 text-blue-400 opacity-50" />
+        </div>
+      </div>
+
+      {/* Add Daily Message */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <Bell className="h-5 w-5 text-blue-600" />
+          הודעת היום
+        </h3>
+        <div className="flex gap-3">
+          <textarea
+            placeholder="כתוב הודעה לצוות..."
+            value={messageContent}
+            onChange={(e) => setMessageContent(e.target.value)}
+            className="flex-1 p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            rows="2"
+          />
+          <button
+            onClick={() => createMessage.mutate(messageContent)}
+            disabled={!messageContent.trim() || createMessage.isPending}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2 h-fit"
+          >
+            <Send className="h-4 w-4" />
+            שלח
+          </button>
+        </div>
+      </div>
+
+      {/* Calendar Section */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <Calendar className="h-5 w-5 text-blue-600" />
+          לוח שנה
+        </h3>
+        <div className="grid grid-cols-7 gap-2">
+          {['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'].map(day => (
+            <div key={day} className="text-center font-bold text-sm text-slate-600 p-2">
+              {day}
+            </div>
+          ))}
+          {[...Array(42)].map((_, i) => {
+            const date = new Date(2026, 0, i - 3);
+            const isCurrentMonth = date.getMonth() === 0;
+            const isToday = date.toDateString() === new Date().toDateString();
+            
+            return (
+              <div
+                key={i}
+                className={`p-2 rounded-lg text-center text-sm font-medium transition-colors ${
+                  isCurrentMonth ? 'text-slate-800' : 'text-slate-300'
+                } ${isToday ? 'bg-blue-600 text-white' : 'hover:bg-slate-100'}`}
+              >
+                {date.getDate()}
+              </div>
+            );
+          })}
         </div>
       </div>
 
