@@ -30,6 +30,7 @@ export default function CounselorDashboard({ user, setView }) {
   const [showAddMeeting, setShowAddMeeting] = useState(false);
   const [absenceModalOpen, setAbsenceModalOpen] = useState(false);
   const [printModalOpen, setPrintModalOpen] = useState(false);
+  const [messageModalOpen, setMessageModalOpen] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: myDuty } = useQuery({
