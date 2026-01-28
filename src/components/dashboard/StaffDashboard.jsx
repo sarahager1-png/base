@@ -9,6 +9,7 @@ import ReportingModal from '../modals/ReportingModal';
 import AbsenceReportModal from '../modals/AbsenceReportModal';
 import PrintRequestModal from '../modals/PrintRequestModal';
 import DailyJournal from '../journal/DailyJournal';
+import DailyMessageBoard from './DailyMessageBoard';
 
 const TEACHER_BASE_SCHEDULE = {
   0: { 1: 'הסטוריה - ח׳2', 2: 'הסטוריה - ח׳2', 3: 'פרטני', 4: 'חלון', 5: 'אזרחות - ט׳1', 6: 'אזרחות - ט׳1' },
@@ -62,6 +63,8 @@ export default function StaffDashboard({ user, setView }) {
         onClose={() => setPrintModalOpen(false)}
         user={user}
       />
+
+      <DailyMessageBoard user={user} />
 
       {/* Quick Actions - Top Priority */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
