@@ -86,7 +86,7 @@ export default function CounselorDashboard({ user, setView }) {
               <p className="text-cyan-100 text-sm opacity-90">יועצת - {user.title || ''}</p>
             </div>
           </div>
-          <p className="text-white/90 text-base">"לכתחילה אריבער" - יום של תמיכה והקשבה 💙</p>
+          <p className="text-white/90 text-base">יום של תמיכה והקשבה 💙</p>
         </div>
       </div>
 
@@ -264,6 +264,44 @@ export default function CounselorDashboard({ user, setView }) {
           </div>
           פעולות מהירות
         </h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+          <button onClick={() => setAbsenceModalOpen(true)} className="relative overflow-hidden flex flex-col items-center p-4 bg-gradient-to-br from-red-50 to-pink-50 rounded-xl shadow-sm border-2 border-red-200 hover:border-red-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+            <div className="absolute top-1 right-1 bg-red-500 text-[9px] text-white font-bold px-2 py-0.5 rounded-full shadow">חשוב</div>
+            <div className="p-2.5 bg-red-100 rounded-full text-red-600 group-hover:scale-110 transition-transform mb-2">
+              <Stethoscope className="h-6 w-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-700 leading-tight">דיווח היעדרות</span>
+          </button>
+        
+          <button onClick={() => setPrintModalOpen(true)} className="flex flex-col items-center p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl shadow-sm border-2 border-blue-200 hover:border-blue-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+            <div className="p-2.5 bg-blue-100 rounded-full text-blue-600 group-hover:scale-110 transition-transform mb-2">
+              <Printer className="h-6 w-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-700 leading-tight">צילום</span>
+          </button>
+
+          <button onClick={() => openFeature('purchase')} className="flex flex-col items-center p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl shadow-sm border-2 border-amber-200 hover:border-amber-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+            <div className="p-2.5 bg-amber-100 rounded-full text-amber-600 group-hover:scale-110 transition-transform mb-2">
+              <ShoppingCart className="h-6 w-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-700 leading-tight">רכש</span>
+          </button>
+
+          <button onClick={() => openFeature('maintenance_general')} className="flex flex-col items-center p-4 bg-gradient-to-br from-slate-50 to-gray-50 rounded-xl shadow-sm border-2 border-slate-200 hover:border-slate-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+            <div className="p-2.5 bg-slate-100 rounded-full text-slate-600 group-hover:scale-110 transition-transform mb-2">
+              <Wrench className="h-6 w-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-700 leading-tight">תחזוקה כללית</span>
+          </button>
+
+          <button onClick={() => openFeature('maintenance_pc')} className="flex flex-col items-center p-4 bg-gradient-to-br from-cyan-50 to-teal-50 rounded-xl shadow-sm border-2 border-cyan-200 hover:border-cyan-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+            <div className="p-2.5 bg-cyan-100 rounded-full text-cyan-600 group-hover:scale-110 transition-transform mb-2">
+              <Monitor className="h-6 w-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-700 leading-tight">תחזוקת מחשבים</span>
+          </button>
+        </div>
+
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 gap-3">
           <button onClick={() => setAbsenceModalOpen(true)} className="relative overflow-hidden flex flex-col items-center p-4 bg-gradient-to-br from-red-50 to-pink-50 rounded-xl shadow-sm border-2 border-red-200 hover:border-red-400 hover:shadow-md transition-all group text-center h-28 justify-center">
             <div className="absolute top-1 right-1 bg-red-500 text-[9px] text-white font-bold px-2 py-0.5 rounded-full shadow">חשוב</div>
