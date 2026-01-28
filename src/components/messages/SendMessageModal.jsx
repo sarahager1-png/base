@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { X, Send, Heart } from 'lucide-react';
+import { X, Send, Heart, MessageCircle, Lightbulb, ThumbsUp } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function SendMessageModal({ user, isOpen, onClose, recipientRole }) {
   const [content, setContent] = useState('');
   const [selectedRecipient, setSelectedRecipient] = useState('');
+  const [messageType, setMessageType] = useState('personal');
   const queryClient = useQueryClient();
+
+  const messageTypeIcons = {
+    personal: { icon: Heart, label: 'הודעה אישית', color: 'pink' },
+    feedback: { icon: ThumbsUp, label: 'משוב', color: 'blue' },
+    suggestion: { icon: Lightbulb, label: 'הצעה', color: 'amber' },
+  };
 
   const { data: staffMembers = [] } = useQuery({
     queryKey: ['staff-members'],
@@ -56,7 +63,7 @@ export default function SendMessageModal({ user, isOpen, onClose, recipientRole 
       recipient_name: recipient.full_name,
       recipient_role: recipient.role,
       content: content.trim(),
-      message_type: 'personal'
+      message_type: messageType
     });
   };
 
@@ -69,8 +76,8 @@ export default function SendMessageModal({ user, isOpen, onClose, recipientRole 
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
         <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-t-2xl p-6 text-white flex justify-between items-center">
           <h2 className="text-xl font-bold flex items-center gap-2">
-            <Heart className="h-5 w-5" />
-            שלח הודעה אישית
+            <MessageCircle className="h-5 w-5" />
+            שלח הודעה
           </h2>
           <button onClick={onClose} className="p-1 hover:bg-white/20 rounded-lg">
             <X className="h-5 w-5" />
@@ -78,6 +85,26 @@ export default function SendMessageModal({ user, isOpen, onClose, recipientRole 
         </div>
 
         <div className="p-6 space-y-4">
+          {/* Message Type Selection */}
+          <div>
+            <label className="text-sm font-bold text-slate-700 block mb-2">סוג הודעה:</label>
+            <div className="grid grid-cols-3 gap-2">
+              {Object.entries(messageTypeIcons).map(([type, { icon: Icon, label, color }]) => (
+                <button
+                  key={type}
+                  onClick={() => setMessageType(type)}
+                  className={`p-3 rounded-lg border-2 transition-all flex flex-col items-center gap-1 ${
+                    messageType === type
+                      ? `bg-${color}-50 border-${color}-500`
+                      : 'bg-slate-50 border-slate-200 hover:border-slate-300'
+                  }`}
+                >
+                  <Icon className={`h-4 w-4 ${messageType === type ? `text-${color}-600` : 'text-slate-600'}`} />
+                  <span className="text-xs font-medium text-slate-700">{label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
           <div>
             <label className="text-sm font-bold text-slate-700 block mb-2">שלח אל:</label>
             <select
