@@ -13,7 +13,7 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
     { id: 'schedule', label: 'לוח זמנים', icon: Calendar, roles: ['teacher', 'admin', 'vice_principal', 'secretary', 'coordinator', 'assistant'] },
     { id: 'tasks', label: 'משימות ואישורים', icon: CheckSquare, roles: ['all'] },
     { id: 'attendance', label: 'היעדרויות ודיווח', icon: Clock, roles: ['teacher', 'admin', 'vice_principal', 'secretary', 'coordinator', 'assistant', 'substitute'] },
-    { id: 'hr', label: 'ניהול צוות', icon: Users, roles: ['admin', 'vice_principal', 'secretary'] },
+    { id: 'hr', label: 'ניהול צוות', icon: Users, roles: ['admin', 'vice_principal', 'secretary', 'coordinator', 'maintenance', 'assistant', 'substitute'] },
     { id: 'onboarding', label: 'טפסי קליטה', icon: UserPlus, roles: ['substitute', 'admin', 'vice_principal'] },
     { id: 'printing', label: 'מרכז צילומים', icon: Printer, roles: ['secretary', 'teacher', 'coordinator', 'assistant', 'vice_principal'] },
     { id: 'maintenance', label: 'תפעול ורכש', icon: Settings, roles: ['admin', 'vice_principal', 'secretary', 'maintenance', 'teacher', 'coordinator'] },
