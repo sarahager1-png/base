@@ -8,6 +8,7 @@ export default function SendMessageModal({ user, isOpen, onClose, recipientRole 
   const [content, setContent] = useState('');
   const [selectedRecipient, setSelectedRecipient] = useState('');
   const [messageType, setMessageType] = useState('personal');
+  const [sendToAll, setSendToAll] = useState(false);
   const queryClient = useQueryClient();
 
   const messageTypeIcons = {
@@ -34,6 +35,9 @@ export default function SendMessageModal({ user, isOpen, onClose, recipientRole 
 
   const sendMessage = useMutation({
     mutationFn: async (messageData) => {
+      if (Array.isArray(messageData)) {
+        return base44.entities.Message.bulkCreate(messageData);
+      }
       return base44.entities.Message.create(messageData);
     },
     onSuccess: () => {
@@ -43,28 +47,42 @@ export default function SendMessageModal({ user, isOpen, onClose, recipientRole 
       });
       setContent('');
       setSelectedRecipient('');
+      setSendToAll(false);
       onClose();
     },
   });
 
   const handleSend = () => {
-    if (!content.trim() || !selectedRecipient) {
+    if (!content.trim() || (!sendToAll && !selectedRecipient)) {
       toast.error('אנא מלא את כל השדות');
       return;
     }
 
-    const recipient = staffMembers.find(m => m.email === selectedRecipient);
-    
-    sendMessage.mutate({
-      sender_email: user.email,
-      sender_name: user.full_name,
-      sender_role: user.role,
-      recipient_email: recipient.email,
-      recipient_name: recipient.full_name,
-      recipient_role: recipient.role,
-      content: content.trim(),
-      message_type: messageType
-    });
+    if (sendToAll) {
+      const messages = getRecipients().map(recipient => ({
+        sender_email: user.email,
+        sender_name: user.full_name,
+        sender_role: user.role,
+        recipient_email: recipient.email,
+        recipient_name: recipient.full_name,
+        recipient_role: recipient.role,
+        content: content.trim(),
+        message_type: messageType
+      }));
+      sendMessage.mutate(messages);
+    } else {
+      const recipient = staffMembers.find(m => m.email === selectedRecipient);
+      sendMessage.mutate({
+        sender_email: user.email,
+        sender_name: user.full_name,
+        sender_role: user.role,
+        recipient_email: recipient.email,
+        recipient_name: recipient.full_name,
+        recipient_role: recipient.role,
+        content: content.trim(),
+        message_type: messageType
+      });
+    }
   };
 
   if (!isOpen) return null;
@@ -107,18 +125,49 @@ export default function SendMessageModal({ user, isOpen, onClose, recipientRole 
           </div>
           <div>
             <label className="text-sm font-bold text-slate-700 block mb-2">שלח אל:</label>
-            <select
-              value={selectedRecipient}
-              onChange={(e) => setSelectedRecipient(e.target.value)}
-              className="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">-- בחר משתקל/ת --</option>
-              {recipients.map(member => (
-                <option key={member.id} value={member.email}>
-                  {member.full_name}
-                </option>
-              ))}
-            </select>
+            <div className="flex gap-2 mb-3">
+              <button
+                onClick={() => setSendToAll(false)}
+                className={`flex-1 px-3 py-2 rounded-lg font-medium transition-all ${
+                  !sendToAll
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                }`}
+              >
+                אדם אחד
+              </button>
+              <button
+                onClick={() => setSendToAll(true)}
+                className={`flex-1 px-3 py-2 rounded-lg font-medium transition-all ${
+                  sendToAll
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                }`}
+              >
+                כל הצוות
+              </button>
+            </div>
+            {!sendToAll && (
+              <select
+                value={selectedRecipient}
+                onChange={(e) => setSelectedRecipient(e.target.value)}
+                className="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">-- בחר משתקל/ת --</option>
+                {recipients.map(member => (
+                  <option key={member.id} value={member.email}>
+                    {member.full_name}
+                  </option>
+                ))}
+              </select>
+            )}
+            {sendToAll && (
+              <div className="p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                <p className="text-sm text-purple-800 font-medium">
+                  📢 ההודעה תשלח ל-{recipients.length} משתקלים/ות
+                </p>
+              </div>
+            )}
           </div>
 
           <div>
