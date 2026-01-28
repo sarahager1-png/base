@@ -2,12 +2,17 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import StatCard from '../StatCard';
+import MeetingsList from '../meetings/MeetingsList';
+import { useState } from 'react';
+import AddMeeting from '../meetings/AddMeeting';
 import {
   Users, AlertTriangle, Clock, ShoppingCart, FileText,
-  Wrench, BarChart3, TrendingUp
+  Wrench, BarChart3, TrendingUp, Plus
 } from 'lucide-react';
 
 export default function AdminDashboard() {
+  const [showAddMeeting, setShowAddMeeting] = useState(false);
+
   // Fetch all data
   const { data: users = [] } = useQuery({
     queryKey: ['users-all'],
@@ -220,6 +225,28 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Meetings Schedule */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <Users className="h-5 w-5 text-blue-600" />
+            לוח פגישות
+          </h3>
+          <button
+            onClick={() => setShowAddMeeting(true)}
+            className="px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1 shadow-sm"
+          >
+            <Plus className="h-4 w-4" />
+            פגישה חדשה
+          </button>
+        </div>
+        <MeetingsList user={{ email: users[0]?.email || 'admin@school.local', full_name: 'מנהלת' }} />
+      </div>
+
+      {showAddMeeting && (
+        <AddMeeting user={{ email: users[0]?.email || 'admin@school.local', full_name: 'מנהלת' }} onClose={() => setShowAddMeeting(false)} />
+      )}
     </div>
   );
 }
