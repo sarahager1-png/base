@@ -25,6 +25,7 @@ const TEACHER_BASE_SCHEDULE = {
 export default function CounselorDashboard({ user, setView }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [activeFeature, setActiveFeature] = useState(null);
+  const [showAddMeeting, setShowAddMeeting] = useState(false);
   const [absenceModalOpen, setAbsenceModalOpen] = useState(false);
   const [printModalOpen, setPrintModalOpen] = useState(false);
   const [showAddMeeting, setShowAddMeeting] = useState(false);
