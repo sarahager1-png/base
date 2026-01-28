@@ -7,7 +7,8 @@ import {
 export default function Sidebar({ activeView, setView, user, isOpen, closeSidebar, onLogout }) {
   const menuItems = [
     { id: 'dashboard', label: 'לוח בקרה ראשי', icon: Home, roles: ['all'] },
-    { id: 'schedule', label: 'יומן וגאנט מוסדי', icon: Calendar, roles: ['teacher', 'admin', 'vice_principal', 'secretary', 'coordinator', 'assistant'] },
+    { id: 'journal', label: 'יומן בית הספר', icon: Calendar, roles: ['all'] },
+    { id: 'schedule', label: 'לוח זמנים', icon: Calendar, roles: ['teacher', 'admin', 'vice_principal', 'secretary', 'coordinator', 'assistant'] },
     { id: 'tasks', label: 'משימות ואישורים', icon: CheckSquare, roles: ['all'] },
     { id: 'attendance', label: 'היעדרויות ודיווח', icon: Clock, roles: ['teacher', 'admin', 'vice_principal', 'secretary', 'coordinator', 'assistant', 'substitute'] },
     { id: 'hr', label: 'ניהול צוות', icon: Users, roles: ['admin', 'vice_principal', 'secretary'] },
