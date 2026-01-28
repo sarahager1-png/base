@@ -188,12 +188,7 @@ export default function Dashboard() {
             <Journal />
           )}
 
-          {currentView !== 'dashboard' && currentView !== 'hr' && currentView !== 'journal' && (
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-10 text-center">
-              <h2 className="text-2xl font-bold text-slate-800">עמוד בבנייה: {currentView}</h2>
-              <p className="text-slate-500 mt-2">המודול בפיתוח</p>
-            </div>
-          )}
+
         </main>
       </div>
 

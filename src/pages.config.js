@@ -1,12 +1,12 @@
 import Dashboard from './pages/Dashboard';
-import Schedule from './pages/Schedule';
 import Journal from './pages/Journal';
+import Schedule from './pages/Schedule';
 
 
 export const PAGES = {
     "Dashboard": Dashboard,
-    "Schedule": Schedule,
     "Journal": Journal,
+    "Schedule": Schedule,
 }
 
 export const pagesConfig = {
