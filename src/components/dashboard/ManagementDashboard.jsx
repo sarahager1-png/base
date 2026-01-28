@@ -145,30 +145,27 @@ export default function ManagementDashboard({ user }) {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <h4 className="font-bold text-slate-700 mb-3 text-sm">חריגים שוטפים:</h4>
-            {absences.slice(0, 2).map(absence => (
-              <div key={absence.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200 hover:border-blue-300 transition-colors">
-                <div className="flex items-start gap-3">
-                  <div className="mt-1 w-2 h-2 rounded-full bg-amber-400" />
-                  <div>
-                    <p className="text-sm font-medium text-slate-800">
-                      {absence.user_name} - היעדרות {absence.absence_type}
-                    </p>
-                    <p className="text-xs text-slate-500 mt-1">{absence.start_date}</p>
-                  </div>
-                </div>
-                <button className="text-xs bg-white border border-blue-200 text-blue-700 px-3 py-1.5 rounded-md hover:bg-blue-50 font-medium shadow-sm">
-                  אשר
-                </button>
-              </div>
-            ))}
-            {absences.length === 0 && (
-              <p className="text-sm text-slate-400 text-center py-4">אין חריגים פעילים</p>
-            )}
+          <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
+            <div className="flex justify-between items-center mb-3">
+              <h4 className="font-bold text-blue-900 flex items-center gap-2">
+                <Users className="h-4 w-4" /> יומן פגישות
+              </h4>
+              <button
+                onClick={() => setShowAddMeeting(true)}
+                className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1"
+              >
+                <Plus className="h-3 w-3" />
+                פגישה חדשה
+              </button>
+            </div>
+            <MeetingsList user={user} />
           </div>
         </div>
       </div>
+
+      {showAddMeeting && (
+        <AddMeeting user={user} onClose={() => setShowAddMeeting(false)} />
+      )}
     </div>
   );
 }

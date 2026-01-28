@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 
 export default function VicePrincipalDashboard({ user, setView }) {
+  const [showAddMeeting, setShowAddMeeting] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [activeFeature, setActiveFeature] = useState(null);
   const queryClient = useQueryClient();
