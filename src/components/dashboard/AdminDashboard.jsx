@@ -15,7 +15,6 @@ import { toast } from 'sonner';
 
 export default function AdminDashboard() {
   const [showAddMeeting, setShowAddMeeting] = useState(false);
-  const [messageContent, setMessageContent] = useState('');
   const [messageModalOpen, setMessageModalOpen] = useState(false);
   const queryClient = useQueryClient();
   
@@ -108,8 +107,6 @@ export default function AdminDashboard() {
         recipientRole="staff"
       />
       
-      <DailyMessageBoard user={{ email: 'admin' }} />
-
       {/* Header */}
       <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-3xl p-8 text-white shadow-lg border border-slate-600/20">
         <div className="flex items-center justify-between">
@@ -121,61 +118,8 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Add Daily Message */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-        <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <Bell className="h-5 w-5 text-blue-600" />
-          הודעת היום
-        </h3>
-        <div className="flex gap-3">
-          <textarea
-            placeholder="כתוב הודעה לצוות..."
-            value={messageContent}
-            onChange={(e) => setMessageContent(e.target.value)}
-            className="flex-1 p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            rows="2"
-          />
-          <button
-            onClick={() => createMessage.mutate(messageContent)}
-            disabled={!messageContent.trim() || createMessage.isPending}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2 h-fit"
-          >
-            <Send className="h-4 w-4" />
-            שלח
-          </button>
-        </div>
-      </div>
-
-      {/* Calendar Section */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-        <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-blue-600" />
-          לוח שנה
-        </h3>
-        <div className="grid grid-cols-7 gap-2">
-          {['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'].map(day => (
-            <div key={day} className="text-center font-bold text-sm text-slate-600 p-2">
-              {day}
-            </div>
-          ))}
-          {[...Array(42)].map((_, i) => {
-            const date = new Date(2026, 0, i - 3);
-            const isCurrentMonth = date.getMonth() === 0;
-            const isToday = date.toDateString() === new Date().toDateString();
-            
-            return (
-              <div
-                key={i}
-                className={`p-2 rounded-lg text-center text-sm font-medium transition-colors ${
-                  isCurrentMonth ? 'text-slate-800' : 'text-slate-300'
-                } ${isToday ? 'bg-blue-600 text-white' : 'hover:bg-slate-100'}`}
-              >
-                {date.getDate()}
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      {/* Daily Message Board */}
+      <DailyMessageBoard user={{ email: 'admin' }} />
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -207,6 +151,42 @@ export default function AdminDashboard() {
           color="red"
           subtext="בתחזוקה"
         />
+      </div>
+
+      {/* More Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-3 bg-purple-100 rounded-xl">
+              <FileText className="h-6 w-6 text-purple-600" />
+            </div>
+            <h3 className="font-bold text-slate-800">טפסי קליטה</h3>
+          </div>
+          <div className="text-3xl font-bold text-purple-600 mb-2">{pendingOnboarding}</div>
+          <p className="text-sm text-slate-600">ממתינים לאישור</p>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-3 bg-cyan-100 rounded-xl">
+              <TrendingUp className="h-6 w-6 text-cyan-600" />
+            </div>
+            <h3 className="font-bold text-slate-800">הדפסות</h3>
+          </div>
+          <div className="text-3xl font-bold text-cyan-600 mb-2">{pendingPrints}</div>
+          <p className="text-sm text-slate-600">ממתינות לעיבוד</p>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-3 bg-orange-100 rounded-xl">
+              <Users className="h-6 w-6 text-orange-600" />
+            </div>
+            <h3 className="font-bold text-slate-800">מילוי מקום</h3>
+          </div>
+          <div className="text-3xl font-bold text-orange-600 mb-2">{reportedSubstitutes}</div>
+          <p className="text-sm text-slate-600">דוחות לאישור</p>
+        </div>
       </div>
 
       {/* Detailed Stats */}
@@ -259,42 +239,6 @@ export default function AdminDashboard() {
               <span className="text-2xl font-bold text-blue-600">{purchaseStats.completed}</span>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* More Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-purple-100 rounded-xl">
-              <FileText className="h-6 w-6 text-purple-600" />
-            </div>
-            <h3 className="font-bold text-slate-800">טפסי קליטה</h3>
-          </div>
-          <div className="text-3xl font-bold text-purple-600 mb-2">{pendingOnboarding}</div>
-          <p className="text-sm text-slate-600">ממתינים לאישור</p>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-cyan-100 rounded-xl">
-              <TrendingUp className="h-6 w-6 text-cyan-600" />
-            </div>
-            <h3 className="font-bold text-slate-800">הדפסות</h3>
-          </div>
-          <div className="text-3xl font-bold text-cyan-600 mb-2">{pendingPrints}</div>
-          <p className="text-sm text-slate-600">ממתינות לעיבוד</p>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-orange-100 rounded-xl">
-              <Users className="h-6 w-6 text-orange-600" />
-            </div>
-            <h3 className="font-bold text-slate-800">מילוי מקום</h3>
-          </div>
-          <div className="text-3xl font-bold text-orange-600 mb-2">{reportedSubstitutes}</div>
-          <p className="text-sm text-slate-600">דוחות לאישור</p>
         </div>
       </div>
 
