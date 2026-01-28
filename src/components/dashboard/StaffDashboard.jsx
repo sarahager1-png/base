@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import ReportingModal from '../modals/ReportingModal';
 import AbsenceReportModal from '../modals/AbsenceReportModal';
+import PrintRequestModal from '../modals/PrintRequestModal';
 import DailyJournal from '../journal/DailyJournal';
 
 const TEACHER_BASE_SCHEDULE = {
@@ -22,6 +23,7 @@ export default function StaffDashboard({ user, setView }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [activeFeature, setActiveFeature] = useState(null);
   const [absenceModalOpen, setAbsenceModalOpen] = useState(false);
+  const [printModalOpen, setPrintModalOpen] = useState(false);
 
   const { data: myDuty } = useQuery({
     queryKey: ['duty', user.email, new Date().getDate()],
@@ -53,6 +55,11 @@ export default function StaffDashboard({ user, setView }) {
       <AbsenceReportModal 
         isOpen={absenceModalOpen}
         onClose={() => setAbsenceModalOpen(false)}
+        user={user}
+      />
+      <PrintRequestModal 
+        isOpen={printModalOpen}
+        onClose={() => setPrintModalOpen(false)}
         user={user}
       />
 
@@ -155,7 +162,7 @@ export default function StaffDashboard({ user, setView }) {
           <span className="text-[11px] font-bold text-slate-700 leading-tight">פעילות חוץ</span>
         </button>
 
-        <button onClick={() => openFeature('copies')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-blue-300 hover:bg-blue-50 transition-all group text-center h-24 justify-center">
+        <button onClick={() => setPrintModalOpen(true)} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-blue-300 hover:bg-blue-50 transition-all group text-center h-24 justify-center">
           <div className="p-3 bg-blue-50 rounded-full text-blue-500 group-hover:scale-110 transition-transform mb-2">
             <Printer className="h-6 w-6" />
           </div>

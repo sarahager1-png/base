@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import StatCard from '../StatCard';
 import ReportingModal from '../modals/ReportingModal';
 import AbsenceReportModal from '../modals/AbsenceReportModal';
+import PrintRequestModal from '../modals/PrintRequestModal';
 import AbsenceApprovalPanel from './AbsenceApprovalPanel';
 import AddMeeting from '../meetings/AddMeeting';
 import MeetingsList from '../meetings/MeetingsList';
@@ -27,6 +28,7 @@ export default function VicePrincipalDashboard({ user, setView }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [activeFeature, setActiveFeature] = useState(null);
   const [absenceModalOpen, setAbsenceModalOpen] = useState(false);
+  const [printModalOpen, setPrintModalOpen] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: absences = [] } = useQuery({
@@ -86,6 +88,11 @@ export default function VicePrincipalDashboard({ user, setView }) {
       <AbsenceReportModal 
         isOpen={absenceModalOpen}
         onClose={() => setAbsenceModalOpen(false)}
+        user={user}
+      />
+      <PrintRequestModal 
+        isOpen={printModalOpen}
+        onClose={() => setPrintModalOpen(false)}
         user={user}
       />
 
@@ -222,7 +229,7 @@ export default function VicePrincipalDashboard({ user, setView }) {
           <span className="text-[11px] font-bold text-slate-700 leading-tight">פעילות חוץ</span>
         </button>
 
-        <button onClick={() => openFeature('copies')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-blue-300 hover:bg-blue-50 transition-all group text-center h-24 justify-center">
+        <button onClick={() => setPrintModalOpen(true)} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-blue-300 hover:bg-blue-50 transition-all group text-center h-24 justify-center">
           <div className="p-3 bg-blue-50 rounded-full text-blue-500 group-hover:scale-110 transition-transform mb-2">
             <Printer className="h-6 w-6" />
           </div>
