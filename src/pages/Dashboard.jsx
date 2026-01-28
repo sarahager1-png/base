@@ -12,6 +12,7 @@ import CoordinatorDashboard from '../components/dashboard/CoordinatorDashboard';
 import SubstituteDashboard from '../components/dashboard/SubstituteDashboard';
 import VicePrincipalDashboard from '../components/dashboard/VicePrincipalDashboard';
 import Journal from './Journal';
+import JournalManagement from './JournalManagement';
 import Schedule from './Schedule';
 import Tasks from './Tasks';
 import Attendance from './Attendance';
@@ -192,6 +193,7 @@ export default function Dashboard() {
           )}
 
           {currentView === 'journal' && <Journal />}
+          {currentView === 'journal-management' && <JournalManagement />}
           {currentView === 'schedule' && <Schedule />}
           {currentView === 'tasks' && <Tasks />}
           {currentView === 'attendance' && <Attendance />}
