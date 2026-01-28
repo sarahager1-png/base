@@ -9,6 +9,7 @@ import AbsenceApprovalPanel from './AbsenceApprovalPanel';
 import AddMeeting from '../meetings/AddMeeting';
 import MeetingsList from '../meetings/MeetingsList';
 import DailyJournal from '../journal/DailyJournal';
+import DailyMessageBoard from './DailyMessageBoard';
 import { 
   AlertTriangle, UserCheck, Clock, ShoppingCart, Shield,
   CheckCircle, XCircle, Calendar, Printer, Map, Users, Plus, Wrench, Monitor, Timer, Sparkles
@@ -95,6 +96,8 @@ export default function VicePrincipalDashboard({ user, setView }) {
         onClose={() => setPrintModalOpen(false)}
         user={user}
       />
+
+      <DailyMessageBoard user={user} />
 
       {/* Header Banner */}
       <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-3xl p-8 text-white shadow-lg border border-slate-600/20 relative overflow-hidden">
