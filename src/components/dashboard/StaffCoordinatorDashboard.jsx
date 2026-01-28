@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { 
   Calendar, Stethoscope, Clock, Map, Printer, 
   ShoppingCart, Wrench, Monitor, Shield, Timer, Sparkles,
-  Users, MessageCircle, ArrowRight, FileSignature, Upload, CheckSquare, Heart
+  Users, MessageCircle, ArrowRight, FileSignature, Upload, CheckSquare, Heart, Plus
 } from 'lucide-react';
 import ReportingModal from '../modals/ReportingModal';
 import AbsenceReportModal from '../modals/AbsenceReportModal';
@@ -29,7 +29,6 @@ export default function StaffCoordinatorDashboard({ user, setView }) {
   const [absenceModalOpen, setAbsenceModalOpen] = useState(false);
   const [printModalOpen, setPrintModalOpen] = useState(false);
   const [showAddMeeting, setShowAddMeeting] = useState(false);
-  const { Plus } = require('lucide-react');
 
   const { data: myDuty } = useQuery({
     queryKey: ['duty', user.email, new Date().getDate()],
