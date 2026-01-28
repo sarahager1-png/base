@@ -133,18 +133,23 @@ export default function ManagementDashboard({ user }) {
                 </p>
               </div>
             </div>
-            <div className="flex flex-row md:flex-col gap-2 mt-2 md:mt-0 w-full md:w-auto">
+            <div className="flex flex-row md:flex-col gap-2 mt-2 md:mt-0 w-full md:w-auto pointer-events-auto">
               {dailyMessage && (
                 <button 
-                  onClick={() => updateMessageStatus.mutate({ id: dailyMessage.id, active: false })}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    updateMessageStatus.mutate({ id: dailyMessage.id, active: false });
+                  }}
                   className="flex-1 md:flex-none text-xs bg-white text-red-600 px-4 py-2 rounded-lg font-bold border border-red-200 hover:bg-red-50 transition-colors"
                 >
                   ביטול הודעה
                 </button>
               )}
               <button 
-                onClick={() => {
-                  setMessageText(getGreetingByHour());
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMessageText('');
+                  setEditingMessageId(null);
                   setShowMessageModal(true);
                 }}
                 className="flex-1 md:flex-none text-xs bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-sm"
