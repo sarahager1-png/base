@@ -26,6 +26,7 @@ export default function StaffCoordinatorDashboard({ user, setView }) {
   const [activeFeature, setActiveFeature] = useState(null);
   const [absenceModalOpen, setAbsenceModalOpen] = useState(false);
   const [printModalOpen, setPrintModalOpen] = useState(false);
+  const [showAddMeeting, setShowAddMeeting] = useState(false);
 
   const { data: myDuty } = useQuery({
     queryKey: ['duty', user.email, new Date().getDate()],
@@ -332,6 +333,30 @@ export default function StaffCoordinatorDashboard({ user, setView }) {
           </button>
         </div>
       </div>
+
+      {/* Meetings Schedule */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
+            <div className="p-2 bg-blue-50 rounded-xl border border-blue-100">
+              <Users className="h-4 w-4 text-blue-600" />
+            </div>
+            לוח פגישות
+          </h3>
+          <button
+            onClick={() => setShowAddMeeting(true)}
+            className="px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1 shadow-sm"
+          >
+            <Plus className="h-4 w-4" />
+            פגישה חדשה
+          </button>
+        </div>
+        <MeetingsList user={user} />
+      </div>
+
+      {showAddMeeting && (
+        <AddMeeting user={user} onClose={() => setShowAddMeeting(false)} />
+      )}
     </div>
   );
 }
