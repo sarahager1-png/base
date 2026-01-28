@@ -58,6 +58,8 @@ import Onboarding from './pages/Onboarding';
 import Printing from './pages/Printing';
 import Schedule from './pages/Schedule';
 import Tasks from './pages/Tasks';
+import DutyManagement from './pages/DutyManagement';
+import RoomManagement from './pages/RoomManagement';
 
 
 export const PAGES = {
@@ -72,6 +74,8 @@ export const PAGES = {
     "Printing": Printing,
     "Schedule": Schedule,
     "Tasks": Tasks,
+    "DutyManagement": DutyManagement,
+    "RoomManagement": RoomManagement,
 }
 
 export const pagesConfig = {
