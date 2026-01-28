@@ -34,6 +34,12 @@ export default function AddMeeting({ user, onClose }) {
 
   const queryClient = useQueryClient();
 
+  // Fetch all staff members for selection
+  const { data: staffMembers = [] } = useQuery({
+    queryKey: ['staff-members'],
+    queryFn: () => base44.entities.User.list(),
+  });
+
   // Fetch meetings for the selected date
   const { data: existingMeetings = [] } = useQuery({
     queryKey: ['meetings-on-date', formData.meeting_date, user.email],
@@ -105,13 +111,20 @@ export default function AddMeeting({ user, onClose }) {
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="text-xs font-bold text-slate-600 block mb-2">שם המשתתף/ת</label>
-            <Input
-              placeholder="שם הורה / תלמיד/ה"
+            <label className="text-xs font-bold text-slate-600 block mb-2">בחר עובד/ת</label>
+            <select
+              className="w-full p-2 border border-slate-300 rounded-lg"
               value={formData.participant_name}
               onChange={(e) => setFormData({...formData, participant_name: e.target.value})}
               required
-            />
+            >
+              <option value="">-- בחר משתתף/ת --</option>
+              {staffMembers.map(member => (
+                <option key={member.id} value={member.full_name}>
+                  {member.full_name} ({member.role})
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
