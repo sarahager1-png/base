@@ -66,6 +66,17 @@ export default function StaffDashboard({ user, setView }) {
 
       <DailyMessageBoard user={user} />
 
+      {/* Today's Journal */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+        <h3 className="text-base font-bold text-slate-800 mb-5 flex items-center gap-2">
+          <div className="p-2 bg-amber-50 rounded-xl border border-amber-100">
+            <Calendar className="h-4 w-4 text-amber-600" />
+          </div>
+          יומן בית הספר - היום
+        </h3>
+        <DailyJournal date={new Date()} />
+      </div>
+
       {/* Quick Actions - Top Priority */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
         <button onClick={() => setAbsenceModalOpen(true)} className="relative overflow-hidden flex flex-col items-center p-4 bg-gradient-to-br from-red-50 to-pink-50 rounded-xl shadow-sm border-2 border-red-200 hover:border-red-400 hover:shadow-md transition-all group text-center h-28 justify-center">
@@ -196,17 +207,6 @@ export default function StaffDashboard({ user, setView }) {
           </div>
         </div>
       )}
-
-      {/* Today's Journal */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
-        <h3 className="text-base font-bold text-slate-800 mb-5 flex items-center gap-2">
-          <div className="p-2 bg-amber-50 rounded-xl border border-amber-100">
-            <Calendar className="h-4 w-4 text-amber-600" />
-          </div>
-          יומן בית הספר - היום
-        </h3>
-        <DailyJournal date={new Date()} />
-      </div>
 
 
     </div>
