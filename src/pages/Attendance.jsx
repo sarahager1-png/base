@@ -76,10 +76,10 @@ export default function AttendancePage() {
       </div>
 
       {/* Tabs */}
-      <div className="mb-6 flex gap-2 bg-white p-1 rounded-xl shadow-sm border border-slate-200">
+      <div className="mb-6 flex gap-2 bg-white p-1 rounded-xl shadow-sm border border-slate-200 flex-wrap">
         <button
           onClick={() => setActiveTab('absences')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-semibold transition-all text-sm ${
+          className={`flex-1 min-w-fit flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-semibold transition-all text-sm ${
             activeTab === 'absences' 
               ? 'bg-slate-800 text-white shadow-sm' 
               : 'text-slate-600 hover:bg-slate-50'
@@ -90,7 +90,7 @@ export default function AttendancePage() {
         </button>
         <button
           onClick={() => setActiveTab('substitutes')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-semibold transition-all text-sm ${
+          className={`flex-1 min-w-fit flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-semibold transition-all text-sm ${
             activeTab === 'substitutes' 
               ? 'bg-slate-800 text-white shadow-sm' 
               : 'text-slate-600 hover:bg-slate-50'
@@ -99,6 +99,19 @@ export default function AttendancePage() {
           <Users className="h-4 w-4" />
           מילויי מקום
         </button>
+        {isManager && (
+          <button
+            onClick={() => setActiveTab('statistics')}
+            className={`flex-1 min-w-fit flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-semibold transition-all text-sm ${
+              activeTab === 'statistics' 
+                ? 'bg-slate-800 text-white shadow-sm' 
+                : 'text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <FileText className="h-4 w-4" />
+            סטטיסטיקה
+          </button>
+        )}
       </div>
 
       {activeTab === 'absences' && (
@@ -279,7 +292,7 @@ export default function AttendancePage() {
                   displaySubstitutes.map(sub => {
                     const config = substituteStatusConfig[sub.status] || substituteStatusConfig.reported;
                     const StatusIcon = config.icon;
-                    
+
                     return (
                       <div key={sub.id} className="flex items-start justify-between p-4 bg-slate-50 rounded-xl border border-slate-200 hover:border-purple-200 transition-colors">
                         <div className="flex-1">
@@ -323,6 +336,55 @@ export default function AttendancePage() {
             </div>
           </div>
         )}
+
+      {activeTab === 'statistics' && (
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200">
+          <div className="p-6 border-b border-slate-100">
+            <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
+              <div className="p-2 bg-blue-50 rounded-xl border border-blue-100">
+                <FileText className="h-4 w-4 text-blue-600" />
+              </div>
+              סטטיסטיקה - היעדרויות לפי עובד
+            </h2>
+          </div>
+          <div className="p-6">
+            <div className="space-y-3">
+              {(() => {
+                const staffStats = {};
+                allAbsences.forEach(absence => {
+                  if (!staffStats[absence.user_email]) {
+                    staffStats[absence.user_email] = { name: absence.user_name, total: 0, approved: 0, pending: 0, rejected: 0 };
+                  }
+                  const days = new Date(absence.end_date) - new Date(absence.start_date);
+                  staffStats[absence.user_email].total += Math.ceil(days / (1000 * 60 * 60 * 24)) + 1;
+                  staffStats[absence.user_email][absence.status] += 1;
+                });
+
+                return Object.values(staffStats).length > 0 ? (
+                  Object.values(staffStats).sort((a, b) => b.total - a.total).map((stat, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200 hover:border-blue-200 transition-colors">
+                      <div className="flex-1">
+                        <p className="font-bold text-slate-800">{stat.name}</p>
+                        <div className="flex gap-4 text-xs text-slate-600 mt-1">
+                          <span>אושרו: {stat.approved}</span>
+                          <span>ממתינים: {stat.pending}</span>
+                          <span>נדחו: {stat.rejected}</span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-blue-600">{stat.total}</p>
+                        <p className="text-xs text-slate-500">ימים בסה"כ</p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-slate-400 text-center py-12">אין נתונים סטטיסטיים</p>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
