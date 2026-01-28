@@ -6,6 +6,7 @@ import {
   ShoppingCart, Wrench, Monitor, Shield, Hammer
 } from 'lucide-react';
 import ReportingModal from '../modals/ReportingModal';
+import AbsenceReportModal from '../modals/AbsenceReportModal';
 import DailyJournal from '../journal/DailyJournal';
 
 const TEACHER_BASE_SCHEDULE = {
