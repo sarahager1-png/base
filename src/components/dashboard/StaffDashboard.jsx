@@ -77,7 +77,7 @@ export default function StaffDashboard({ user, setView }) {
                 <p className="text-slate-300 text-sm">{user.title || 'עובדת הוראה'}</p>
               </div>
             </div>
-            <p className="text-slate-300 text-sm mt-2">"לכתחילה אריבער" - יום מוצלח ומלא עשייה 🌟</p>
+
           </div>
         </div>
       </div>

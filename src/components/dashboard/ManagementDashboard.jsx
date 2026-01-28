@@ -100,7 +100,6 @@ export default function ManagementDashboard({ user }) {
         <div className="bg-gradient-to-r from-blue-900 to-indigo-800 p-6 text-white flex justify-between items-center">
           <div>
             <h2 className="text-2xl font-bold">בוקר טוב, {user.full_name}!</h2>
-            <p className="text-blue-100 text-sm opacity-90">"לכתחילה אריבער" - יום מוצלח ומלא עשייה.</p>
           </div>
           <div className="hidden md:block">
             <Shield className="h-10 w-10 text-blue-200 opacity-20" />
