@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 
 export default function ManagementDashboard({ user }) {
+  const [showAddMeeting, setShowAddMeeting] = useState(false);
   const { data: absences = [] } = useQuery({
     queryKey: ['absences', 'pending'],
     queryFn: () => base44.entities.Absence.filter({ status: 'pending' }),
