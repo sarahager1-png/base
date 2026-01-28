@@ -16,6 +16,7 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedLessons, setSelectedLessons] = useState([]);
   const [substituteName, setSubstituteName] = useState('');
+  const [showWarning, setShowWarning] = useState(false);
   
   // Reset on close
   React.useEffect(() => {
@@ -24,8 +25,20 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
       setSelectedLessons([]);
       setSubstituteName('');
       setFormData({});
+      setShowWarning(false);
     }
   }, [isOpen]);
+
+  // Fetch teachers list
+  const { data: allUsers = [] } = useQuery({
+    queryKey: ['users'],
+    queryFn: () => base44.entities.User.list(),
+    enabled: isOpen && feature === 'substitute',
+  });
+
+  const teachers = allUsers.filter(u => 
+    ['teacher', 'coordinator', 'counselor', 'vice_principal'].includes(u.role)
+  );
 
   const TEACHER_SCHEDULE = {
     0: { 1: 'הסטוריה - ח׳2', 2: 'הסטוריה - ח׳2', 3: 'פרטני', 4: 'חלון', 5: 'אזרחות - ט׳1', 6: 'אזרחות - ט׳1' },
@@ -38,6 +51,17 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
 
   const daySchedule = selectedDate ? TEACHER_SCHEDULE[new Date(selectedDate).getDay()] || {} : {};
   const frontalLessons = Object.entries(daySchedule).filter(([_, lesson]) => !['חלון', 'פרטני', 'ישיבת צוות', 'שהייה'].includes(lesson));
+  const scheduledLessonsCount = frontalLessons.length;
+  const totalHoursWithSubstitute = scheduledLessonsCount + selectedLessons.length;
+  
+  // Check if exceeds 9 hours
+  React.useEffect(() => {
+    if (totalHoursWithSubstitute > 9) {
+      setShowWarning(true);
+    } else {
+      setShowWarning(false);
+    }
+  }, [totalHoursWithSubstitute]);
 
   // Queries for history
   const { data: substituteHistory = [] } = useQuery({
@@ -217,63 +241,98 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
                 />
               </div>
 
-              {selectedDate && frontalLessons.length > 0 && (
-                <div>
-                  <label className="text-xs font-bold text-slate-500 mb-2 block">בחרי שעות פרונטליות שמילאת</label>
-                  <div className="space-y-2">
-                    {frontalLessons.map(([hourNum, lesson]) => {
-                      const [subject, className] = lesson.split(' - ');
-                      const isSelected = selectedLessons.some(l => l.hour === hourNum);
-                      return (
-                        <button
-                          key={hourNum}
-                          onClick={() => {
-                            if (isSelected) {
-                              setSelectedLessons(selectedLessons.filter(l => l.hour !== hourNum));
-                            } else {
-                              setSelectedLessons([...selectedLessons, { hour: hourNum, subject, class: className }]);
-                            }
-                          }}
-                          className={`w-full p-3 rounded-lg border-2 text-right transition-all ${
-                            isSelected 
-                              ? 'border-purple-500 bg-purple-50' 
-                              : 'border-slate-200 bg-white hover:border-purple-300'
-                          }`}
-                        >
-                          <div className="flex justify-between items-center">
-                            <span className="font-bold text-sm">שעה {hourNum}: {lesson}</span>
-                            {isSelected && <span className="text-purple-600 font-bold">✓</span>}
-                          </div>
-                        </button>
-                      );
-                    })}
+              {selectedDate && (
+                <>
+                  <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg">
+                    <p className="text-sm text-slate-700">
+                      <span className="font-bold">שעות המערכת שלך היום:</span> {scheduledLessonsCount} שעות
+                    </p>
+                    <p className="text-sm text-slate-700 mt-1">
+                      <span className="font-bold">שעות מילוי מקום שבחרת:</span> {selectedLessons.length} שעות
+                    </p>
+                    <p className={`text-sm font-bold mt-1 ${totalHoursWithSubstitute > 9 ? 'text-red-600' : 'text-green-600'}`}>
+                      סה״כ: {totalHoursWithSubstitute} שעות {totalHoursWithSubstitute > 9 && '⚠️ חריגה מ-9 שעות!'}
+                    </p>
                   </div>
-                </div>
+
+                  {showWarning && (
+                    <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-bold text-red-900">אזהרה: חריגה מ-9 שעות יומיות!</p>
+                          <p className="text-xs text-red-700 mt-1">
+                            יש לדווח על היעדרות משעות שהיו חלון/פרטני במערכת שלך, או לבחור פחות שעות מילוי מקום.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {frontalLessons.length > 0 && (
+                    <div>
+                      <label className="text-xs font-bold text-slate-500 mb-2 block">בחרי שעות פרונטליות שמילאת</label>
+                      <div className="space-y-2">
+                        {frontalLessons.map(([hourNum, lesson]) => {
+                          const [subject, className] = lesson.split(' - ');
+                          const isSelected = selectedLessons.some(l => l.hour === hourNum);
+                          return (
+                            <button
+                              key={hourNum}
+                              onClick={() => {
+                                if (isSelected) {
+                                  setSelectedLessons(selectedLessons.filter(l => l.hour !== hourNum));
+                                } else {
+                                  setSelectedLessons([...selectedLessons, { hour: hourNum, subject, class: className }]);
+                                }
+                              }}
+                              className={`w-full p-3 rounded-lg border-2 text-right transition-all ${
+                                isSelected 
+                                  ? 'border-purple-500 bg-purple-50' 
+                                  : 'border-slate-200 bg-white hover:border-purple-300'
+                              }`}
+                            >
+                              <div className="flex justify-between items-center">
+                                <span className="font-bold text-sm">שעה {hourNum}: {lesson}</span>
+                                {isSelected && <span className="text-purple-600 font-bold">✓</span>}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
 
               {selectedLessons.length > 0 && (
                 <div>
                   <label className="text-xs font-bold text-slate-500 mb-2 block">במקום מי מילאת?</label>
-                  <input
-                    type="text"
+                  <select
                     value={substituteName}
                     onChange={(e) => setSubstituteName(e.target.value)}
-                    placeholder="שם המורה"
                     className="w-full p-3 border rounded-lg"
-                  />
+                  >
+                    <option value="">בחרי מורה מהרשימה</option>
+                    {teachers.map(teacher => (
+                      <option key={teacher.id} value={teacher.full_name}>
+                        {teacher.full_name} {teacher.title && `(${teacher.title})`}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               )}
 
               <button 
                 onClick={handleSubmit}
-                disabled={!selectedDate || selectedLessons.length === 0 || !substituteName}
+                disabled={!selectedDate || selectedLessons.length === 0 || !substituteName || showWarning}
                 className={`w-full text-white py-3 rounded-xl font-bold ${
-                  !selectedDate || selectedLessons.length === 0 || !substituteName
+                  !selectedDate || selectedLessons.length === 0 || !substituteName || showWarning
                     ? 'bg-slate-300' 
                     : 'bg-purple-600 hover:bg-purple-700'
                 }`}
               >
-                שלח דיווח
+                {showWarning ? 'לא ניתן לדווח - יותר מ-9 שעות' : 'שלח דיווח'}
               </button>
             </div>
           )}
