@@ -12,6 +12,8 @@ import DailyJournal from '../journal/DailyJournal';
 import AddMeeting from '../meetings/AddMeeting';
 import MeetingsList from '../meetings/MeetingsList';
 import StatCard from '../StatCard';
+import SendMessageModal from '../messages/SendMessageModal';
+import MessagesCenter from '../messages/MessagesCenter';
 
 const TEACHER_BASE_SCHEDULE = {
   0: { 1: 'הסטוריה - ח׳2', 2: 'הסטוריה - ח׳2', 3: 'פרטני', 4: 'חלון', 5: 'אזרחות - ט׳1', 6: 'אזרחות - ט׳1' },
@@ -202,6 +204,27 @@ export default function CounselorDashboard({ user, setView }) {
           </button>
         </div>
         <MeetingsList user={user} />
+      </div>
+
+      {/* Quick Send Message to Staff */}
+      <button
+        onClick={() => setMessageModalOpen(true)}
+        className="w-full p-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-2xl hover:shadow-lg transition-all font-bold text-center flex items-center justify-center gap-2"
+      >
+        <Heart className="h-5 w-5" />
+        שלח הערה מעצימה לצוות
+      </button>
+
+      <SendMessageModal 
+        isOpen={messageModalOpen}
+        onClose={() => setMessageModalOpen(false)}
+        user={user}
+        recipientRole="staff"
+      />
+
+      {/* Messages Center */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+        <MessagesCenter user={user} />
       </div>
 
       {/* Today's Journal */}
