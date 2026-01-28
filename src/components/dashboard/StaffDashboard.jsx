@@ -6,6 +6,7 @@ import {
   ShoppingCart, Wrench, Monitor, Shield, Hammer
 } from 'lucide-react';
 import ReportingModal from '../modals/ReportingModal';
+import DailyJournal from '../journal/DailyJournal';
 
 const TEACHER_BASE_SCHEDULE = {
   0: { 1: 'הסטוריה - ח׳2', 2: 'הסטוריה - ח׳2', 3: 'פרטני', 4: 'חלון', 5: 'אזרחות - ט׳1', 6: 'אזרחות - ט׳1' },
@@ -113,6 +114,15 @@ export default function StaffDashboard({ user, setView }) {
           </div>
         </div>
       )}
+
+      {/* Today's Journal */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+        <h3 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
+          <Calendar className="h-5 w-5 text-blue-500" />
+          יומן היום
+        </h3>
+        <DailyJournal date={new Date()} />
+      </div>
 
       {/* Action Icons Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
