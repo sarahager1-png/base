@@ -11,6 +11,7 @@ import MaintenanceDashboard from '../components/dashboard/MaintenanceDashboard';
 import CoordinatorDashboard from '../components/dashboard/CoordinatorDashboard';
 import SubstituteDashboard from '../components/dashboard/SubstituteDashboard';
 import VicePrincipalDashboard from '../components/dashboard/VicePrincipalDashboard';
+import Journal from './Journal';
 
 const HEBREW_DATE = "כ״ח טבת תשפ״ו";
 const GREGORIAN_DATE = new Date().toLocaleDateString('he-IL');
@@ -183,7 +184,11 @@ export default function Dashboard() {
             <HRDashboard />
           )}
 
-          {currentView !== 'dashboard' && currentView !== 'hr' && (
+          {currentView === 'journal' && (
+            <Journal />
+          )}
+
+          {currentView !== 'dashboard' && currentView !== 'hr' && currentView !== 'journal' && (
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-10 text-center">
               <h2 className="text-2xl font-bold text-slate-800">עמוד בבנייה: {currentView}</h2>
               <p className="text-slate-500 mt-2">המודול בפיתוח</p>
