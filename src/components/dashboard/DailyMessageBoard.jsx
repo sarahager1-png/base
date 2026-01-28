@@ -23,8 +23,9 @@ export default function DailyMessageBoard({ user }) {
     queryKey: ['dailyMessage'],
     queryFn: async () => {
       const messages = await base44.entities.DailyMessage.filter({ active: true }, '-created_date', 1);
-      return messages[0];
+      return messages[0] || null;
     },
+    initialData: null,
   });
 
   const { data: allMessages = [] } = useQuery({
