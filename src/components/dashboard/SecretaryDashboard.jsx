@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import StatCard from '../StatCard';
-import { Printer, ShoppingCart, FileText, ClipboardCheck, Download } from 'lucide-react';
+import { Printer, ShoppingCart, FileText, ClipboardCheck, Download, AlertCircle } from 'lucide-react';
 
 export default function SecretaryDashboard() {
   const queryClient = useQueryClient();
@@ -16,6 +16,13 @@ export default function SecretaryDashboard() {
     queryKey: ['purchases', 'approved'],
     queryFn: () => base44.entities.PurchaseRequest.filter({ status: 'approved' }),
   });
+
+  const { data: dailyMessages = [] } = useQuery({
+    queryKey: ['dailyMessages'],
+    queryFn: () => base44.entities.DailyMessage.list('-created_date'),
+  });
+
+  const activeMessage = dailyMessages.find(msg => msg.active);
 
   const completePrint = useMutation({
     mutationFn: (id) => base44.entities.PrintRequest.update(id, { status: 'completed' }),
@@ -40,8 +47,26 @@ export default function SecretaryDashboard() {
   const totalCopies = printQueue.reduce((sum, job) => sum + job.copies, 0);
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="space-y-6 animate-fade-in">
+      {/* Daily Message */}
+      {activeMessage && (
+        <div className="bg-white border border-amber-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-amber-50 rounded-xl text-amber-600 flex-shrink-0 border border-amber-100">
+              <AlertCircle className="h-5 w-5" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-slate-800 text-base mb-2">הודעת היום</h3>
+              <p className="text-slate-600 leading-relaxed text-sm">{activeMessage.content}</p>
+              {activeMessage.created_by_name && (
+                <p className="text-xs text-slate-400 mt-3">— {activeMessage.created_by_name}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatCard 
           title="ממתין להדפסה" 
           value={printQueue.length} 
