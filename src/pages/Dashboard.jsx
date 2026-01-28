@@ -20,6 +20,7 @@ export default function Dashboard() {
   const [currentView, setCurrentView] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [demoMode, setDemoMode] = useState(false);
+  const [viewAsRole, setViewAsRole] = useState(null);
 
   useEffect(() => {
     loadUser();
@@ -78,24 +79,27 @@ export default function Dashboard() {
           </div>
           
           <div className="flex items-center gap-6">
-            {/* User Switcher for Demo */}
-            {allUsers.length > 1 && (
-              <div className="hidden md:flex items-center gap-2 bg-slate-100 p-1 rounded-lg overflow-x-auto max-w-md">
-                {allUsers.map(u => (
+            {/* Role Switcher for Admin */}
+            {user.role === 'admin' && (
+              <div className="hidden md:flex items-center gap-2 bg-slate-100 p-1 rounded-lg overflow-x-auto">
+                {[
+                  { role: null, label: 'מנהלת' },
+                  { role: 'vice_principal', label: 'סגנית' },
+                  { role: 'secretary', label: 'מזכירה' },
+                  { role: 'teacher', label: 'מורה' },
+                  { role: 'coordinator', label: 'רכזת' },
+                  { role: 'maintenance', label: 'אב בית' },
+                  { role: 'substitute', label: 'ממלאת מקום' },
+                  { role: 'assistant', label: 'סייעת' },
+                ].map(item => (
                   <button
-                    key={u.id}
-                    onClick={() => switchUser(u)}
-                    className={`px-3 py-1 text-xs rounded-md whitespace-nowrap transition-all ${user.id === u.id ? 'bg-white shadow-sm text-blue-700 font-bold' : 'text-slate-500 hover:text-slate-700'}`}
+                    key={item.role || 'admin'}
+                    onClick={() => setViewAsRole(item.role)}
+                    className={`px-3 py-1 text-xs rounded-md whitespace-nowrap transition-all ${viewAsRole === item.role ? 'bg-white shadow-sm text-blue-700 font-bold' : 'text-slate-500 hover:text-slate-700'}`}
                   >
-                    {u.full_name?.split(' ')[0] || u.full_name || u.email.split('@')[0]}
+                    {item.label}
                   </button>
                 ))}
-              </div>
-            )}
-
-            {allUsers.length <= 1 && user.role === 'admin' && (
-              <div className="hidden md:block text-xs bg-amber-50 text-amber-700 px-3 py-1.5 rounded-lg border border-amber-200">
-                💡 הזמן משתמשים נוספים דרך "ניהול צוות"
               </div>
             )}
 
