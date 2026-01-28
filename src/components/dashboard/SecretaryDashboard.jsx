@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import StatCard from '../StatCard';
-import { Printer, ShoppingCart, FileText, ClipboardCheck } from 'lucide-react';
+import { Printer, ShoppingCart, FileText, ClipboardCheck, Download } from 'lucide-react';
 
 export default function SecretaryDashboard() {
   const queryClient = useQueryClient();
@@ -23,6 +23,19 @@ export default function SecretaryDashboard() {
       queryClient.invalidateQueries({ queryKey: ['prints'] });
     },
   });
+
+  const downloadApproval = async (purchaseId) => {
+    const response = await base44.functions.invoke('generatePurchaseApproval', { purchaseId });
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `purchase-approval-${purchaseId.slice(0, 8)}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
+  };
 
   const totalCopies = printQueue.reduce((sum, job) => sum + job.copies, 0);
 
@@ -104,15 +117,28 @@ export default function SecretaryDashboard() {
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
               <ShoppingCart className="h-5 w-5 text-amber-500" />
-              רכש וספקים
+              רכש מאושר ({purchases.length})
             </h3>
-            <div className="flex gap-3">
-              <button className="flex-1 py-3 border border-slate-200 rounded-xl text-slate-600 hover:border-amber-400 hover:text-amber-600 text-sm font-medium">
-                הזמנת ציוד
-              </button>
-              <button className="flex-1 py-3 border border-slate-200 rounded-xl text-slate-600 hover:border-amber-400 hover:text-amber-600 text-sm font-medium">
-                ניהול ספקים
-              </button>
+            <div className="space-y-3">
+              {purchases.length > 0 ? (
+                purchases.map(purchase => (
+                  <div key={purchase.id} className="flex items-center justify-between p-4 bg-amber-50 rounded-xl border border-amber-200">
+                    <div>
+                      <p className="font-bold text-slate-800">{purchase.item_name}</p>
+                      <p className="text-xs text-slate-500">{purchase.user_name} • {purchase.estimated_cost ? `₪${purchase.estimated_cost}` : 'ללא עלות'}</p>
+                    </div>
+                    <button 
+                      onClick={() => downloadApproval(purchase.id)}
+                      className="px-4 py-2 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 transition-colors shadow-sm flex items-center gap-2"
+                    >
+                      <Download className="h-4 w-4" />
+                      הורד אישור
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p className="text-slate-400 text-center py-8">אין רכש מאושר</p>
+              )}
             </div>
           </div>
         </div>
