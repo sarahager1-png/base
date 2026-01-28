@@ -3,13 +3,15 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { 
   Calendar, Stethoscope, Clock, Map, Printer, 
-  ShoppingCart, Wrench, Monitor, Shield, Hammer, Timer, Sparkles
+  ShoppingCart, Wrench, Monitor, Shield, Hammer, Timer, Sparkles, Heart, Mail
 } from 'lucide-react';
 import ReportingModal from '../modals/ReportingModal';
 import AbsenceReportModal from '../modals/AbsenceReportModal';
 import PrintRequestModal from '../modals/PrintRequestModal';
 import DailyJournal from '../journal/DailyJournal';
 import DailyMessageBoard from './DailyMessageBoard';
+import SendMessageModal from '../messages/SendMessageModal';
+import MessagesCenter from '../messages/MessagesCenter';
 
 const TEACHER_BASE_SCHEDULE = {
   0: { 1: 'הסטוריה - ח׳2', 2: 'הסטוריה - ח׳2', 3: 'פרטני', 4: 'חלון', 5: 'אזרחות - ט׳1', 6: 'אזרחות - ט׳1' },
@@ -25,6 +27,7 @@ export default function StaffDashboard({ user, setView }) {
   const [activeFeature, setActiveFeature] = useState(null);
   const [absenceModalOpen, setAbsenceModalOpen] = useState(false);
   const [printModalOpen, setPrintModalOpen] = useState(false);
+  const [messageModalOpen, setMessageModalOpen] = useState(false);
 
   const { data: myDuty } = useQuery({
     queryKey: ['duty', user.email, new Date().getDate()],
@@ -62,6 +65,12 @@ export default function StaffDashboard({ user, setView }) {
         isOpen={printModalOpen}
         onClose={() => setPrintModalOpen(false)}
         user={user}
+      />
+      <SendMessageModal 
+        isOpen={messageModalOpen}
+        onClose={() => setMessageModalOpen(false)}
+        user={user}
+        recipientRole="leadership"
       />
 
       <DailyMessageBoard user={user} />
@@ -193,6 +202,15 @@ export default function StaffDashboard({ user, setView }) {
         </div>
       </div>
 
+      {/* Quick Send Message */}
+      <button
+        onClick={() => setMessageModalOpen(true)}
+        className="w-full p-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-2xl hover:shadow-lg transition-all font-bold text-center flex items-center justify-center gap-2"
+      >
+        <Heart className="h-5 w-5" />
+        שלח הודעה למנהלת / סגנית / יועצת
+      </button>
+
       {/* Duty Alert */}
       {myDuty && (
         <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-center justify-between">
@@ -207,6 +225,11 @@ export default function StaffDashboard({ user, setView }) {
           </div>
         </div>
       )}
+
+      {/* Messages Center */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+        <MessagesCenter user={user} />
+      </div>
 
 
     </div>
