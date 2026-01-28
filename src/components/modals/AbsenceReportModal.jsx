@@ -102,7 +102,6 @@ export default function AbsenceReportModal({ isOpen, onClose, user }) {
       lesson_hours: lessonHours,
       medical_certificate_required: requiresCertificate,
       medical_certificate_url: certificateUrl,
-      substitute_teacher_email: substituteEmail,
       substitute_teacher_name: substituteName,
       status: requiresCertificate && !certificateUrl ? 'awaiting_certificate' : 'pending',
       choice_days_used: absenceReason === 'choice_day' ? 1 : 0,
@@ -174,11 +173,16 @@ export default function AbsenceReportModal({ isOpen, onClose, user }) {
           {/* Lesson Hours */}
           <div>
             <div className="flex justify-between items-center mb-3">
-              <label className="text-sm font-bold text-slate-700">שעות מערכת שבהן נעדרת</label>
-              <Button onClick={addLessonHour} variant="outline" size="sm">
-                <Clock className="h-4 w-4 mr-1" />
-                הוסף שעה
-              </Button>
+              <label className="text-sm font-bold text-slate-700">היעדרות</label>
+              <div className="flex gap-2">
+                <Button onClick={() => setLessonHours([{ date: startDate, hour_number: 0, subject: 'כל היום', class_name: '' }])} variant="outline" size="sm">
+                  כל היום
+                </Button>
+                <Button onClick={addLessonHour} variant="outline" size="sm">
+                  <Clock className="h-4 w-4 mr-1" />
+                  הוסף שעה
+                </Button>
+              </div>
             </div>
             <div className="space-y-2">
               {lessonHours.map((hour, index) => (
@@ -189,29 +193,37 @@ export default function AbsenceReportModal({ isOpen, onClose, user }) {
                     onChange={(e) => updateLessonHour(index, 'date', e.target.value)}
                     className="p-2 border border-slate-300 rounded text-sm"
                   />
-                  <input
-                    type="number"
-                    placeholder="שעה"
-                    min="1"
-                    max="8"
-                    value={hour.hour_number}
-                    onChange={(e) => updateLessonHour(index, 'hour_number', parseInt(e.target.value))}
-                    className="p-2 border border-slate-300 rounded text-sm"
-                  />
-                  <input
-                    type="text"
-                    placeholder="מקצוע"
-                    value={hour.subject}
-                    onChange={(e) => updateLessonHour(index, 'subject', e.target.value)}
-                    className="p-2 border border-slate-300 rounded text-sm"
-                  />
-                  <input
-                    type="text"
-                    placeholder="כיתה"
-                    value={hour.class_name}
-                    onChange={(e) => updateLessonHour(index, 'class_name', e.target.value)}
-                    className="p-2 border border-slate-300 rounded text-sm"
-                  />
+                  {hour.subject !== 'כל היום' ? (
+                    <>
+                      <input
+                        type="number"
+                        placeholder="שעה"
+                        min="1"
+                        max="8"
+                        value={hour.hour_number}
+                        onChange={(e) => updateLessonHour(index, 'hour_number', parseInt(e.target.value))}
+                        className="p-2 border border-slate-300 rounded text-sm"
+                      />
+                      <input
+                        type="text"
+                        placeholder="מקצוע"
+                        value={hour.subject}
+                        onChange={(e) => updateLessonHour(index, 'subject', e.target.value)}
+                        className="p-2 border border-slate-300 rounded text-sm"
+                      />
+                      <input
+                        type="text"
+                        placeholder="כיתה"
+                        value={hour.class_name}
+                        onChange={(e) => updateLessonHour(index, 'class_name', e.target.value)}
+                        className="p-2 border border-slate-300 rounded text-sm"
+                      />
+                    </>
+                  ) : (
+                    <div className="col-span-3 flex items-center justify-center text-slate-600 font-bold">
+                      כל היום
+                    </div>
+                  )}
                   <button
                     onClick={() => removeLessonHour(index)}
                     className="text-red-600 hover:bg-red-50 rounded p-2 text-sm font-bold"
@@ -226,27 +238,15 @@ export default function AbsenceReportModal({ isOpen, onClose, user }) {
           {/* Substitute Teacher */}
           <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
             <h4 className="font-bold text-purple-900 mb-3">ממלאת מקום</h4>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">שם ממלאת המקום</label>
-                <input
-                  type="text"
-                  value={substituteName}
-                  onChange={(e) => setSubstituteName(e.target.value)}
-                  placeholder="לדוגמה: רחל לוי"
-                  className="w-full p-2 border border-purple-300 rounded-lg bg-white"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">אימייל ממלאת המקום</label>
-                <input
-                  type="email"
-                  value={substituteEmail}
-                  onChange={(e) => setSubstituteEmail(e.target.value)}
-                  placeholder="rachel@example.com"
-                  className="w-full p-2 border border-purple-300 rounded-lg bg-white"
-                />
-              </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">שם ממלאת המקום</label>
+              <input
+                type="text"
+                value={substituteName}
+                onChange={(e) => setSubstituteName(e.target.value)}
+                placeholder="לדוגמה: רחל לוי"
+                className="w-full p-2 border border-purple-300 rounded-lg bg-white"
+              />
             </div>
           </div>
 

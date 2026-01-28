@@ -13,13 +13,31 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
 
   // Form states
   const [formData, setFormData] = useState({});
-  const [subHoursCount, setSubHoursCount] = useState(0);
-  const [offsetType, setOffsetType] = useState('');
-  const [dutyAlert, setDutyAlert] = useState(false);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedLessons, setSelectedLessons] = useState([]);
+  const [substituteName, setSubstituteName] = useState('');
+  
+  // Reset on close
+  React.useEffect(() => {
+    if (!isOpen) {
+      setSelectedDate('');
+      setSelectedLessons([]);
+      setSubstituteName('');
+      setFormData({});
+    }
+  }, [isOpen]);
 
-  const currentHours = 7; // Mock current daily hours
-  const totalHours = currentHours + subHoursCount;
-  const isOverLimit = totalHours > 9;
+  const TEACHER_SCHEDULE = {
+    0: { 1: 'הסטוריה - ח׳2', 2: 'הסטוריה - ח׳2', 3: 'פרטני', 4: 'חלון', 5: 'אזרחות - ט׳1', 6: 'אזרחות - ט׳1' },
+    1: { 1: 'חלון', 2: 'הסטוריה - ח׳3', 3: 'הסטוריה - ח׳3', 4: 'ישיבת צוות', 5: 'הסטוריה - ח׳2' },
+    2: { 1: 'אזרחות - ט׳1', 2: 'אזרחות - ט׳1', 3: 'הסטוריה - ח׳2', 4: 'הסטוריה - ח׳2', 5: 'שהייה', 6: 'שהייה' },
+    3: { 1: 'הסטוריה - ח׳3', 2: 'הסטוריה - ח׳3', 3: 'חלון', 4: 'פרטני', 5: 'חינוך - ח׳2' },
+    4: { 1: 'חלון', 2: 'חלון', 3: 'הסטוריה - ח׳2', 4: 'הסטוריה - ח׳2', 5: 'אזרחות - ט׳1' },
+    5: { 1: 'סיכום שבוע - ח׳2', 2: 'פרטני' },
+  };
+
+  const daySchedule = selectedDate ? TEACHER_SCHEDULE[new Date(selectedDate).getDay()] || {} : {};
+  const frontalLessons = Object.entries(daySchedule).filter(([_, lesson]) => !['חלון', 'פרטני', 'ישיבת צוות', 'שהייה'].includes(lesson));
 
   // Queries for history
   const { data: substituteHistory = [] } = useQuery({
@@ -90,14 +108,14 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
 
   const handleSubmit = () => {
     if (feature === 'substitute') {
-      if (isOverLimit && !offsetType) return;
       createSubstitute.mutate({
         reporter_email: user.email,
         reporter_name: user.full_name,
-        date: formData.date,
-        original_teacher: formData.original_teacher,
-        hours_count: subHoursCount,
-        offset_hour_type: offsetType || 'none',
+        date: selectedDate,
+        hours_count: selectedLessons.length,
+        class_name: selectedLessons.map(l => l.class).join(', '),
+        subject: selectedLessons.map(l => l.subject).join(', '),
+        original_teacher: substituteName,
       });
     } else if (feature === 'overtime') {
       createOvertime.mutate({
@@ -190,44 +208,70 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
                 <label className="text-xs font-bold text-slate-500">תאריך</label>
                 <input 
                   type="date" 
-                  className="w-full p-2 border rounded-lg"
-                  onChange={(e) => setFormData({...formData, date: e.target.value})}
-                />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-slate-500">כמות שעות</label>
-                <select 
+                  value={selectedDate}
                   className="w-full p-2 border rounded-lg"
                   onChange={(e) => {
-                    const val = e.target.value;
-                    setSubHoursCount(val === 'day' ? 6 : parseInt(val) || 0);
+                    setSelectedDate(e.target.value);
+                    setSelectedLessons([]);
                   }}
-                >
-                  <option value="0">בחר...</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="day">יום מלא (6)</option>
-                </select>
+                />
               </div>
-              {isOverLimit && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs">
-                  <p className="font-bold text-red-600 flex items-center gap-1 mb-2">
-                    <AlertTriangle className="h-3 w-3"/> חריגה (מעל 9 שעות)
-                  </p>
-                  <select 
-                    className="w-full p-1 border border-red-300 rounded bg-white"
-                    onChange={(e) => setOffsetType(e.target.value)}
-                  >
-                    <option value="">בחר שעה לקיזוז...</option>
-                    <option value="stay">שהייה</option>
-                    <option value="individual">פרטני</option>
-                  </select>
+
+              {selectedDate && frontalLessons.length > 0 && (
+                <div>
+                  <label className="text-xs font-bold text-slate-500 mb-2 block">בחרי שעות פרונטליות שמילאת</label>
+                  <div className="space-y-2">
+                    {frontalLessons.map(([hourNum, lesson]) => {
+                      const [subject, className] = lesson.split(' - ');
+                      const isSelected = selectedLessons.some(l => l.hour === hourNum);
+                      return (
+                        <button
+                          key={hourNum}
+                          onClick={() => {
+                            if (isSelected) {
+                              setSelectedLessons(selectedLessons.filter(l => l.hour !== hourNum));
+                            } else {
+                              setSelectedLessons([...selectedLessons, { hour: hourNum, subject, class: className }]);
+                            }
+                          }}
+                          className={`w-full p-3 rounded-lg border-2 text-right transition-all ${
+                            isSelected 
+                              ? 'border-purple-500 bg-purple-50' 
+                              : 'border-slate-200 bg-white hover:border-purple-300'
+                          }`}
+                        >
+                          <div className="flex justify-between items-center">
+                            <span className="font-bold text-sm">שעה {hourNum}: {lesson}</span>
+                            {isSelected && <span className="text-purple-600 font-bold">✓</span>}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
+
+              {selectedLessons.length > 0 && (
+                <div>
+                  <label className="text-xs font-bold text-slate-500 mb-2 block">במקום מי מילאת?</label>
+                  <input
+                    type="text"
+                    value={substituteName}
+                    onChange={(e) => setSubstituteName(e.target.value)}
+                    placeholder="שם המורה"
+                    className="w-full p-3 border rounded-lg"
+                  />
+                </div>
+              )}
+
               <button 
                 onClick={handleSubmit}
-                disabled={isOverLimit && !offsetType}
-                className={`w-full text-white py-3 rounded-xl font-bold ${isOverLimit && !offsetType ? 'bg-slate-300' : 'bg-blue-600 hover:bg-blue-700'}`}
+                disabled={!selectedDate || selectedLessons.length === 0 || !substituteName}
+                className={`w-full text-white py-3 rounded-xl font-bold ${
+                  !selectedDate || selectedLessons.length === 0 || !substituteName
+                    ? 'bg-slate-300' 
+                    : 'bg-purple-600 hover:bg-purple-700'
+                }`}
               >
                 שלח דיווח
               </button>
