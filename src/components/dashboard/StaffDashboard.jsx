@@ -20,6 +20,7 @@ const TEACHER_BASE_SCHEDULE = {
 export default function StaffDashboard({ user, setView }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [activeFeature, setActiveFeature] = useState(null);
+  const [absenceModalOpen, setAbsenceModalOpen] = useState(false);
 
   const { data: myDuty } = useQuery({
     queryKey: ['duty', user.email, new Date().getDate()],
@@ -46,6 +47,11 @@ export default function StaffDashboard({ user, setView }) {
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         feature={activeFeature}
+        user={user}
+      />
+      <AbsenceReportModal 
+        isOpen={absenceModalOpen}
+        onClose={() => setAbsenceModalOpen(false)}
         user={user}
       />
 
@@ -126,7 +132,7 @@ export default function StaffDashboard({ user, setView }) {
 
       {/* Action Icons Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-        <button onClick={() => openFeature('absence')} className="relative overflow-hidden flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-red-300 hover:bg-red-50 transition-all group text-center h-24 justify-center">
+        <button onClick={() => setAbsenceModalOpen(true)} className="relative overflow-hidden flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-red-300 hover:bg-red-50 transition-all group text-center h-24 justify-center">
           <div className="absolute top-0 right-0 bg-red-100 text-[10px] text-red-700 font-bold px-2 py-0.5 rounded-bl-lg">לדיווח</div>
           <div className="p-3 bg-red-50 rounded-full text-red-500 group-hover:scale-110 transition-transform mb-2">
             <Stethoscope className="h-6 w-6" />

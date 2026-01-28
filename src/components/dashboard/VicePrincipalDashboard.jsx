@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import StatCard from '../StatCard';
 import ReportingModal from '../modals/ReportingModal';
+import AbsenceReportModal from '../modals/AbsenceReportModal';
+import AbsenceApprovalPanel from './AbsenceApprovalPanel';
 import AddMeeting from '../meetings/AddMeeting';
 import MeetingsList from '../meetings/MeetingsList';
 import { 
@@ -14,6 +16,7 @@ export default function VicePrincipalDashboard({ user, setView }) {
   const [showAddMeeting, setShowAddMeeting] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [activeFeature, setActiveFeature] = useState(null);
+  const [absenceModalOpen, setAbsenceModalOpen] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: absences = [] } = useQuery({
@@ -66,6 +69,11 @@ export default function VicePrincipalDashboard({ user, setView }) {
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         feature={activeFeature}
+        user={user}
+      />
+      <AbsenceReportModal 
+        isOpen={absenceModalOpen}
+        onClose={() => setAbsenceModalOpen(false)}
         user={user}
       />
 
@@ -130,7 +138,7 @@ export default function VicePrincipalDashboard({ user, setView }) {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3">
-        <button onClick={() => openFeature('absence')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-red-300 hover:bg-red-50 transition-all group text-center h-24 justify-center">
+        <button onClick={() => setAbsenceModalOpen(true)} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-red-300 hover:bg-red-50 transition-all group text-center h-24 justify-center">
           <div className="p-3 bg-red-50 rounded-full text-red-500 group-hover:scale-110 transition-transform mb-2">
             <Clock className="h-6 w-6" />
           </div>
@@ -173,34 +181,7 @@ export default function VicePrincipalDashboard({ user, setView }) {
             <Clock className="h-5 w-5 text-amber-500" />
             היעדרויות לאישור
           </h3>
-          <div className="space-y-3">
-            {absences.length > 0 ? (
-              absences.map(absence => (
-                <div key={absence.id} className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
-                  <div>
-                    <p className="font-bold text-slate-800">{absence.user_name}</p>
-                    <p className="text-sm text-slate-600">{absence.absence_type} | {absence.start_date} - {absence.end_date}</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={() => updateAbsence.mutate({ id: absence.id, status: 'approved' })}
-                      className="p-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200"
-                    >
-                      <CheckCircle className="h-5 w-5" />
-                    </button>
-                    <button 
-                      onClick={() => updateAbsence.mutate({ id: absence.id, status: 'rejected' })}
-                      className="p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200"
-                    >
-                      <XCircle className="h-5 w-5" />
-                    </button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-slate-400 text-center py-8">אין היעדרויות ממתינות</p>
-            )}
-          </div>
+          <AbsenceApprovalPanel />
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
