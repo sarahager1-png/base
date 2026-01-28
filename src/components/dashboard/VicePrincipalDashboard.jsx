@@ -60,7 +60,7 @@ export default function VicePrincipalDashboard({ user, setView }) {
         staff_email: user.email, 
         day: today 
       });
-      return duties[0];
+      return duties[0] || null;
     },
   });
 

@@ -34,7 +34,7 @@ export default function StaffDashboard({ user, setView }) {
         staff_email: user.email, 
         day: today 
       });
-      return duties[0];
+      return duties[0] || null;
     },
   });
 
