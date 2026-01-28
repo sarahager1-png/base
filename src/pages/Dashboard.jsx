@@ -24,6 +24,8 @@ import Maintenance from './Maintenance';
 import Printing from './Printing';
 import Onboarding from './Onboarding';
 import Notifications from './Notifications';
+import DutyManagement from './DutyManagement';
+import RoomManagement from './RoomManagement';
 
 const HEBREW_DATE = "כ״ח טבת תשפ״ו";
 const GREGORIAN_DATE = new Date().toLocaleDateString('he-IL');
@@ -209,6 +211,8 @@ export default function Dashboard() {
           {currentView === 'schedule' && <Schedule />}
           {currentView === 'tasks' && <Tasks />}
           {currentView === 'attendance' && <Attendance />}
+          {currentView === 'duty-management' && <DutyManagement />}
+          {currentView === 'room-management' && <RoomManagement />}
           {currentView === 'community' && <Community />}
           {currentView === 'maintenance' && <Maintenance />}
           {currentView === 'printing' && <Printing />}

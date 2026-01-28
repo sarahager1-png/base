@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   Home, Calendar, CheckSquare, Clock, Users, UserPlus,
-  Printer, Settings, Heart, LogOut, X, Bell
+  Printer, Settings, Heart, LogOut, X, Bell, Shield as ShieldIcon
 } from 'lucide-react';
 
 export default function Sidebar({ activeView, setView, user, isOpen, closeSidebar, onLogout }) {
