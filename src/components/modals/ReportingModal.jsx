@@ -505,7 +505,7 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
                 <textarea 
                   className="w-full p-2 border rounded-lg" 
                   rows="3"
-                  placeholder="לדוגמה: הכנת מערכי שיעור, תיקון מבחנים"
+                  placeholder="לדוגמה: אסיפת הורים, פעילות עם תלמידים, הכנת מערכי שיעור"
                   onChange={(e) => setFormData({...formData, reason: e.target.value})}
                 ></textarea>
               </div>
