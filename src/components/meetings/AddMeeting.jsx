@@ -21,27 +21,16 @@ export default function AddMeeting({ user, onClose }) {
     status: 'scheduled'
   });
 
-  const [syncToGoogle, setSyncToGoogle] = useState(true);
-
   const queryClient = useQueryClient();
 
   const createMeeting = useMutation({
     mutationFn: async (data) => {
       const meeting = await base44.entities.Meeting.create(data);
-      
-      if (syncToGoogle) {
-        try {
-          await base44.functions.invoke('syncMeetingToCalendar', { meetingId: meeting.id });
-          toast.success('הפגישה נוספה גם ליומן גוגל');
-        } catch (error) {
-          toast.error('הפגישה נוצרה אך לא סונכרנה ליומן גוגל');
-        }
-      }
-      
       return meeting;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['meetings'] });
+      toast.success('הפגישה נקבעה בהצלחה');
       onClose();
     },
   });
@@ -138,19 +127,6 @@ export default function AddMeeting({ user, onClose }) {
               className="h-24"
               required
             />
-          </div>
-
-          <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
-            <input
-              type="checkbox"
-              id="syncGoogle"
-              checked={syncToGoogle}
-              onChange={(e) => setSyncToGoogle(e.target.checked)}
-              className="w-4 h-4"
-            />
-            <label htmlFor="syncGoogle" className="text-sm text-blue-800 cursor-pointer">
-              סנכרן ליומן Google Calendar שלי
-            </label>
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
