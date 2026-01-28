@@ -203,7 +203,7 @@ export default function Dashboard() {
               )}
 
               {(viewAsRole === 'secretary') && (
-                <SecretaryDashboard />
+                <SecretaryDashboard user={{...user, role: 'secretary'}} />
               )}
 
               {(['teacher', 'assistant'].includes(viewAsRole)) && (
@@ -215,7 +215,7 @@ export default function Dashboard() {
               )}
               
               {(viewAsRole === 'maintenance') && (
-                <MaintenanceDashboard />
+                <MaintenanceDashboard user={{...user, role: 'maintenance'}} />
               )}
               
               {(viewAsRole === 'substitute') && (
@@ -225,8 +225,8 @@ export default function Dashboard() {
               {!viewAsRole && user.role === 'vice_principal' && (
                 <VicePrincipalDashboard user={user} setView={setCurrentView} />
               )}
-              {!viewAsRole && user.role === 'secretary' && <SecretaryDashboard />}
-              {!viewAsRole && user.role === 'maintenance' && <MaintenanceDashboard />}
+              {!viewAsRole && user.role === 'secretary' && <SecretaryDashboard user={user} />}
+              {!viewAsRole && user.role === 'maintenance' && <MaintenanceDashboard user={user} />}
               {!viewAsRole && user.role === 'substitute' && <SubstituteDashboard user={user} />}
               {!viewAsRole && user.role === 'counselor' && (
                 <CounselorDashboard user={user} setView={setCurrentView} />
