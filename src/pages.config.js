@@ -51,6 +51,7 @@ import Attendance from './pages/Attendance';
 import Community from './pages/Community';
 import Dashboard from './pages/Dashboard';
 import DutyManagement from './pages/DutyManagement';
+import FileManagement from './pages/FileManagement';
 import Journal from './pages/Journal';
 import JournalManagement from './pages/JournalManagement';
 import Maintenance from './pages/Maintenance';
@@ -60,7 +61,6 @@ import Printing from './pages/Printing';
 import RoomManagement from './pages/RoomManagement';
 import Schedule from './pages/Schedule';
 import Tasks from './pages/Tasks';
-import FileManagement from './pages/FileManagement';
 
 
 export const PAGES = {
@@ -68,6 +68,7 @@ export const PAGES = {
     "Community": Community,
     "Dashboard": Dashboard,
     "DutyManagement": DutyManagement,
+    "FileManagement": FileManagement,
     "Journal": Journal,
     "JournalManagement": JournalManagement,
     "Maintenance": Maintenance,
@@ -77,7 +78,6 @@ export const PAGES = {
     "RoomManagement": RoomManagement,
     "Schedule": Schedule,
     "Tasks": Tasks,
-    "FileManagement": FileManagement,
 }
 
 export const pagesConfig = {
