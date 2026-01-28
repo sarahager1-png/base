@@ -97,12 +97,19 @@ export default function ManagementDashboard({ user }) {
     <div className="space-y-8 animate-fade-in">
       {/* Daily Message Board */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-900 to-indigo-800 p-6 text-white flex justify-between items-center">
-          <div>
-            <h2 className="text-2xl font-bold">בוקר טוב, {user.full_name}!</h2>
-          </div>
-          <div className="hidden md:block">
-            <Shield className="h-10 w-10 text-blue-200 opacity-20" />
+        <div className="bg-gradient-to-r from-blue-900 to-indigo-800 p-8 text-white">
+          <div className="flex justify-between items-start mb-4">
+            <div className="flex-1">
+              <div className="w-16 h-16 bg-white/20 rounded-lg flex items-center justify-center border border-white/30 mb-4">
+                <Shield className="h-8 w-8 text-blue-200" />
+              </div>
+              <h1 className="text-3xl font-bold">מערכת ניהול בית הספר</h1>
+              <p className="text-blue-100 text-sm mt-2">רשת חינוך חב״ד • {new Date().toLocaleDateString('he-IL', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-blue-100 text-sm">ברוך הבא,</p>
+              <p className="text-xl font-bold">{user.full_name}</p>
+            </div>
           </div>
         </div>
         <div className="p-6 bg-blue-50/50 border-b border-blue-100">
