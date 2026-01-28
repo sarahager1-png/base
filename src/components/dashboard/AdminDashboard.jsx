@@ -8,7 +8,7 @@ import AddMeeting from '../meetings/AddMeeting';
 import DailyMessageBoard from './DailyMessageBoard';
 import {
   Users, AlertTriangle, Clock, ShoppingCart, FileText,
-  Wrench, BarChart3, TrendingUp, Plus, Calendar, Send
+  Wrench, BarChart3, TrendingUp, Plus, Calendar, Send, Bell
 } from 'lucide-react';
 import { toast } from 'sonner';
 
