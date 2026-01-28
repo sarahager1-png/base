@@ -22,12 +22,6 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
   const isOverLimit = totalHours > 9;
 
   // Queries for history
-  const { data: absenceHistory = [] } = useQuery({
-    queryKey: ['absences', user.email],
-    queryFn: () => base44.entities.Absence.filter({ user_email: user.email }, '-created_date', 10),
-    enabled: isOpen && feature === 'absence' && activeTab === 'history',
-  });
-
   const { data: substituteHistory = [] } = useQuery({
     queryKey: ['substitutes', user.email],
     queryFn: () => base44.entities.SubstituteReport.filter({ reporter_email: user.email }, '-created_date', 10),
@@ -52,14 +46,7 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
     enabled: isOpen && feature === 'copies' && activeTab === 'history',
   });
 
-  // Mutations
-  const createAbsence = useMutation({
-    mutationFn: (data) => base44.entities.Absence.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['absences'] });
-      onClose();
-    },
-  });
+
 
   const createSubstitute = useMutation({
     mutationFn: (data) => base44.entities.SubstituteReport.create(data),
@@ -102,16 +89,7 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
   });
 
   const handleSubmit = () => {
-    if (feature === 'absence') {
-      createAbsence.mutate({
-        user_email: user.email,
-        user_name: user.full_name,
-        absence_type: formData.absence_type || 'sick',
-        start_date: formData.start_date,
-        end_date: formData.end_date,
-        medical_certificate_url: formData.file_url,
-      });
-    } else if (feature === 'substitute') {
+    if (feature === 'substitute') {
       if (isOverLimit && !offsetType) return;
       createSubstitute.mutate({
         reporter_email: user.email,
@@ -161,7 +139,6 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
   if (!isOpen) return null;
 
   const featureConfig = {
-    absence: { icon: Stethoscope, title: 'דיווח היעדרות', color: 'red' },
     substitute: { icon: Clock, title: 'דיווח מילוי מקום', color: 'purple' },
     external: { icon: Map, title: 'פעילות חוץ', color: 'green' },
     overtime: { icon: Timer, title: 'שעות נוספות', color: 'amber' },
@@ -206,59 +183,6 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
         )}
 
         <div className="p-6 overflow-y-auto flex-1">
-          {/* ABSENCE */}
-          {feature === 'absence' && activeTab === 'report' && (
-            <div className="space-y-4">
-              <div>
-                <label className="text-xs font-bold text-slate-500">סוג היעדרות</label>
-                <select 
-                  className="w-full p-2 border rounded-lg bg-white"
-                  onChange={(e) => setFormData({...formData, absence_type: e.target.value})}
-                >
-                  <option value="sick">מחלה</option>
-                  <option value="child_sick">מחלת ילד</option>
-                  <option value="personal_day">יום בחירה</option>
-                  <option value="bereavement">אבל</option>
-                </select>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="text-xs font-bold text-slate-500">מ-</label>
-                  <input 
-                    type="date" 
-                    className="w-full p-2 border rounded-lg"
-                    onChange={(e) => setFormData({...formData, start_date: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-slate-500">עד</label>
-                  <input 
-                    type="date" 
-                    className="w-full p-2 border rounded-lg"
-                    onChange={(e) => setFormData({...formData, end_date: e.target.value})}
-                  />
-                </div>
-              </div>
-              <button 
-                onClick={handleSubmit}
-                className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200"
-              >
-                שלח דיווח
-              </button>
-            </div>
-          )}
-
-          {feature === 'absence' && activeTab === 'history' && (
-            <div className="space-y-2">
-              {absenceHistory.map(abs => (
-                <div key={abs.id} className="p-3 border rounded-lg">
-                  <p className="font-bold text-sm">{abs.start_date} - {abs.end_date}</p>
-                  <p className="text-xs text-slate-500">{abs.absence_type} • {abs.status}</p>
-                </div>
-              ))}
-            </div>
-          )}
-
           {/* SUBSTITUTE */}
           {feature === 'substitute' && activeTab === 'report' && (
             <div className="space-y-4">
