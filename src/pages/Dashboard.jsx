@@ -12,6 +12,7 @@ import MaintenanceDashboard from '../components/dashboard/MaintenanceDashboard';
 import CoordinatorDashboard from '../components/dashboard/CoordinatorDashboard';
 import SubstituteDashboard from '../components/dashboard/SubstituteDashboard';
 import VicePrincipalDashboard from '../components/dashboard/VicePrincipalDashboard';
+import CounselorDashboard from '../components/dashboard/CounselorDashboard';
 import Journal from './Journal';
 import JournalManagement from './JournalManagement';
 import Schedule from './Schedule';
@@ -164,8 +165,12 @@ export default function Dashboard() {
                 <SecretaryDashboard />
               )}
 
-              {(['teacher', 'assistant', 'counselor'].includes(viewAsRole)) && (
+              {(['teacher', 'assistant'].includes(viewAsRole)) && (
                 <StaffDashboard user={{...user, role: viewAsRole}} setView={setCurrentView} />
+              )}
+
+              {(viewAsRole === 'counselor') && (
+                <CounselorDashboard user={{...user, role: 'counselor'}} setView={setCurrentView} />
               )}
               
               {(viewAsRole === 'maintenance') && (
@@ -187,7 +192,10 @@ export default function Dashboard() {
               {!viewAsRole && user.role === 'maintenance' && <MaintenanceDashboard />}
               {!viewAsRole && user.role === 'coordinator' && <CoordinatorDashboard />}
               {!viewAsRole && user.role === 'substitute' && <SubstituteDashboard user={user} />}
-              {!viewAsRole && ['teacher', 'assistant', 'counselor'].includes(user.role) && (
+              {!viewAsRole && user.role === 'counselor' && (
+                <CounselorDashboard user={user} setView={setCurrentView} />
+              )}
+              {!viewAsRole && ['teacher', 'assistant'].includes(user.role) && (
                 <StaffDashboard user={user} setView={setCurrentView} />
               )}
             </>
