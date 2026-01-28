@@ -351,11 +351,26 @@ export default function PrintingPage() {
                             </span>
                           )}
                         </div>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-slate-600">
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm text-slate-600">
                           <span>👤 {request.user_name}</span>
                           <span>📚 {request.subject}</span>
                           <span>🏫 {request.class_name}</span>
-                          <span>📄 {request.copies} × {request.pages_per_copy} = {request.total_pages} דפים</span>
+                          <span>📄 {request.total_pages} דפים</span>
+                          <span className="flex items-center gap-1">
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                              request.paper_size === 'special' ? 'bg-amber-100 text-amber-700' :
+                              request.paper_size === 'A3' ? 'bg-blue-100 text-blue-700' :
+                              'bg-slate-100 text-slate-600'
+                            }`}>
+                              {request.paper_size === 'special' ? 'מיוחד' :
+                               request.paper_size === 'A3' ? 'A3' : 'A4'}
+                            </span>
+                            {request.color_mode === 'color' && (
+                              <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-purple-100 text-purple-700">
+                                צבעוני
+                              </span>
+                            )}
+                          </span>
                         </div>
                         <p className="text-xs text-slate-400 mt-2">
                           {new Date(request.created_date).toLocaleDateString('he-IL')}
@@ -430,11 +445,26 @@ export default function PrintingPage() {
                           <FileText className="h-4 w-4 text-blue-500" />
                           <span className="font-bold text-slate-800">{request.file_name}</span>
                         </div>
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm text-slate-600">
+                        <div className="grid grid-cols-2 md:grid-cols-6 gap-2 text-sm text-slate-600">
                           <span>👤 {request.user_name}</span>
                           <span>📚 {request.subject}</span>
                           <span>🏫 {request.class_name}</span>
                           <span>📄 {request.total_pages} דפים</span>
+                          <span className="flex items-center gap-1">
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                              request.paper_size === 'special' ? 'bg-amber-100 text-amber-700' :
+                              request.paper_size === 'A3' ? 'bg-blue-100 text-blue-700' :
+                              'bg-slate-100 text-slate-600'
+                            }`}>
+                              {request.paper_size === 'special' ? 'מיוחד' :
+                               request.paper_size === 'A3' ? 'A3' : 'A4'}
+                            </span>
+                            {request.color_mode === 'color' && (
+                              <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-purple-100 text-purple-700">
+                                צבעוני
+                              </span>
+                            )}
+                          </span>
                           <span>✅ {request.approved_by}</span>
                         </div>
                       </div>
@@ -486,10 +516,23 @@ export default function PrintingPage() {
                                request.status === 'printing' ? 'בהדפסה' : 'הושלם'}
                             </span>
                           </div>
-                          <div className="flex items-center gap-4 text-sm text-slate-600">
+                          <div className="flex items-center gap-4 text-sm text-slate-600 flex-wrap">
                             <span>📚 {request.subject}</span>
                             <span>🏫 {request.class_name}</span>
                             <span>📄 {request.total_pages} דפים</span>
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                              request.paper_size === 'special' ? 'bg-amber-100 text-amber-700' :
+                              request.paper_size === 'A3' ? 'bg-blue-100 text-blue-700' :
+                              'bg-slate-100 text-slate-600'
+                            }`}>
+                              {request.paper_size === 'special' ? 'גודל מיוחד' :
+                               request.paper_size === 'A3' ? 'A3' : 'A4'}
+                            </span>
+                            {request.color_mode === 'color' && (
+                              <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-purple-100 text-purple-700">
+                                🎨 צבעוני
+                              </span>
+                            )}
                           </div>
                           <p className="text-xs text-slate-400 mt-2">
                             {new Date(request.created_date).toLocaleDateString('he-IL')}

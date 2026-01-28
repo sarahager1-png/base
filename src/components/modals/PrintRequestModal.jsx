@@ -15,6 +15,8 @@ export default function PrintRequestModal({ isOpen, onClose, user }) {
     class_name: '',
     copies: 1,
     pages_per_copy: 1,
+    paper_size: 'A4',
+    color_mode: 'black_white',
     urgent: false
   });
 
@@ -52,6 +54,8 @@ export default function PrintRequestModal({ isOpen, onClose, user }) {
         copies: formData.copies,
         pages_per_copy: formData.pages_per_copy,
         total_pages,
+        paper_size: formData.paper_size,
+        color_mode: formData.color_mode,
         urgent: formData.urgent,
         status: 'pending'
       });
@@ -67,6 +71,8 @@ export default function PrintRequestModal({ isOpen, onClose, user }) {
         class_name: '',
         copies: 1,
         pages_per_copy: 1,
+        paper_size: 'A4',
+        color_mode: 'black_white',
         urgent: false
       });
       
@@ -146,12 +152,44 @@ export default function PrintRequestModal({ isOpen, onClose, user }) {
             </div>
           </div>
 
-          <div className="bg-slate-50 p-4 rounded-lg">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold text-slate-600 block mb-2">גודל דף</label>
+              <select
+                value={formData.paper_size}
+                onChange={(e) => setFormData({...formData, paper_size: e.target.value})}
+                className="w-full p-2 border border-slate-300 rounded-lg bg-white"
+              >
+                <option value="A4">A4 רגיל</option>
+                <option value="A3">A3 גדול</option>
+                <option value="special">גודל מיוחד</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-600 block mb-2">סוג הדפסה</label>
+              <select
+                value={formData.color_mode}
+                onChange={(e) => setFormData({...formData, color_mode: e.target.value})}
+                className="w-full p-2 border border-slate-300 rounded-lg bg-white"
+              >
+                <option value="black_white">שחור-לבן</option>
+                <option value="color">צבעוני</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="bg-slate-50 p-4 rounded-lg space-y-2">
             <p className="text-sm text-slate-600">
               סה״כ דפים להדפסה: <span className="font-bold text-blue-600">
                 {formData.copies * formData.pages_per_copy}
               </span>
             </p>
+            {formData.paper_size === 'special' && (
+              <p className="text-xs text-amber-600 font-medium">⚠️ גודל מיוחד - דורש אישור מיוחד</p>
+            )}
+            {formData.color_mode === 'color' && (
+              <p className="text-xs text-purple-600 font-medium">🎨 הדפסה צבעונית</p>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
