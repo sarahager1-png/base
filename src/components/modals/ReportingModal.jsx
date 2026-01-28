@@ -339,7 +339,7 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
                     onChange={(e) => setSubstituteName(e.target.value)}
                     className="w-full p-3 border rounded-lg"
                   >
-                    <option value="">בחרי מורה מהרשימה</option>
+                    <option value="">בחרי עובדת הוראה מהרשימה</option>
                     {teachers.map(teacher => (
                       <option key={teacher.id} value={teacher.full_name}>
                         {teacher.full_name} {teacher.title && `(${teacher.title})`}
