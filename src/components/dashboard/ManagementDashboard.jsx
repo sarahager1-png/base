@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import StatCard from '../StatCard';
 import AddMeeting from '../meetings/AddMeeting';
 import MeetingsList from '../meetings/MeetingsList';
 import { 
   AlertTriangle, UserCheck, Users, ShoppingCart, 
-  Shield, Megaphone, UserPlus, Clock, Plus
+  Shield, Megaphone, UserPlus, Clock, Plus, X
 } from 'lucide-react';
 
 export default function ManagementDashboard({ user }) {
   const [showAddMeeting, setShowAddMeeting] = useState(false);
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [messageText, setMessageText] = useState('');
+  const queryClient = useQueryClient();
+
   const { data: absences = [] } = useQuery({
     queryKey: ['absences', 'pending'],
     queryFn: () => base44.entities.Absence.filter({ status: 'pending' }),
@@ -36,6 +40,39 @@ export default function ManagementDashboard({ user }) {
     queryFn: async () => {
       const messages = await base44.entities.DailyMessage.filter({ active: true }, '-created_date', 1);
       return messages[0];
+    },
+  });
+
+  const { data: allMessages = [] } = useQuery({
+    queryKey: ['allMessages'],
+    queryFn: () => base44.entities.DailyMessage.list('-created_date'),
+  });
+
+  const createMessage = useMutation({
+    mutationFn: async (content) => {
+      // Deactivate previous messages
+      const activeMessages = await base44.entities.DailyMessage.filter({ active: true });
+      for (const msg of activeMessages) {
+        await base44.entities.DailyMessage.update(msg.id, { active: false });
+      }
+      // Create new active message
+      return base44.entities.DailyMessage.create({
+        content,
+        active: true,
+        created_by_name: user.full_name
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dailyMessage', 'allMessages'] });
+      setMessageText('');
+      setShowMessageModal(false);
+    },
+  });
+
+  const updateMessageStatus = useMutation({
+    mutationFn: ({ id, active }) => base44.entities.DailyMessage.update(id, { active }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dailyMessage', 'allMessages'] });
     },
   });
 
@@ -71,10 +108,18 @@ export default function ManagementDashboard({ user }) {
               </div>
             </div>
             <div className="flex flex-row md:flex-col gap-2 mt-2 md:mt-0 w-full md:w-auto">
-              <button className="flex-1 md:flex-none text-xs bg-white text-blue-600 px-4 py-2 rounded-lg font-bold border border-blue-200 hover:bg-blue-50 transition-colors">
-                עריכת הודעה
-              </button>
-              <button className="flex-1 md:flex-none text-xs bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-sm">
+              {dailyMessage && (
+                <button 
+                  onClick={() => updateMessageStatus.mutate({ id: dailyMessage.id, active: false })}
+                  className="flex-1 md:flex-none text-xs bg-white text-red-600 px-4 py-2 rounded-lg font-bold border border-red-200 hover:bg-red-50 transition-colors"
+                >
+                  ביטול הודעה
+                </button>
+              )}
+              <button 
+                onClick={() => setShowMessageModal(true)}
+                className="flex-1 md:flex-none text-xs bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-sm"
+              >
                 הודעה חדשה
               </button>
             </div>
@@ -167,6 +212,41 @@ export default function ManagementDashboard({ user }) {
 
       {showAddMeeting && (
         <AddMeeting user={user} onClose={() => setShowAddMeeting(false)} />
+      )}
+
+      {/* Message Modal */}
+      {showMessageModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-lg max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold text-slate-800">הודעה חדשה לדשבורד</h3>
+              <button onClick={() => setShowMessageModal(false)} className="text-slate-400 hover:text-slate-600">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <textarea
+              placeholder="לדוגמה: בוקר טוב, רשת חינוך חב״ד..."
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              className="w-full p-3 border border-slate-200 rounded-lg mb-4 text-sm focus:outline-none focus:border-blue-500 resize-none h-24"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowMessageModal(false)}
+                className="flex-1 px-4 py-2 text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors font-medium"
+              >
+                ביטול
+              </button>
+              <button
+                onClick={() => createMessage.mutate(messageText)}
+                disabled={!messageText.trim() || createMessage.isPending}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-300 transition-colors font-medium"
+              >
+                {createMessage.isPending ? 'שומר...' : 'פרסום'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
