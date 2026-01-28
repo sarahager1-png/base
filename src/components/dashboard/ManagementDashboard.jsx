@@ -121,10 +121,12 @@ export default function ManagementDashboard({ user }) {
                   if (dailyMessage) {
                     setEditingMessageId(dailyMessage.id);
                     setMessageText(dailyMessage.content);
-                    setShowMessageModal(true);
+                  } else {
+                    setMessageText(getGreetingByHour());
                   }
+                  setShowMessageModal(true);
                 }}
-                className={`bg-white p-4 rounded-xl border border-slate-200 shadow-sm mt-2 ${dailyMessage ? 'cursor-pointer hover:border-blue-400 hover:shadow-md transition-all' : ''}`}
+                className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mt-2 cursor-pointer hover:border-blue-400 hover:shadow-md transition-all"
               >
                 <p className="text-slate-800 font-serif text-lg leading-relaxed">
                   {dailyMessage?.content || 'אין הודעה פעילה כרגע'}
