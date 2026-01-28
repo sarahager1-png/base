@@ -97,19 +97,24 @@ export default function VicePrincipalDashboard({ user, setView }) {
       />
 
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-purple-900 to-blue-900 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-32 h-32 bg-white opacity-5 rounded-full -translate-x-10 -translate-y-10"></div>
-        <div className="relative z-10">
-          <h2 className="text-3xl font-bold mb-2">בוקר טוב, {user.full_name}!</h2>
-          <p className="text-blue-100 text-lg opacity-90 flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            דשבורד סגנית מנהלת - "לכתחילה אריבער"
-          </p>
+      <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-3xl p-8 text-white shadow-lg border border-slate-600/20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]"></div>
+        <div className="relative z-10 flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold mb-2 text-white">שלום, {user.full_name}</h2>
+            <p className="text-slate-300 text-sm flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              סגנית מנהלת - "לכתחילה אריבער"
+            </p>
+          </div>
+          <div className="h-16 w-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/20">
+            <Shield className="h-8 w-8 text-amber-400" />
+          </div>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
           title="היעדרויות לאישור" 
           value={absences.length} 
@@ -141,7 +146,7 @@ export default function VicePrincipalDashboard({ user, setView }) {
       </div>
 
       {/* Daily Schedule */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-bold text-slate-800 flex items-center gap-2">
             <Calendar className="h-5 w-5 text-blue-600" />
@@ -198,9 +203,11 @@ export default function VicePrincipalDashboard({ user, setView }) {
       )}
 
       {/* Today's Journal */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-        <h3 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-blue-500" />
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+        <h3 className="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <div className="p-2 bg-blue-50 rounded-xl border border-blue-100">
+            <Calendar className="h-4 w-4 text-blue-600" />
+          </div>
           יומן היום
         </h3>
         <DailyJournal date={new Date()} />
@@ -265,19 +272,23 @@ export default function VicePrincipalDashboard({ user, setView }) {
       </div>
 
       {/* Pending Approvals */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-          <h3 className="text-xl font-bold text-blue-900 mb-6 flex items-center gap-2">
-            <Clock className="h-5 w-5 text-amber-500" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+          <h3 className="text-base font-bold text-slate-800 mb-6 flex items-center gap-2">
+            <div className="p-2 bg-amber-50 rounded-xl border border-amber-100">
+              <Clock className="h-4 w-4 text-amber-600" />
+            </div>
             היעדרויות לאישור
           </h3>
           <AbsenceApprovalPanel />
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold text-blue-900 flex items-center gap-2">
-              <Users className="h-5 w-5 text-blue-500" />
+            <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
+              <div className="p-2 bg-blue-50 rounded-xl border border-blue-100">
+                <Users className="h-4 w-4 text-blue-600" />
+              </div>
               יומן פגישות
             </h3>
             <button

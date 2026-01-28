@@ -24,8 +24,8 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
 
   return (
     <aside className={`
-      fixed inset-y-0 right-0 z-50 w-64 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out border-l border-blue-50
-      ${isOpen ? 'translate-x-0' : 'translate-x-full'} lg:relative lg:translate-x-0 lg:shadow-none
+      fixed inset-y-0 right-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out border-l border-slate-200
+      ${isOpen ? 'translate-x-0' : 'translate-x-full'} lg:relative lg:translate-x-0 lg:shadow-sm
     `}>
       <div className="h-full flex flex-col">
         <div className="p-6 border-b border-slate-100 flex items-center justify-between lg:hidden">
@@ -43,13 +43,13 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
                 <button
                   key={item.id}
                   onClick={() => { setView(item.id); closeSidebar(); }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-right group
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-right group text-sm
                     ${activeView === item.id 
-                      ? 'bg-blue-50 text-blue-900 font-bold shadow-sm' 
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-blue-800'}
+                      ? 'bg-slate-800 text-white font-semibold shadow-sm' 
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800'}
                   `}
                 >
-                  <item.icon className={`h-5 w-5 ${activeView === item.id ? 'text-amber-500' : 'text-slate-400 group-hover:text-blue-500'}`} />
+                  <item.icon className={`h-4 w-4 ${activeView === item.id ? 'text-white' : 'text-slate-400 group-hover:text-slate-600'}`} />
                   <span>{item.label}</span>
                 </button>
               ))}

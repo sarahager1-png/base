@@ -50,32 +50,32 @@
 import Attendance from './pages/Attendance';
 import Community from './pages/Community';
 import Dashboard from './pages/Dashboard';
+import DutyManagement from './pages/DutyManagement';
 import Journal from './pages/Journal';
 import JournalManagement from './pages/JournalManagement';
 import Maintenance from './pages/Maintenance';
 import Notifications from './pages/Notifications';
 import Onboarding from './pages/Onboarding';
 import Printing from './pages/Printing';
+import RoomManagement from './pages/RoomManagement';
 import Schedule from './pages/Schedule';
 import Tasks from './pages/Tasks';
-import DutyManagement from './pages/DutyManagement';
-import RoomManagement from './pages/RoomManagement';
 
 
 export const PAGES = {
     "Attendance": Attendance,
     "Community": Community,
     "Dashboard": Dashboard,
+    "DutyManagement": DutyManagement,
     "Journal": Journal,
     "JournalManagement": JournalManagement,
     "Maintenance": Maintenance,
     "Notifications": Notifications,
     "Onboarding": Onboarding,
     "Printing": Printing,
+    "RoomManagement": RoomManagement,
     "Schedule": Schedule,
     "Tasks": Tasks,
-    "DutyManagement": DutyManagement,
-    "RoomManagement": RoomManagement,
 }
 
 export const pagesConfig = {

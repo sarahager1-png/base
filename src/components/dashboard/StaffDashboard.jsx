@@ -64,33 +64,35 @@ export default function StaffDashboard({ user, setView }) {
       />
 
       {/* Header Banner */}
-      <div className="bg-gradient-to-br from-indigo-600 via-blue-600 to-purple-600 rounded-2xl p-8 text-white shadow-2xl relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30"></div>
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="h-16 w-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border-2 border-white/30">
-              <span className="text-3xl font-bold">{user.full_name?.charAt(0)}</span>
+      <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-3xl p-8 text-white shadow-lg border border-slate-600/20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]"></div>
+        <div className="relative z-10 flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="h-12 w-12 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20">
+                <span className="text-2xl font-bold">{user.full_name?.charAt(0)}</span>
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold">שלום, {user.full_name}</h2>
+                <p className="text-slate-300 text-sm">{user.title || 'עובדת הוראה'}</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-3xl font-bold mb-1">שלום, {user.full_name}!</h2>
-              <p className="text-blue-100 text-sm opacity-90">{user.title || 'עובדת הוראה'}</p>
-            </div>
+            <p className="text-slate-300 text-sm mt-2">"לכתחילה אריבער" - יום מוצלח ומלא עשייה 🌟</p>
           </div>
-          <p className="text-white/90 text-base">"לכתחילה אריבער" - יום מוצלח ומלא עשייה 🌟</p>
         </div>
       </div>
 
       {/* Daily Schedule */}
-      <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-2xl shadow-lg border border-blue-100 p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h3 className="font-bold text-slate-800 flex items-center gap-2 text-lg">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Calendar className="h-5 w-5 text-blue-600" />
+            <h3 className="font-bold text-slate-800 flex items-center gap-2 text-base">
+              <div className="p-2 bg-blue-50 rounded-xl border border-blue-100">
+                <Calendar className="h-4 w-4 text-blue-600" />
               </div>
               מערכת השעות שלי
             </h3>
-            <p className="text-sm text-slate-500 mt-1">{new Date().toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+            <p className="text-xs text-slate-500 mt-1">{new Date().toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
           </div>
           <button 
             onClick={() => setView('schedule')}
@@ -150,10 +152,10 @@ export default function StaffDashboard({ user, setView }) {
       )}
 
       {/* Today's Journal */}
-      <div className="bg-gradient-to-br from-white to-amber-50/30 rounded-2xl shadow-lg border border-amber-100 p-6">
-        <h3 className="text-xl font-bold text-slate-800 mb-5 flex items-center gap-2">
-          <div className="p-2 bg-amber-100 rounded-lg">
-            <Calendar className="h-5 w-5 text-amber-600" />
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+        <h3 className="text-base font-bold text-slate-800 mb-5 flex items-center gap-2">
+          <div className="p-2 bg-amber-50 rounded-xl border border-amber-100">
+            <Calendar className="h-4 w-4 text-amber-600" />
           </div>
           יומן בית הספר - היום
         </h3>
@@ -161,10 +163,10 @@ export default function StaffDashboard({ user, setView }) {
       </div>
 
       {/* Action Icons Grid */}
-      <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
-        <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <div className="h-8 w-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
-            <span className="text-white text-sm">⚡</span>
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+        <h3 className="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <div className="h-8 w-8 bg-slate-100 rounded-lg flex items-center justify-center border border-slate-200">
+            <span className="text-slate-600 text-sm">⚡</span>
           </div>
           פעולות מהירות
         </h3>
