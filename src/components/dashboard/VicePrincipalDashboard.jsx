@@ -7,10 +7,20 @@ import AbsenceReportModal from '../modals/AbsenceReportModal';
 import AbsenceApprovalPanel from './AbsenceApprovalPanel';
 import AddMeeting from '../meetings/AddMeeting';
 import MeetingsList from '../meetings/MeetingsList';
+import DailyJournal from '../journal/DailyJournal';
 import { 
   AlertTriangle, UserCheck, Clock, ShoppingCart, Shield,
-  CheckCircle, XCircle, Calendar, Printer, Map, Users, Plus
+  CheckCircle, XCircle, Calendar, Printer, Map, Users, Plus, Wrench, Monitor
 } from 'lucide-react';
+
+const TEACHER_BASE_SCHEDULE = {
+  0: { 1: 'הסטוריה - ח׳2', 2: 'הסטוריה - ח׳2', 3: 'פרטני', 4: 'חלון', 5: 'אזרחות - ט׳1', 6: 'אזרחות - ט׳1' },
+  1: { 1: 'חלון', 2: 'הסטוריה - ח׳3', 3: 'הסטוריה - ח׳3', 4: 'ישיבת צוות', 5: 'הסטוריה - ח׳2' },
+  2: { 1: 'אזרחות - ט׳1', 2: 'אזרחות - ט׳1', 3: 'הסטוריה - ח׳2', 4: 'הסטוריה - ח׳2', 5: 'שהייה', 6: 'שהייה' },
+  3: { 1: 'הסטוריה - ח׳3', 2: 'הסטוריה - ח׳3', 3: 'חלון', 4: 'פרטני', 5: 'חינוך - ח׳2' },
+  4: { 1: 'חלון', 2: 'חלון', 3: 'הסטוריה - ח׳2', 4: 'הסטוריה - ח׳2', 5: 'אזרחות - ט׳1' },
+  5: { 1: 'סיכום שבוע - ח׳2', 2: 'פרטני' },
+};
 
 export default function VicePrincipalDashboard({ user, setView }) {
   const [showAddMeeting, setShowAddMeeting] = useState(false);
@@ -62,6 +72,8 @@ export default function VicePrincipalDashboard({ user, setView }) {
     setActiveFeature(feature);
     setModalOpen(true);
   };
+
+  const dayIdx = new Date().getDay();
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -121,6 +133,48 @@ export default function VicePrincipalDashboard({ user, setView }) {
         />
       </div>
 
+      {/* Daily Schedule */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="font-bold text-slate-800 flex items-center gap-2">
+            <Calendar className="h-5 w-5 text-blue-600" />
+            מערכת שעות - {new Date().toLocaleDateString('he-IL', { weekday: 'long', day: '2-digit', month: '2-digit' })}
+          </h3>
+          <button 
+            onClick={() => setView('schedule')}
+            className="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-1.5 rounded-lg transition-colors border border-blue-100"
+          >
+            לצפייה ביומן חודשי מלא
+          </button>
+        </div>
+        
+        <div className="flex gap-4 overflow-x-auto pb-2">
+          {[1, 2, 3, 4, 5, 6, 7].map(hour => {
+            const lesson = TEACHER_BASE_SCHEDULE[dayIdx]?.[hour];
+            
+            return (
+              <div key={hour} className="min-w-[120px] flex-1">
+                <div className="text-center text-xs font-bold text-slate-400 mb-1">שעה {hour}</div>
+                <div className={`p-4 rounded-xl border text-center h-full flex flex-col justify-center items-center gap-1 shadow-sm transition-all hover:shadow-md ${lesson ? 'bg-white border-slate-200' : 'bg-slate-50 border-transparent'}`}>
+                  {lesson ? (
+                    <>
+                      <span className="font-bold text-slate-800 text-sm">{lesson.split('-')[0]?.trim()}</span>
+                      {lesson.includes('-') && (
+                        <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                          {lesson.split('-')[1]?.trim()}
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <span className="text-slate-300">-</span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* My Duty Alert */}
       {myDuty && (
         <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-center justify-between">
@@ -136,8 +190,17 @@ export default function VicePrincipalDashboard({ user, setView }) {
         </div>
       )}
 
+      {/* Today's Journal */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+        <h3 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
+          <Calendar className="h-5 w-5 text-blue-500" />
+          יומן היום
+        </h3>
+        <DailyJournal date={new Date()} />
+      </div>
+
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
         <button onClick={() => setAbsenceModalOpen(true)} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-red-300 hover:bg-red-50 transition-all group text-center h-24 justify-center">
           <div className="p-3 bg-red-50 rounded-full text-red-500 group-hover:scale-110 transition-transform mb-2">
             <Clock className="h-6 w-6" />
@@ -171,6 +234,16 @@ export default function VicePrincipalDashboard({ user, setView }) {
             <ShoppingCart className="h-6 w-6" />
           </div>
           <span className="text-[11px] font-bold text-slate-700 leading-tight">רכש</span>
+        </button>
+
+        <button onClick={() => openFeature('maintenance_general')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-slate-400 hover:bg-slate-50 transition-all group text-center h-24 justify-center">
+          <Wrench className="h-6 w-6 text-slate-500 mb-1 group-hover:scale-110 transition-transform" />
+          <span className="text-[11px] font-bold text-slate-700 leading-tight">תחזוקה כללית</span>
+        </button>
+
+        <button onClick={() => openFeature('maintenance_pc')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-cyan-300 hover:bg-cyan-50 transition-all group text-center h-24 justify-center">
+          <Monitor className="h-6 w-6 text-cyan-500 mb-1 group-hover:scale-110 transition-transform" />
+          <span className="text-[11px] font-bold text-slate-700 leading-tight">תחזוקת מחשבים</span>
         </button>
       </div>
 
