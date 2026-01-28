@@ -41,38 +41,6 @@ export default function ManagementDashboard({ user }) {
     <div className="space-y-8 animate-fade-in">
       <DailyMessageBoard user={user} />
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard 
-          title="מילוי מקום נדרש" 
-          value={urgentSubRequests.length} 
-          icon={AlertTriangle} 
-          color="red" 
-          subtext={urgentSubRequests.length > 0 ? "דחוף: טרם שובץ" : "הכל מכוסה"} 
-        />
-        <StatCard 
-          title="טפסים לאישור" 
-          value={onboardingDocs.length} 
-          icon={UserCheck} 
-          color="purple" 
-          subtext="עובדים חדשים ממתינים" 
-        />
-        <StatCard 
-          title="היעדרויות ממתינות" 
-          value={absences.length} 
-          icon={Clock} 
-          color="amber" 
-          subtext="לאישור מנהלת" 
-        />
-        <StatCard 
-          title="בקשות רכש" 
-          value={purchaseRequests.length} 
-          icon={ShoppingCart} 
-          color="blue" 
-          subtext="ממתינות לאישור תקציבי" 
-        />
-      </div>
-
       {/* Control Center */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
         <div className="flex justify-between items-center mb-6">
@@ -122,6 +90,38 @@ export default function ManagementDashboard({ user }) {
             <MeetingsList user={user} />
           </div>
         </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard 
+          title="מילוי מקום נדרש" 
+          value={urgentSubRequests.length} 
+          icon={AlertTriangle} 
+          color="red" 
+          subtext={urgentSubRequests.length > 0 ? "דחוף: טרם שובץ" : "הכל מכוסה"} 
+        />
+        <StatCard 
+          title="טפסים לאישור" 
+          value={onboardingDocs.length} 
+          icon={UserCheck} 
+          color="purple" 
+          subtext="עובדים חדשים ממתינים" 
+        />
+        <StatCard 
+          title="היעדרויות ממתינות" 
+          value={absences.length} 
+          icon={Clock} 
+          color="amber" 
+          subtext="לאישור מנהלת" 
+        />
+        <StatCard 
+          title="בקשות רכש" 
+          value={purchaseRequests.length} 
+          icon={ShoppingCart} 
+          color="blue" 
+          subtext="ממתינות לאישור תקציבי" 
+        />
       </div>
 
       {showAddMeeting && (
