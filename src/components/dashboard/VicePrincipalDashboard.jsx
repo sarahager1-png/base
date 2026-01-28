@@ -10,9 +10,11 @@ import AddMeeting from '../meetings/AddMeeting';
 import MeetingsList from '../meetings/MeetingsList';
 import DailyJournal from '../journal/DailyJournal';
 import DailyMessageBoard from './DailyMessageBoard';
+import SendMessageModal from '../messages/SendMessageModal';
+import MessagesCenter from '../messages/MessagesCenter';
 import { 
   AlertTriangle, UserCheck, Clock, ShoppingCart, Shield,
-  CheckCircle, XCircle, Calendar, Printer, Map, Users, Plus, Wrench, Monitor, Timer, Sparkles
+  CheckCircle, XCircle, Calendar, Printer, Map, Users, Plus, Wrench, Monitor, Timer, Sparkles, Heart
 } from 'lucide-react';
 
 const TEACHER_BASE_SCHEDULE = {
@@ -30,6 +32,7 @@ export default function VicePrincipalDashboard({ user, setView }) {
   const [activeFeature, setActiveFeature] = useState(null);
   const [absenceModalOpen, setAbsenceModalOpen] = useState(false);
   const [printModalOpen, setPrintModalOpen] = useState(false);
+  const [messageModalOpen, setMessageModalOpen] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: absences = [] } = useQuery({
@@ -95,6 +98,12 @@ export default function VicePrincipalDashboard({ user, setView }) {
         isOpen={printModalOpen}
         onClose={() => setPrintModalOpen(false)}
         user={user}
+      />
+      <SendMessageModal 
+        isOpen={messageModalOpen}
+        onClose={() => setMessageModalOpen(false)}
+        user={user}
+        recipientRole="staff"
       />
 
       <DailyMessageBoard user={user} />
@@ -308,6 +317,20 @@ export default function VicePrincipalDashboard({ user, setView }) {
           </div>
           <MeetingsList user={user} />
         </div>
+      </div>
+
+      {/* Quick Send Message to Staff */}
+      <button
+        onClick={() => setMessageModalOpen(true)}
+        className="w-full p-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-2xl hover:shadow-lg transition-all font-bold text-center flex items-center justify-center gap-2"
+      >
+        <Heart className="h-5 w-5" />
+        שלח הערה מעצימה לצוות
+      </button>
+
+      {/* Messages Center */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+        <MessagesCenter user={user} />
       </div>
 
       {showAddMeeting && (
