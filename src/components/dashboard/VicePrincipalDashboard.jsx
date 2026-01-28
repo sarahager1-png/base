@@ -11,7 +11,7 @@ import MeetingsList from '../meetings/MeetingsList';
 import DailyJournal from '../journal/DailyJournal';
 import { 
   AlertTriangle, UserCheck, Clock, ShoppingCart, Shield,
-  CheckCircle, XCircle, Calendar, Printer, Map, Users, Plus, Wrench, Monitor
+  CheckCircle, XCircle, Calendar, Printer, Map, Users, Plus, Wrench, Monitor, Timer, Sparkles
 } from 'lucide-react';
 
 const TEACHER_BASE_SCHEDULE = {
@@ -207,7 +207,7 @@ export default function VicePrincipalDashboard({ user, setView }) {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-9 gap-3">
         <button onClick={() => setAbsenceModalOpen(true)} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-red-300 hover:bg-red-50 transition-all group text-center h-24 justify-center">
           <div className="p-3 bg-red-50 rounded-full text-red-500 group-hover:scale-110 transition-transform mb-2">
             <Clock className="h-6 w-6" />
@@ -251,6 +251,16 @@ export default function VicePrincipalDashboard({ user, setView }) {
         <button onClick={() => openFeature('maintenance_pc')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-cyan-300 hover:bg-cyan-50 transition-all group text-center h-24 justify-center">
           <Monitor className="h-6 w-6 text-cyan-500 mb-1 group-hover:scale-110 transition-transform" />
           <span className="text-[11px] font-bold text-slate-700 leading-tight">תחזוקת מחשבים</span>
+        </button>
+
+        <button onClick={() => openFeature('overtime')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-amber-300 hover:bg-amber-50 transition-all group text-center h-24 justify-center">
+          <Timer className="h-6 w-6 text-amber-500 mb-1 group-hover:scale-110 transition-transform" />
+          <span className="text-[11px] font-bold text-slate-700 leading-tight">שעות נוספות</span>
+        </button>
+
+        <button onClick={() => openFeature('special_overtime')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-indigo-300 hover:bg-indigo-50 transition-all group text-center h-24 justify-center">
+          <Sparkles className="h-6 w-6 text-indigo-500 mb-1 group-hover:scale-110 transition-transform" />
+          <span className="text-[11px] font-bold text-slate-700 leading-tight">שעות מיוחדות</span>
         </button>
       </div>
 

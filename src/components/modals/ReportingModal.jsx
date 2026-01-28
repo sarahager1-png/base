@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { 
   X, Stethoscope, Clock, Map, Timer, Printer, 
   ShoppingCart, Hammer, Monitor, Upload, AlertTriangle,
-  ShieldAlert
+  ShieldAlert, Sparkles
 } from 'lucide-react';
 
 export default function ReportingModal({ isOpen, onClose, feature, user }) {
@@ -17,6 +17,7 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
   const [selectedLessons, setSelectedLessons] = useState([]);
   const [substituteName, setSubstituteName] = useState('');
   const [showWarning, setShowWarning] = useState(false);
+  const [weekDates, setWeekDates] = useState([]);
   
   // Reset on close
   React.useEffect(() => {
@@ -88,6 +89,12 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
     enabled: isOpen && feature === 'copies' && activeTab === 'history',
   });
 
+  const { data: specialOvertimeHistory = [] } = useQuery({
+    queryKey: ['special_overtime', user.email],
+    queryFn: () => base44.entities.SpecialOvertimeReport.filter({ user_email: user.email }, '-created_date', 10),
+    enabled: isOpen && feature === 'special_overtime' && activeTab === 'history',
+  });
+
 
 
   const createSubstitute = useMutation({
@@ -130,6 +137,14 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
     },
   });
 
+  const createSpecialOvertime = useMutation({
+    mutationFn: (data) => base44.entities.SpecialOvertimeReport.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['special_overtime'] });
+      onClose();
+    },
+  });
+
   const handleSubmit = () => {
     if (feature === 'substitute') {
       createSubstitute.mutate({
@@ -153,7 +168,7 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
       createExternal.mutate({
         user_email: user.email,
         user_name: user.full_name,
-        date: formData.date,
+        date: formData.start_date,
         destination: formData.destination,
         start_time: formData.start_time,
         end_time: formData.end_time,
@@ -175,6 +190,16 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
         issue: formData.issue,
         urgency: formData.urgency || 'normal',
       });
+    } else if (feature === 'special_overtime') {
+      const total_hours = weekDates.reduce((sum, d) => sum + (d.hours || 0), 0);
+      createSpecialOvertime.mutate({
+        user_email: user.email,
+        user_name: user.full_name,
+        activity_type: formData.activity_type,
+        dates: weekDates,
+        total_hours,
+        details: formData.details || '',
+      });
     }
   };
 
@@ -184,6 +209,7 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
     substitute: { icon: Clock, title: 'דיווח מילוי מקום', color: 'purple' },
     external: { icon: Map, title: 'פעילות חוץ', color: 'green' },
     overtime: { icon: Timer, title: 'שעות נוספות', color: 'amber' },
+    special_overtime: { icon: Sparkles, title: 'שעות נוספות מיוחדות', color: 'indigo' },
     copies: { icon: Printer, title: 'מכסת צילומים', color: 'blue' },
     purchase: { icon: ShoppingCart, title: 'בקשת רכש', color: 'amber' },
     maintenance_general: { icon: Hammer, title: 'תחזוקה כללית', color: 'slate' },
@@ -219,7 +245,7 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
               onClick={() => setActiveTab('history')}
               className={`flex-1 py-3 text-sm font-bold ${activeTab === 'history' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-500 hover:bg-slate-50'}`}
             >
-              היסטוריה ונתונים
+              {feature === 'overtime' ? 'יתרת שעות: 40' : 'היסטוריה ונתונים'}
             </button>
           </div>
         )}
@@ -383,6 +409,221 @@ export default function ReportingModal({ isOpen, onClose, feature, user }) {
               >
                 שלח למנהלת
               </button>
+            </div>
+          )}
+
+          {/* EXTERNAL ACTIVITY */}
+          {feature === 'external' && activeTab === 'report' && (
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-slate-500">תאריך התחלה</label>
+                <input 
+                  type="date" 
+                  className="w-full p-2 border rounded-lg"
+                  onChange={(e) => setFormData({...formData, start_date: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-500">תאריך סיום</label>
+                <input 
+                  type="date" 
+                  className="w-full p-2 border rounded-lg"
+                  onChange={(e) => setFormData({...formData, end_date: e.target.value})}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-500">שעת התחלה</label>
+                  <input 
+                    type="time" 
+                    className="w-full p-2 border rounded-lg"
+                    onChange={(e) => setFormData({...formData, start_time: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-500">שעת סיום</label>
+                  <input 
+                    type="time" 
+                    className="w-full p-2 border rounded-lg"
+                    onChange={(e) => setFormData({...formData, end_time: e.target.value})}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-500">פרוט הפעילות</label>
+                <textarea 
+                  className="w-full p-2 border rounded-lg" 
+                  rows="3"
+                  placeholder="לדוגמה: סיור לימודי למוזיאון המדע"
+                  onChange={(e) => setFormData({...formData, destination: e.target.value})}
+                ></textarea>
+              </div>
+              <button 
+                onClick={handleSubmit}
+                className="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700"
+              >
+                שלח לאישור
+              </button>
+            </div>
+          )}
+
+          {feature === 'external' && activeTab === 'history' && (
+            <div className="space-y-2">
+              {externalHistory.map(ext => (
+                <div key={ext.id} className="p-3 border rounded-lg">
+                  <p className="font-bold text-sm">{ext.date}</p>
+                  <p className="text-xs text-slate-500">{ext.destination}</p>
+                  <p className="text-xs text-slate-400">{ext.start_time} - {ext.end_time}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* OVERTIME */}
+          {feature === 'overtime' && activeTab === 'report' && (
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-slate-500">תאריך</label>
+                <input 
+                  type="date" 
+                  className="w-full p-2 border rounded-lg"
+                  onChange={(e) => setFormData({...formData, date: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-500">מספר שעות</label>
+                <input 
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  className="w-full p-2 border rounded-lg"
+                  onChange={(e) => setFormData({...formData, hours: parseFloat(e.target.value)})}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-500">פירוט - על מה?</label>
+                <textarea 
+                  className="w-full p-2 border rounded-lg" 
+                  rows="3"
+                  placeholder="לדוגמה: הכנת מערכי שיעור, תיקון מבחנים"
+                  onChange={(e) => setFormData({...formData, reason: e.target.value})}
+                ></textarea>
+              </div>
+              <button 
+                onClick={handleSubmit}
+                className="w-full bg-amber-600 text-white py-3 rounded-xl font-bold hover:bg-amber-700"
+              >
+                שלח דיווח
+              </button>
+            </div>
+          )}
+
+          {feature === 'overtime' && activeTab === 'history' && (
+            <div className="space-y-4">
+              <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                <p className="text-sm font-bold text-amber-900">יתרת שעות נוספות: 40 שעות</p>
+                <p className="text-xs text-amber-700 mt-1">מתוך מכסה שנתית</p>
+              </div>
+              <div className="space-y-2">
+                {overtimeHistory.map(ot => (
+                  <div key={ot.id} className="p-3 border rounded-lg">
+                    <p className="font-bold text-sm">{ot.date} - {ot.hours} שעות</p>
+                    <p className="text-xs text-slate-500">{ot.reason}</p>
+                    <p className="text-xs text-slate-400">{ot.status}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* SPECIAL OVERTIME */}
+          {feature === 'special_overtime' && activeTab === 'report' && (
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-slate-500">סוג פעילות</label>
+                <select 
+                  className="w-full p-2 border rounded-lg"
+                  onChange={(e) => setFormData({...formData, activity_type: e.target.value})}
+                >
+                  <option value="">בחרי סוג</option>
+                  <option value="tzomchim">צומחים מחדש</option>
+                  <option value="duty">תורנות</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-500 mb-2 block">שיבוץ שבועי</label>
+                <div className="space-y-2">
+                  {['א', 'ב', 'ג', 'ד', 'ה', 'ו'].map((day, idx) => {
+                    const dayDate = weekDates[idx] || { date: '', hours: 0 };
+                    return (
+                      <div key={idx} className="flex items-center gap-2">
+                        <span className="w-8 font-bold text-slate-600">יום {day}</span>
+                        <input 
+                          type="date"
+                          value={dayDate.date || ''}
+                          onChange={(e) => {
+                            const newDates = [...weekDates];
+                            newDates[idx] = { ...dayDate, date: e.target.value };
+                            setWeekDates(newDates);
+                          }}
+                          className="flex-1 p-2 border rounded-lg text-sm"
+                        />
+                        <input 
+                          type="number"
+                          min="0"
+                          step="0.5"
+                          value={dayDate.hours || 0}
+                          onChange={(e) => {
+                            const newDates = [...weekDates];
+                            newDates[idx] = { ...dayDate, hours: parseFloat(e.target.value) || 0 };
+                            setWeekDates(newDates);
+                          }}
+                          placeholder="שעות"
+                          className="w-20 p-2 border rounded-lg text-sm"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="text-sm font-bold text-indigo-600 mt-2">
+                  סה״כ: {weekDates.reduce((sum, d) => sum + (d.hours || 0), 0)} שעות
+                </p>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-500">פרטים נוספים</label>
+                <textarea 
+                  className="w-full p-2 border rounded-lg" 
+                  rows="2"
+                  onChange={(e) => setFormData({...formData, details: e.target.value})}
+                ></textarea>
+              </div>
+
+              <button 
+                onClick={handleSubmit}
+                disabled={!formData.activity_type || weekDates.length === 0}
+                className={`w-full text-white py-3 rounded-xl font-bold ${
+                  !formData.activity_type || weekDates.length === 0
+                    ? 'bg-slate-300'
+                    : 'bg-indigo-600 hover:bg-indigo-700'
+                }`}
+              >
+                שלח דיווח
+              </button>
+            </div>
+          )}
+
+          {feature === 'special_overtime' && activeTab === 'history' && (
+            <div className="space-y-2">
+              {specialOvertimeHistory.map(sot => (
+                <div key={sot.id} className="p-3 border rounded-lg">
+                  <p className="font-bold text-sm">
+                    {sot.activity_type === 'tzomchim' ? 'צומחים מחדש' : 'תורנות'} - {sot.total_hours} שעות
+                  </p>
+                  <p className="text-xs text-slate-500">{sot.status}</p>
+                </div>
+              ))}
             </div>
           )}
 

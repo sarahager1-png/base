@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { 
   Calendar, Stethoscope, Clock, Map, Printer, 
-  ShoppingCart, Wrench, Monitor, Shield, Hammer
+  ShoppingCart, Wrench, Monitor, Shield, Hammer, Timer, Sparkles
 } from 'lucide-react';
 import ReportingModal from '../modals/ReportingModal';
 import AbsenceReportModal from '../modals/AbsenceReportModal';
@@ -139,7 +139,7 @@ export default function StaffDashboard({ user, setView }) {
       </div>
 
       {/* Action Icons Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-9 gap-3">
         <button onClick={() => setAbsenceModalOpen(true)} className="relative overflow-hidden flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-red-300 hover:bg-red-50 transition-all group text-center h-24 justify-center">
           <div className="absolute top-0 right-0 bg-red-100 text-[10px] text-red-700 font-bold px-2 py-0.5 rounded-bl-lg">לדיווח</div>
           <div className="p-3 bg-red-50 rounded-full text-red-500 group-hover:scale-110 transition-transform mb-2">
@@ -182,6 +182,16 @@ export default function StaffDashboard({ user, setView }) {
         <button onClick={() => openFeature('maintenance_pc')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-cyan-300 hover:bg-cyan-50 transition-all group text-center h-24 justify-center">
           <Monitor className="h-6 w-6 text-cyan-500 mb-1 group-hover:scale-110 transition-transform" />
           <span className="text-[11px] font-bold text-slate-700 leading-tight">תחזוקת מחשבים</span>
+        </button>
+
+        <button onClick={() => openFeature('overtime')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-amber-300 hover:bg-amber-50 transition-all group text-center h-24 justify-center">
+          <Timer className="h-6 w-6 text-amber-500 mb-1 group-hover:scale-110 transition-transform" />
+          <span className="text-[11px] font-bold text-slate-700 leading-tight">שעות נוספות</span>
+        </button>
+
+        <button onClick={() => openFeature('special_overtime')} className="flex flex-col items-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-indigo-300 hover:bg-indigo-50 transition-all group text-center h-24 justify-center">
+          <Sparkles className="h-6 w-6 text-indigo-500 mb-1 group-hover:scale-110 transition-transform" />
+          <span className="text-[11px] font-bold text-slate-700 leading-tight">שעות מיוחדות</span>
         </button>
       </div>
     </div>
