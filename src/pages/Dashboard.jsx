@@ -138,27 +138,44 @@ export default function Dashboard() {
         <main className="flex-1 pb-10 min-w-0">
           {currentView === 'dashboard' && (
             <>
-              {(user.role === 'admin' || user.role === 'vice_principal') && (
+              {((user.role === 'admin' && !viewAsRole)) && (
                 <ManagementDashboard user={user} />
               )}
               
-              {user.role === 'vice_principal' && (
-                <div className="my-8 flex items-center gap-4">
-                  <div className="h-px bg-slate-200 flex-1"></div>
-                  <span className="text-slate-400 text-sm font-medium">אזור אישי (מורה)</span>
-                  <div className="h-px bg-slate-200 flex-1"></div>
-                </div>
-              )}
-              
-              {['teacher', 'assistant'].includes(user.role) && (
-                <StaffDashboard user={user} setView={setCurrentView} />
+              {(viewAsRole === 'vice_principal') && (
+                <VicePrincipalDashboard user={{...user, role: 'vice_principal'}} setView={setCurrentView} />
               )}
 
-              {user.role === 'vice_principal' && <VicePrincipalDashboard user={user} setView={setCurrentView} />}
-              {user.role === 'secretary' && <SecretaryDashboard />}
-              {user.role === 'maintenance' && <MaintenanceDashboard />}
-              {user.role === 'coordinator' && <CoordinatorDashboard />}
-              {user.role === 'substitute' && <SubstituteDashboard user={user} />}
+              {(viewAsRole === 'secretary') && (
+                <SecretaryDashboard />
+              )}
+
+              {(['teacher', 'assistant'].includes(viewAsRole)) && (
+                <StaffDashboard user={{...user, role: viewAsRole}} setView={setCurrentView} />
+              )}
+              
+              {(viewAsRole === 'maintenance') && (
+                <MaintenanceDashboard />
+              )}
+              
+              {(viewAsRole === 'coordinator') && (
+                <CoordinatorDashboard />
+              )}
+              
+              {(viewAsRole === 'substitute') && (
+                <SubstituteDashboard user={{...user, role: 'substitute'}} />
+              )}
+
+              {!viewAsRole && user.role === 'vice_principal' && (
+                <VicePrincipalDashboard user={user} setView={setCurrentView} />
+              )}
+              {!viewAsRole && user.role === 'secretary' && <SecretaryDashboard />}
+              {!viewAsRole && user.role === 'maintenance' && <MaintenanceDashboard />}
+              {!viewAsRole && user.role === 'coordinator' && <CoordinatorDashboard />}
+              {!viewAsRole && user.role === 'substitute' && <SubstituteDashboard user={user} />}
+              {!viewAsRole && ['teacher', 'assistant'].includes(user.role) && (
+                <StaffDashboard user={user} setView={setCurrentView} />
+              )}
             </>
           )}
 
