@@ -41,9 +41,9 @@ export default function HRDashboard() {
     { value: 'admin', label: 'מנהלת' },
     { value: 'vice_principal', label: 'סגנית מנהלת' },
     { value: 'secretary', label: 'מזכירה' },
-    { value: 'teacher', label: 'מורה' },
-    { value: 'counselor', label: 'יועצת' },
+    { value: 'teacher', label: 'עובדת הוראה' },
     { value: 'coordinator', label: 'רכזת' },
+    { value: 'counselor', label: 'יועצת' },
     { value: 'assistant', label: 'סייעת' },
     { value: 'maintenance', label: 'אב בית' },
     { value: 'substitute', label: 'ממלאת מקום' },
@@ -162,14 +162,14 @@ export default function HRDashboard() {
                           'bg-blue-100 text-blue-700'
                         }`}>
                           {u.role === 'admin' ? 'מנהלת' :
-                           u.role === 'vice_principal' ? 'סגנית' :
-                           u.role === 'secretary' ? 'מזכירה' :
-                           u.role === 'counselor' ? 'יועצת' :
-                           u.role === 'coordinator' ? 'רכזת' :
-                           u.role === 'maintenance' ? 'אב בית' :
-                           u.role === 'substitute' ? 'ממלאת מקום' :
-                           u.role === 'assistant' ? 'סייעת' :
-                           u.role === 'teacher' ? 'מורה' : 'צוות'}
+                          u.role === 'vice_principal' ? 'סגנית' :
+                          u.role === 'secretary' ? 'מזכירה' :
+                          u.role === 'counselor' ? 'יועצת' :
+                          u.role === 'coordinator' ? 'רכזת' :
+                          u.role === 'maintenance' ? 'אב בית' :
+                          u.role === 'substitute' ? 'ממלאת מקום' :
+                          u.role === 'assistant' ? 'סייעת' :
+                          u.role === 'teacher' ? 'עובדת הוראה' : 'צוות'}
                         </span>
                       </td>
                       <td className="p-3 text-slate-400 text-xs">
