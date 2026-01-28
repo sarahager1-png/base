@@ -8,14 +8,18 @@ import AddMeeting from '../meetings/AddMeeting';
 import DailyMessageBoard from './DailyMessageBoard';
 import {
   Users, AlertTriangle, Clock, ShoppingCart, FileText,
-  Wrench, BarChart3, TrendingUp, Plus, Calendar, Send, Bell
+  Wrench, BarChart3, TrendingUp, Plus, Calendar, Send, Bell, Heart
 } from 'lucide-react';
+import SendMessageModal from '../messages/SendMessageModal';
 import { toast } from 'sonner';
 
 export default function AdminDashboard() {
   const [showAddMeeting, setShowAddMeeting] = useState(false);
   const [messageContent, setMessageContent] = useState('');
+  const [messageModalOpen, setMessageModalOpen] = useState(false);
   const queryClient = useQueryClient();
+  
+  const user = { email: 'admin@school.local', full_name: 'מנהלת', role: 'admin' };
 
   // Fetch all data
   const { data: users = [] } = useQuery({
@@ -97,6 +101,13 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8 animate-fade-in">
+      <SendMessageModal 
+        isOpen={messageModalOpen}
+        onClose={() => setMessageModalOpen(false)}
+        user={user}
+        recipientRole="staff"
+      />
+      
       <DailyMessageBoard user={{ email: 'admin' }} />
 
       {/* Header */}
@@ -286,6 +297,15 @@ export default function AdminDashboard() {
           <p className="text-sm text-slate-600">דוחות לאישור</p>
         </div>
       </div>
+
+      {/* Quick Send Message to Staff */}
+      <button
+        onClick={() => setMessageModalOpen(true)}
+        className="w-full p-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-2xl hover:shadow-lg transition-all font-bold text-center flex items-center justify-center gap-2"
+      >
+        <Heart className="h-5 w-5" />
+        שלח הערה מעצימה לצוות
+      </button>
 
       {/* System Health */}
       <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
