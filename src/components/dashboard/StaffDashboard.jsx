@@ -126,24 +126,7 @@ export default function StaffDashboard({ user, setView }) {
         </button>
       </div>
 
-      {/* Header Banner */}
-      <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-3xl p-8 text-white shadow-lg border border-slate-600/20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]"></div>
-        <div className="relative z-10 flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="h-12 w-12 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20">
-                <span className="text-2xl font-bold">{user.full_name?.charAt(0)}</span>
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold">שלום, {user.full_name}</h2>
-                <p className="text-slate-300 text-sm">{user.title || 'עובדת הוראה'}</p>
-              </div>
-            </div>
 
-          </div>
-        </div>
-      </div>
 
       {/* Daily Schedule */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
