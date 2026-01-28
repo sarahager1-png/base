@@ -156,6 +156,7 @@ export default function Dashboard() {
                   { role: 'maintenance', label: 'אב בית' },
                   { role: 'substitute', label: 'ממלאת מקום' },
                   { role: 'assistant', label: 'סייעת' },
+                  { role: 'user', label: 'עובד כללי' },
                 ].map(item => (
                   <button
                     key={item.role || 'admin'}
