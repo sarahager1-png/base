@@ -19,6 +19,15 @@ export default function Schedule() {
 
   const queryClient = useQueryClient();
 
+  const TEACHER_SCHEDULE = {
+    0: { 1: 'הסטוריה - ח׳2', 2: 'הסטוריה - ח׳2', 3: 'פרטני', 4: 'חלון', 5: 'אזרחות - ט׳1', 6: 'אזרחות - ט׳1' },
+    1: { 1: 'חלון', 2: 'הסטוריה - ח׳3', 3: 'הסטוריה - ח׳3', 4: 'ישיבת צוות', 5: 'הסטוריה - ח׳2' },
+    2: { 1: 'אזרחות - ט׳1', 2: 'אזרחות - ט׳1', 3: 'הסטוריה - ח׳2', 4: 'הסטוריה - ח׳2', 5: 'שהייה', 6: 'שהייה' },
+    3: { 1: 'הסטוריה - ח׳3', 2: 'הסטוריה - ח׳3', 3: 'חלון', 4: 'פרטני', 5: 'חינוך - ח׳2' },
+    4: { 1: 'חלון', 2: 'חלון', 3: 'הסטוריה - ח׳2', 4: 'הסטוריה - ח׳2', 5: 'אזרחות - ט׳1' },
+    5: { 1: 'סיכום שבוע - ח׳2', 2: 'פרטני' },
+  };
+
   useEffect(() => {
     loadUser();
   }, []);
@@ -127,9 +136,9 @@ export default function Schedule() {
           <div>
             <h2 className="text-2xl font-bold text-blue-900 flex items-center gap-2">
               <CalendarDays className="h-6 w-6 text-amber-500" />
-              לוח שנה ויומן מוסדי
+              מערכת שעות ויומן
             </h2>
-            <p className="text-slate-500">תכנון חודשי וניהול סדר יום</p>
+            <p className="text-slate-500">מערכת שעות שבועית ואירועים מיוחדים</p>
           </div>
           {canSchedule && (
             <button 
@@ -139,6 +148,69 @@ export default function Schedule() {
               <Plus className="h-4 w-4" /> אירוע חדש
             </button>
           )}
+        </div>
+
+        {/* Weekly Schedule */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+          <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <Clock className="h-5 w-5 text-blue-500" />
+            מערכת שעות שבועית
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr>
+                  <th className="border border-slate-200 bg-slate-50 p-3 text-sm font-bold text-slate-600">שעה</th>
+                  {['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי'].map(day => (
+                    <th key={day} className="border border-slate-200 bg-slate-50 p-3 text-sm font-bold text-slate-600">{day}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[1, 2, 3, 4, 5, 6, 7].map(hour => (
+                  <tr key={hour}>
+                    <td className="border border-slate-200 bg-blue-50 p-3 text-center font-bold text-blue-900">{hour}</td>
+                    {[0, 1, 2, 3, 4, 5].map(dayIdx => {
+                      const lesson = TEACHER_SCHEDULE[dayIdx]?.[hour];
+                      const isWindow = lesson === 'חלון';
+                      const isPersonal = lesson === 'פרטני';
+                      const isStay = lesson === 'שהייה';
+                      const isMeeting = lesson === 'ישיבת צוות';
+                      
+                      return (
+                        <td 
+                          key={dayIdx} 
+                          className={`border border-slate-200 p-3 text-center ${
+                            !lesson ? 'bg-slate-50' :
+                            isWindow ? 'bg-slate-100 text-slate-400' :
+                            isPersonal ? 'bg-amber-50 text-amber-700' :
+                            isStay ? 'bg-purple-50 text-purple-700' :
+                            isMeeting ? 'bg-green-50 text-green-700' :
+                            'bg-white'
+                          }`}
+                        >
+                          {lesson ? (
+                            <div className="text-sm">
+                              {lesson.includes(' - ') ? (
+                                <>
+                                  <div className="font-bold">{lesson.split(' - ')[0]}</div>
+                                  <div className="text-xs opacity-70">{lesson.split(' - ')[1]}</div>
+                                </>
+                              ) : (
+                                <span className="text-xs font-medium">{lesson}</span>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-slate-300">-</span>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
