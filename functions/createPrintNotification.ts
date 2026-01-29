@@ -21,6 +21,22 @@ Deno.serve(async (req) => {
       }
     }
 
+    if (event.type === 'update' && data.status === 'approved') {
+      const secretaries = await base44.asServiceRole.entities.User.filter({ role: 'secretary' });
+
+      for (const secretary of secretaries) {
+        await base44.asServiceRole.entities.Notification.create({
+          user_email: secretary.email,
+          title: '✅ בקשת הדפסה אושרה - ממתינה להדפסה',
+          message: `${data.user_name} - ${data.file_name} (${data.copies} עותקים)`,
+          type: 'print',
+          priority: data.urgent ? 'urgent' : 'important',
+          related_entity_type: 'PrintRequest',
+          related_entity_id: data.id
+        });
+      }
+    }
+
     if (event.type === 'update' && data.status === 'completed') {
       await base44.asServiceRole.entities.Notification.create({
         user_email: data.user_email,
