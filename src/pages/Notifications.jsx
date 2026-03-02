@@ -4,6 +4,8 @@ import { base44 } from '@/api/base44Client';
 import { Bell, Check, Trash2, Filter, AlertTriangle, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { formatDistanceToNow } from 'date-fns';
+import { he } from 'date-fns/locale';
 
 export default function NotificationsPage() {
   const [typeFilter, setTypeFilter] = useState('all');

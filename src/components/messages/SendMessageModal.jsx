@@ -12,9 +12,21 @@ export default function SendMessageModal({ user, isOpen, onClose, recipientRole 
   const queryClient = useQueryClient();
 
   const messageTypeIcons = {
-    personal: { icon: Heart, label: 'הודעה אישית', color: 'pink' },
-    feedback: { icon: ThumbsUp, label: 'משוב', color: 'blue' },
-    suggestion: { icon: Lightbulb, label: 'הצעה', color: 'amber' },
+    personal: {
+      icon: Heart, label: 'הודעה אישית',
+      activeClass: 'bg-pink-50 border-pink-500',
+      iconClass: 'text-pink-600',
+    },
+    feedback: {
+      icon: ThumbsUp, label: 'משוב',
+      activeClass: 'bg-blue-50 border-blue-500',
+      iconClass: 'text-blue-600',
+    },
+    suggestion: {
+      icon: Lightbulb, label: 'הצעה',
+      activeClass: 'bg-amber-50 border-amber-500',
+      iconClass: 'text-amber-600',
+    },
   };
 
   const { data: staffMembers = [] } = useQuery({
@@ -107,17 +119,17 @@ export default function SendMessageModal({ user, isOpen, onClose, recipientRole 
           <div>
             <label className="text-sm font-bold text-slate-700 block mb-2">סוג הודעה:</label>
             <div className="grid grid-cols-3 gap-2">
-              {Object.entries(messageTypeIcons).map(([type, { icon: Icon, label, color }]) => (
+              {Object.entries(messageTypeIcons).map(([type, { icon: Icon, label, activeClass, iconClass }]) => (
                 <button
                   key={type}
                   onClick={() => setMessageType(type)}
                   className={`p-3 rounded-lg border-2 transition-all flex flex-col items-center gap-1 ${
                     messageType === type
-                      ? `bg-${color}-50 border-${color}-500`
+                      ? activeClass
                       : 'bg-slate-50 border-slate-200 hover:border-slate-300'
                   }`}
                 >
-                  <Icon className={`h-4 w-4 ${messageType === type ? `text-${color}-600` : 'text-slate-600'}`} />
+                  <Icon className={`h-4 w-4 ${messageType === type ? iconClass : 'text-slate-600'}`} />
                   <span className="text-xs font-medium text-slate-700">{label}</span>
                 </button>
               ))}
@@ -190,7 +202,7 @@ export default function SendMessageModal({ user, isOpen, onClose, recipientRole 
             </button>
             <button
               onClick={handleSend}
-              disabled={!content.trim() || !selectedRecipient || sendMessage.isPending}
+              disabled={!content.trim() || (!sendToAll && !selectedRecipient) || sendMessage.isPending}
               className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:shadow-lg transition-all disabled:opacity-50 font-medium flex items-center justify-center gap-2"
             >
               <Send className="h-4 w-4" />
