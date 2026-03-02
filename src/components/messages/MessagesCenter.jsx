@@ -22,14 +22,14 @@ export default function MessagesCenter({ user }) {
   const markAsRead = useMutation({
     mutationFn: (messageId) => base44.entities.Message.update(messageId, { is_read: true }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['messages'] });
+      queryClient.invalidateQueries({ queryKey: ['messages', user.email] });
     },
   });
 
   const deleteMessage = useMutation({
     mutationFn: (messageId) => base44.entities.Message.delete(messageId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['messages'] });
+      queryClient.invalidateQueries({ queryKey: ['messages', user.email] });
       toast.success('ההודעה נמחקה');
     },
   });

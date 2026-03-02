@@ -12,13 +12,15 @@ import {
 } from 'lucide-react';
 import SendMessageModal from '../messages/SendMessageModal';
 import { toast } from 'sonner';
+import { useAuth } from '@/lib/AuthContext';
 
 export default function AdminDashboard() {
   const [showAddMeeting, setShowAddMeeting] = useState(false);
   const [messageModalOpen, setMessageModalOpen] = useState(false);
+  const [messageContent, setMessageContent] = useState('');
   const queryClient = useQueryClient();
-  
-  const user = { email: 'admin@school.local', full_name: 'מנהלת', role: 'admin' };
+
+  const { user } = useAuth();
 
   // Fetch all data
   const { data: users = [] } = useQuery({
@@ -63,11 +65,11 @@ export default function AdminDashboard() {
 
   const createMessage = useMutation({
     mutationFn: async (content) => {
-      const user = await base44.auth.me();
+      const currentUser = await base44.auth.me();
       return base44.entities.DailyMessage.create({
         content,
         active: true,
-        created_by_name: user.full_name
+        created_by_name: currentUser.full_name
       });
     },
     onSuccess: () => {
@@ -119,7 +121,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Daily Message Board */}
-      <DailyMessageBoard user={{ email: 'admin' }} />
+      <DailyMessageBoard user={user} />
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -288,11 +290,11 @@ export default function AdminDashboard() {
             פגישה חדשה
           </button>
         </div>
-        <MeetingsList user={{ email: users[0]?.email || 'admin@school.local', full_name: 'מנהלת' }} />
+        <MeetingsList user={{ email: user?.email || '', full_name: user?.full_name || '' }} />
       </div>
 
       {showAddMeeting && (
-        <AddMeeting user={{ email: users[0]?.email || 'admin@school.local', full_name: 'מנהלת' }} onClose={() => setShowAddMeeting(false)} />
+        <AddMeeting user={{ email: user?.email || '', full_name: user?.full_name || '' }} onClose={() => setShowAddMeeting(false)} />
       )}
     </div>
   );

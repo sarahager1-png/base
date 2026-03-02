@@ -93,6 +93,12 @@ export default function Dashboard() {
                   <input type="file" accept="image/*" className="hidden" onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
+                      const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+                      if (file.size > MAX_FILE_SIZE) {
+                        alert('הקובץ גדול מדי. גודל מקסימלי: 2MB');
+                        e.target.value = '';
+                        return;
+                      }
                       const reader = new FileReader();
                       reader.onloadend = () => setSchoolLogo(reader.result);
                       reader.readAsDataURL(file);

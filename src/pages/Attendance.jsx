@@ -39,16 +39,16 @@ export default function AttendancePage() {
   const displaySubstitutes = isManager ? allSubstitutes : mySubstitutes;
 
   const absenceStatusConfig = {
-    pending: { icon: Clock, color: 'amber', label: 'ממתין' },
-    approved: { icon: CheckCircle, color: 'green', label: 'מאושר' },
-    rejected: { icon: XCircle, color: 'red', label: 'נדחה' },
-    awaiting_certificate: { icon: AlertCircle, color: 'orange', label: 'ממתין לאישור רפואי' }
+    pending: { icon: Clock, badgeClass: 'bg-amber-100 text-amber-700', iconClass: 'text-amber-600', labelClass: 'text-amber-700', label: 'ממתין' },
+    approved: { icon: CheckCircle, badgeClass: 'bg-green-100 text-green-700', iconClass: 'text-green-600', labelClass: 'text-green-700', label: 'מאושר' },
+    rejected: { icon: XCircle, badgeClass: 'bg-red-100 text-red-700', iconClass: 'text-red-600', labelClass: 'text-red-700', label: 'נדחה' },
+    awaiting_certificate: { icon: AlertCircle, badgeClass: 'bg-orange-100 text-orange-700', iconClass: 'text-orange-600', labelClass: 'text-orange-700', label: 'ממתין לאישור רפואי' }
   };
 
   const substituteStatusConfig = {
-    reported: { icon: Clock, color: 'blue', label: 'דווח' },
-    approved: { icon: CheckCircle, color: 'green', label: 'מאושר' },
-    paid: { icon: CheckCircle, color: 'purple', label: 'שולם' }
+    reported: { icon: Clock, iconClass: 'text-blue-600', labelClass: 'text-blue-700', label: 'דווח' },
+    approved: { icon: CheckCircle, iconClass: 'text-green-600', labelClass: 'text-green-700', label: 'מאושר' },
+    paid: { icon: CheckCircle, iconClass: 'text-purple-600', labelClass: 'text-purple-700', label: 'שולם' }
   };
 
   const reasonLabels = {
@@ -244,7 +244,7 @@ export default function AttendancePage() {
                             {isManager && (
                               <p className="font-bold text-slate-800">{absence.user_name}</p>
                             )}
-                            <div className={`px-3 py-1 rounded-full text-xs font-bold bg-${config.color}-100 text-${config.color}-700`}>
+                            <div className={`px-3 py-1 rounded-full text-xs font-bold ${config.badgeClass}`}>
                               {reasonLabels[absence.absence_reason] || absence.absence_reason}
                             </div>
                           </div>
@@ -260,8 +260,8 @@ export default function AttendancePage() {
                           )}
                         </div>
                         <div className="flex items-center gap-2">
-                          <StatusIcon className={`h-5 w-5 text-${config.color}-600`} />
-                          <span className={`text-xs font-bold text-${config.color}-700`}>
+                          <StatusIcon className={`h-5 w-5 ${config.iconClass}`} />
+                          <span className={`text-xs font-bold ${config.labelClass}`}>
                             {config.label}
                           </span>
                         </div>
@@ -321,8 +321,8 @@ export default function AttendancePage() {
                           )}
                         </div>
                         <div className="flex items-center gap-2">
-                          <StatusIcon className={`h-5 w-5 text-${config.color}-600`} />
-                          <span className={`text-xs font-bold text-${config.color}-700`}>
+                          <StatusIcon className={`h-5 w-5 ${config.iconClass}`} />
+                          <span className={`text-xs font-bold ${config.labelClass}`}>
                             {config.label}
                           </span>
                         </div>
