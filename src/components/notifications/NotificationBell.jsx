@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Bell, X, Check, AlertTriangle, Clock } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { he } from 'date-fns/locale';
+import { timeAgo } from '@/lib/utils';
 
 export default function NotificationBell({ userEmail }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -135,7 +134,7 @@ export default function NotificationBell({ userEmail }) {
                           </div>
                           <p className="text-xs text-slate-600 mt-1">{notif.message}</p>
                           <p className="text-xs text-slate-400 mt-2">
-                            {formatDistanceToNow(new Date(notif.created_date), { addSuffix: true, locale: he })}
+                            {timeAgo(notif.created_date)}
                           </p>
                         </div>
                       </div>

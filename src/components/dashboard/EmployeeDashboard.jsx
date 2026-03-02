@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { 
-  Calendar, Clock, AlertCircle, FileText, 
+import {
+  Calendar, Clock, AlertCircle, FileText,
   Shield, CheckCircle, XCircle, Home
 } from 'lucide-react';
 import DailyJournal from '../journal/DailyJournal';
+import { getStatusBadgeClass } from '@/lib/utils';
 
 export default function EmployeeDashboard({ user }) {
   const dayIdx = new Date().getDay();
@@ -190,12 +191,8 @@ export default function EmployeeDashboard({ user }) {
                     <span className="font-medium text-sm text-slate-800">
                       {absence.absence_reason}
                     </span>
-                    <span className={`text-xs font-bold px-2 py-1 rounded-full ${
-                      absence.status === 'pending' ? 'bg-amber-100 text-amber-700' :
-                      absence.status === 'approved' ? 'bg-green-100 text-green-700' :
-                      'bg-red-100 text-red-700'
-                    }`}>
-                      {absence.status}
+                    <span className={`text-xs font-bold px-2 py-1 rounded-full ${getStatusBadgeClass(absence.status).badgeClass}`}>
+                      {getStatusBadgeClass(absence.status).label}
                     </span>
                   </div>
                   <p className="text-xs text-slate-600">

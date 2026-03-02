@@ -4,8 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { Bell, Check, Trash2, Filter, AlertTriangle, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { formatDistanceToNow } from 'date-fns';
-import { he } from 'date-fns/locale';
+import { timeAgo } from '@/lib/utils';
 
 export default function NotificationsPage() {
   const [typeFilter, setTypeFilter] = useState('all');
@@ -190,7 +189,7 @@ export default function NotificationsPage() {
                         <div className="flex items-center gap-3 text-xs text-slate-400">
                           <span>{typeLabels[notif.type]}</span>
                           <span>•</span>
-                          <span>{formatDistanceToNow(new Date(notif.created_date), { addSuffix: true, locale: he })}</span>
+                          <span>{timeAgo(notif.created_date)}</span>
                         </div>
                         
                         <div className="flex items-center gap-2">

@@ -4,13 +4,13 @@ import { base44 } from '@/api/base44Client';
 import { CalendarDays, Plus, MapPin, Calendar, Clock } from 'lucide-react';
 
 const WEEK_DAYS = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
+const _today = new Date();
+const FIRST_DAY_OF_MONTH = new Date(_today.getFullYear(), _today.getMonth(), 1).getDay();
+const DAYS_IN_MONTH = new Date(_today.getFullYear(), _today.getMonth() + 1, 0).getDate();
 
 export default function Schedule() {
   const [user, setUser] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date().getDate());
-  const today = new Date();
-  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1).getDay();
-  const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [newEventData, setNewEventData] = useState({ 
     title: '', 
@@ -238,11 +238,11 @@ export default function Schedule() {
                 </div>
               ))}
               
-              {Array.from({length: firstDayOfMonth}).map((_, i) => (
+              {Array.from({length: FIRST_DAY_OF_MONTH}).map((_, i) => (
                 <div key={`empty-${i}`} className="bg-white min-h-[100px]" />
               ))}
 
-              {Array.from({length: daysInMonth}).map((_, i) => {
+              {Array.from({length: DAYS_IN_MONTH}).map((_, i) => {
                 const day = i + 1;
                 const dayEvents = getEventsForDay(day);
                 const isSelected = selectedDate === day;

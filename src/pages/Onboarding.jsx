@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { UserPlus, FileText, CheckCircle, XCircle, Clock, AlertCircle } from 'lucide-react';
+import { getStatusBadgeClass } from '@/lib/utils';
 
 export default function OnboardingPage() {
   const { data: user } = useQuery({
@@ -130,13 +131,8 @@ export default function OnboardingPage() {
                         )}
                       </div>
                       <div className="flex flex-col items-end gap-2">
-                        <div className={`px-3 py-1 rounded-full text-xs font-bold ${
-                          doc.status === 'approved' ? 'bg-green-100 text-green-700' :
-                          doc.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                          'bg-amber-100 text-amber-700'
-                        }`}>
-                          {doc.status === 'approved' ? 'מאושר' :
-                           doc.status === 'rejected' ? 'נדחה' : 'ממתין'}
+                        <div className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusBadgeClass(doc.status).badgeClass}`}>
+                          {getStatusBadgeClass(doc.status).label}
                         </div>
                         <a 
                           href={doc.file_url} 

@@ -267,11 +267,11 @@ export default function AdminDashboard() {
             פגישה חדשה
           </button>
         </div>
-        <MeetingsList user={{ email: user?.email || '', full_name: user?.full_name || '' }} />
+        <MeetingsList user={user} />
       </div>
 
       {showAddMeeting && (
-        <AddMeeting user={{ email: user?.email || '', full_name: user?.full_name || '' }} onClose={() => setShowAddMeeting(false)} />
+        <AddMeeting user={user} onClose={() => setShowAddMeeting(false)} />
       )}
     </div>
   );
