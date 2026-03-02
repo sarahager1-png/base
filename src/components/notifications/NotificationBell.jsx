@@ -18,8 +18,19 @@ export default function NotificationBell({ userEmail }) {
 
   const markAsRead = useMutation({
     mutationFn: (id) => base44.entities.Notification.update(id, { read: true }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['notifications', userEmail] });
+      const prev = queryClient.getQueryData(['notifications', userEmail]);
+      queryClient.setQueryData(['notifications', userEmail], (old = []) =>
+        old.map(n => n.id === id ? { ...n, read: true } : n)
+      );
+      return { prev };
+    },
+    onError: (_, __, ctx) => {
+      queryClient.setQueryData(['notifications', userEmail], ctx?.prev);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications', userEmail] });
     },
   });
 
@@ -30,8 +41,19 @@ export default function NotificationBell({ userEmail }) {
         await base44.entities.Notification.update(notif.id, { read: true });
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['notifications', userEmail] });
+      const prev = queryClient.getQueryData(['notifications', userEmail]);
+      queryClient.setQueryData(['notifications', userEmail], (old = []) =>
+        old.map(n => ({ ...n, read: true }))
+      );
+      return { prev };
+    },
+    onError: (_, __, ctx) => {
+      queryClient.setQueryData(['notifications', userEmail], ctx?.prev);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications', userEmail] });
     },
   });
 

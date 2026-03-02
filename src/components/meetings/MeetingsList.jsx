@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Users, Phone, MapPin, Clock, CheckCircle } from 'lucide-react';
@@ -6,6 +6,16 @@ import { format } from 'date-fns';
 
 export default function MeetingsList({ user }) {
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!user?.email) return;
+    const unsubscribe = base44.entities.Meeting.subscribe((event) => {
+      if (['create', 'update', 'delete'].includes(event.type)) {
+        queryClient.invalidateQueries({ queryKey: ['meetings'] });
+      }
+    });
+    return unsubscribe;
+  }, [user?.email, queryClient]);
 
   const { data: meetings = [] } = useQuery({
     queryKey: ['meetings', user.email],

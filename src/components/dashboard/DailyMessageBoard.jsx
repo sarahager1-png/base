@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Shield, Megaphone, X, Bell, Edit2 } from 'lucide-react';
@@ -8,6 +8,16 @@ export default function DailyMessageBoard({ user }) {
   const [messageText, setMessageText] = useState('');
   const [editingMessageId, setEditingMessageId] = useState(null);
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const unsubscribe = base44.entities.DailyMessage.subscribe((event) => {
+      if (['create', 'update', 'delete'].includes(event.type)) {
+        queryClient.invalidateQueries({ queryKey: ['dailyMessage'] });
+        queryClient.invalidateQueries({ queryKey: ['allMessages'] });
+      }
+    });
+    return unsubscribe;
+  }, [queryClient]);
 
   const getGreetingByHour = () => {
     const hour = new Date().getHours();

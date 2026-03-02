@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Clock, Calendar, CheckCircle, XCircle, AlertCircle, Users, FileText } from 'lucide-react';
 
@@ -33,6 +33,24 @@ export default function AttendancePage() {
     queryFn: () => base44.entities.SubstituteReport.filter({ reporter_email: user.email }, '-created_date'),
     enabled: !!user,
   });
+
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const unsubAbsence = base44.entities.Absence.subscribe((event) => {
+      if (['create', 'update', 'delete'].includes(event.type)) {
+        queryClient.invalidateQueries({ queryKey: ['absences'] });
+        queryClient.invalidateQueries({ queryKey: ['myAbsences'] });
+      }
+    });
+    const unsubSubstitute = base44.entities.SubstituteReport.subscribe((event) => {
+      if (['create', 'update', 'delete'].includes(event.type)) {
+        queryClient.invalidateQueries({ queryKey: ['substitutes'] });
+        queryClient.invalidateQueries({ queryKey: ['mySubstitutes'] });
+      }
+    });
+    return () => { unsubAbsence(); unsubSubstitute(); };
+  }, [queryClient]);
 
   const isManager = user && ['admin', 'vice_principal', 'secretary'].includes(user.role);
   const displayAbsences = isManager ? allAbsences : myAbsences;
