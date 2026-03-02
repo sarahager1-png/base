@@ -8,6 +8,9 @@ const WEEK_DAYS = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
 export default function Schedule() {
   const [user, setUser] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date().getDate());
+  const today = new Date();
+  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1).getDay();
+  const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [newEventData, setNewEventData] = useState({ 
     title: '', 
@@ -235,11 +238,11 @@ export default function Schedule() {
                 </div>
               ))}
               
-              {Array.from({length: 4}).map((_, i) => (
+              {Array.from({length: firstDayOfMonth}).map((_, i) => (
                 <div key={`empty-${i}`} className="bg-white min-h-[100px]" />
               ))}
 
-              {Array.from({length: 31}).map((_, i) => {
+              {Array.from({length: daysInMonth}).map((_, i) => {
                 const day = i + 1;
                 const dayEvents = getEventsForDay(day);
                 const isSelected = selectedDate === day;
@@ -271,7 +274,7 @@ export default function Schedule() {
           <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-0 flex flex-col overflow-hidden">
             <div className="bg-blue-600 p-6 text-white">
               <h3 className="text-3xl font-bold mb-1">{selectedDate}</h3>
-              <p className="opacity-90 text-lg">בינואר</p>
+              <p className="opacity-90 text-lg">{new Date().toLocaleDateString('he-IL', { month: 'long' })}</p>
               <div className="mt-4 flex items-center gap-2 text-blue-100 text-sm">
                 <MapPin className="h-4 w-4" />
                 <span>בית הספר "בינה מנהיגותית"</span>

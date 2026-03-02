@@ -9,9 +9,21 @@ export default function MessagesCenter({ user }) {
   const queryClient = useQueryClient();
 
   const messageTypeConfig = {
-    personal: { icon: Heart, label: 'הודעה אישית', color: 'pink' },
-    feedback: { icon: ThumbsUp, label: 'משוב', color: 'blue' },
-    suggestion: { icon: Lightbulb, label: 'הצעה', color: 'amber' },
+    personal: {
+      icon: Heart, label: 'הודעה אישית',
+      iconClass: 'text-pink-600 bg-pink-50 border-pink-100',
+      badgeClass: 'text-pink-700 bg-pink-100',
+    },
+    feedback: {
+      icon: ThumbsUp, label: 'משוב',
+      iconClass: 'text-blue-600 bg-blue-50 border-blue-100',
+      badgeClass: 'text-blue-700 bg-blue-100',
+    },
+    suggestion: {
+      icon: Lightbulb, label: 'הצעה',
+      iconClass: 'text-amber-600 bg-amber-50 border-amber-100',
+      badgeClass: 'text-amber-700 bg-amber-100',
+    },
   };
 
   const { data: messages = [] } = useQuery({
@@ -90,13 +102,13 @@ export default function MessagesCenter({ user }) {
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-start gap-3">
-                  <div className={`p-2 rounded-lg text-${typeConfig.color}-600 bg-${typeConfig.color}-50 border border-${typeConfig.color}-100 mt-1`}>
+                  <div className={`p-2 rounded-lg border mt-1 ${typeConfig.iconClass}`}>
                     <TypeIcon className="h-4 w-4" />
                   </div>
                   <div>
                     <h4 className="font-bold text-slate-800">{message.sender_name}</h4>
                     <p className="text-xs text-slate-500">{message.sender_role}</p>
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded mt-1 inline-block text-${typeConfig.color}-700 bg-${typeConfig.color}-100`}>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded mt-1 inline-block ${typeConfig.badgeClass}`}>
                       {typeConfig.label}
                     </span>
                   </div>

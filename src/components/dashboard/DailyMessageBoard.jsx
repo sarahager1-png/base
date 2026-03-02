@@ -11,11 +11,12 @@ export default function DailyMessageBoard({ user }) {
 
   const getGreetingByHour = () => {
     const hour = new Date().getHours();
-    const greeting = 
-      hour >= 6 && hour < 12 ? `בוקר טוב ${user.full_name}` :
-      hour >= 12 && hour < 17 ? `צהריים טובים ${user.full_name}` :
-      hour >= 17 && hour < 19 ? `ערב טוב ${user.full_name}` :
-      `לילה טוב ${user.full_name}`;
+    const name = user?.full_name || '';
+    const greeting =
+      hour >= 6 && hour < 12 ? `בוקר טוב ${name}` :
+      hour >= 12 && hour < 17 ? `צהריים טובים ${name}` :
+      hour >= 17 && hour < 19 ? `ערב טוב ${name}` :
+      `לילה טוב ${name}`;
     return greeting;
   };
 
@@ -45,11 +46,12 @@ export default function DailyMessageBoard({ user }) {
       return base44.entities.DailyMessage.create({
         content,
         active: true,
-        created_by_name: user.full_name
+        created_by_name: user?.full_name || ''
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['dailyMessage', 'allMessages'] });
+      queryClient.invalidateQueries({ queryKey: ['dailyMessage'] });
+      queryClient.invalidateQueries({ queryKey: ['allMessages'] });
       setMessageText('');
       setEditingMessageId(null);
       setShowMessageModal(false);
@@ -59,7 +61,8 @@ export default function DailyMessageBoard({ user }) {
   const updateMessageStatus = useMutation({
     mutationFn: ({ id, active }) => base44.entities.DailyMessage.update(id, { active }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['dailyMessage', 'allMessages'] });
+      queryClient.invalidateQueries({ queryKey: ['dailyMessage'] });
+      queryClient.invalidateQueries({ queryKey: ['allMessages'] });
     },
   });
 
@@ -94,7 +97,7 @@ export default function DailyMessageBoard({ user }) {
             </div>
             <div className="text-right">
               <p className="text-blue-100 text-sm">ברוך הבא,</p>
-              <p className="text-xl font-bold">{user.full_name}</p>
+              <p className="text-xl font-bold">{user?.full_name}</p>
             </div>
           </div>
         </div>
