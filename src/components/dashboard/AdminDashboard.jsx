@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import StatCard from '../StatCard';
 import MeetingsList from '../meetings/MeetingsList';
@@ -8,16 +8,14 @@ import AddMeeting from '../meetings/AddMeeting';
 import DailyMessageBoard from './DailyMessageBoard';
 import {
   Users, AlertTriangle, Clock, ShoppingCart, FileText,
-  Wrench, BarChart3, TrendingUp, Plus, Calendar, Send, Bell, Heart
+  Wrench, BarChart3, TrendingUp, Plus, Heart
 } from 'lucide-react';
 import SendMessageModal from '../messages/SendMessageModal';
-import { toast } from 'sonner';
 import { useAuth } from '@/lib/AuthContext';
 
 export default function AdminDashboard() {
   const [showAddMeeting, setShowAddMeeting] = useState(false);
   const [messageModalOpen, setMessageModalOpen] = useState(false);
-  const [messageContent, setMessageContent] = useState('');
   const queryClient = useQueryClient();
 
   const { user } = useAuth();
@@ -56,27 +54,6 @@ export default function AdminDashboard() {
   const { data: substituteReports = [] } = useQuery({
     queryKey: ['substitutes-all'],
     queryFn: () => base44.entities.SubstituteReport.list('-created_date', 100),
-  });
-
-  const { data: dailyMessages = [] } = useQuery({
-    queryKey: ['daily-messages'],
-    queryFn: () => base44.entities.DailyMessage.list('-created_date', 5),
-  });
-
-  const createMessage = useMutation({
-    mutationFn: async (content) => {
-      const currentUser = await base44.auth.me();
-      return base44.entities.DailyMessage.create({
-        content,
-        active: true,
-        created_by_name: currentUser.full_name
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['daily-messages'] });
-      toast.success('ההודעה פורסמה בהצלחה');
-      setMessageContent('');
-    },
   });
 
   // Calculate stats
