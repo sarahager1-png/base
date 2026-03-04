@@ -274,7 +274,6 @@ function DashboardInner() {
             </div>
           </div>
         </div>
-        </div>
       </header>
 
       <div className="max-w-7xl mx-auto flex items-start pt-6 gap-6 px-4 sm:px-6 lg:px-8">
