@@ -1,6 +1,16 @@
 import React from 'react';
-import { FileText, Download, Check } from 'lucide-react';
+import { FileText, Download, Check, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+
+function handlePrint(fileUrl) {
+  const win = window.open(fileUrl, '_blank');
+  if (win) {
+    win.onload = () => {
+      win.focus();
+      win.print();
+    };
+  }
+}
 
 function PaperSizeBadge({ paperSize }) {
   const config = {
@@ -37,9 +47,16 @@ export function AdminRequestCard({ request, onApprove }) {
         </div>
         <div className="flex items-center gap-2">
           <a href={request.file_url} target="_blank" rel="noopener noreferrer"
-            className="p-2 hover:bg-blue-100 rounded-lg text-blue-600">
+            className="p-2 hover:bg-blue-100 rounded-lg text-blue-600" title="הורד PDF">
             <Download className="h-4 w-4" />
           </a>
+          <button
+            onClick={() => handlePrint(request.file_url)}
+            className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors"
+            title="תצוגה מקדימה להדפסה"
+          >
+            <Printer className="h-4 w-4" />
+          </button>
           <Button size="sm" onClick={() => onApprove(request.id)} className="bg-green-600 hover:bg-green-700">
             <Check className="h-4 w-4 mr-1" />אשר
           </Button>
@@ -73,10 +90,19 @@ export function SecretaryRequestCard({ request, isSelected, onToggle }) {
             <span>✅ {request.approved_by}</span>
           </div>
         </div>
-        <a href={request.file_url} target="_blank" rel="noopener noreferrer"
-          className="p-2 hover:bg-blue-100 rounded-lg text-blue-600">
-          <Download className="h-4 w-4" />
-        </a>
+        <div className="flex items-center gap-1">
+          <a href={request.file_url} target="_blank" rel="noopener noreferrer"
+            className="p-2 hover:bg-blue-100 rounded-lg text-blue-600" title="הורד PDF">
+            <Download className="h-4 w-4" />
+          </a>
+          <button
+            onClick={() => handlePrint(request.file_url)}
+            className="p-2 hover:bg-green-100 rounded-lg text-green-700 transition-colors"
+            title="הדפס ישירות"
+          >
+            <Printer className="h-4 w-4" />
+          </button>
+        </div>
       </div>
     </div>
   );
