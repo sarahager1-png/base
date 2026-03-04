@@ -259,6 +259,7 @@ function DashboardInner() {
                     { role: 'counselor', label: 'יועצת' },
                     { role: 'maintenance', label: 'אב בית' },
                     { role: 'substitute', label: 'מילוי מקום' },
+                    { role: 'coordinator', label: 'רכז' },
                     { role: 'assistant', label: 'סייעת' },
                     { role: 'user', label: 'עובד כללי' },
                   ].map(item => (
@@ -328,7 +329,11 @@ function DashboardInner() {
               {(viewAsRole === 'counselor') && (
                 <CounselorDashboard user={{...user, role: 'counselor'}} setView={setCurrentView} />
               )}
-              
+
+              {(viewAsRole === 'coordinator') && (
+                <StaffCoordinatorDashboard user={{...user, role: 'coordinator'}} setView={setCurrentView} />
+              )}
+
               {(viewAsRole === 'maintenance') && (
                 <MaintenanceDashboard user={{...user, role: 'maintenance'}} />
               )}
