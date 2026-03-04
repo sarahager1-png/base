@@ -110,26 +110,26 @@ html, body {
 }
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(99, 102, 241, 0.12), 0 8px 16px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 20px 40px rgba(13, 148, 136, 0.12), 0 8px 16px rgba(0, 0, 0, 0.06);
 }
 
 /* ===================== Premium Card ===================== */
 .card-premium {
   background: #ffffff;
   border-radius: 1rem;
-  border: 1px solid rgba(99, 102, 241, 0.12);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(13, 148, 136, 0.12);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(13, 148, 136, 0.06);
   transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, border-color 0.2s ease;
 }
 .card-premium:hover {
   transform: translateY(-3px);
-  border-color: rgba(99, 102, 241, 0.25);
-  box-shadow: 0 8px 30px rgba(99, 102, 241, 0.14), 0 2px 8px rgba(0,0,0,0.06);
+  border-color: rgba(13, 148, 136, 0.25);
+  box-shadow: 0 8px 30px rgba(13, 148, 136, 0.14), 0 2px 8px rgba(0,0,0,0.06);
 }
 .dark .card-premium {
   background: #1e293b;
-  border-color: rgba(99, 102, 241, 0.18);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 4px 12px rgba(99, 102, 241, 0.08);
+  border-color: rgba(13, 148, 136, 0.18);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 4px 12px rgba(13, 148, 136, 0.08);
 }
 
 /* ===================== Page Entrance ===================== */
