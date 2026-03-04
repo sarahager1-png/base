@@ -75,8 +75,8 @@ export default function Schedule() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-6" dir="rtl">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="space-y-6" dir="rtl">
+      <div>
         {/* Event Modal */}
         {isEventModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">

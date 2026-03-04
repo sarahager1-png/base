@@ -27,9 +27,9 @@ export default function CommunityPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 p-4 md:p-6" dir="rtl">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
+    <div className="space-y-6" dir="rtl">
+      <div>
+        <div className="mb-6">
           <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-2">
             קהילה והווי בית ספרי
           </h1>

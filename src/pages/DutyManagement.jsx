@@ -104,13 +104,13 @@ export default function DutyManagementPage() {
   const dayNames = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
 
   return (
-    <div className="space-y-6 p-4 md:p-6" dir="rtl">
-      <div className="bg-gradient-to-r from-blue-900 to-indigo-900 rounded-2xl p-4 md:p-8 text-white">
-        <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
-          <Shield className="h-7 w-7 md:h-8 md:w-8" />
-          ניהול תורנויות
-        </h1>
-        <p className="text-blue-100 mt-2">הגדרת תורנויות ושיבוץ צוות</p>
+    <div className="space-y-6" dir="rtl">
+      <div className="flex items-center gap-3 mb-2">
+        <Shield className="h-6 w-6 text-blue-600" />
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">ניהול תורנויות</h1>
+          <p className="text-sm text-slate-500">הגדרת תורנויות ושיבוץ צוות</p>
+        </div>
       </div>
 
       {/* Settings Management */}

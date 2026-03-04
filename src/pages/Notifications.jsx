@@ -130,9 +130,9 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 md:p-6" dir="rtl">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
+    <div className="space-y-6" dir="rtl">
+      <div>
+        <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-blue-900 mb-2">התראות</h1>
             <p className="text-slate-600">

@@ -107,13 +107,13 @@ export default function RoomManagementPage() {
   const dayNames = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 
   return (
-    <div className="space-y-6 p-4 md:p-6" dir="rtl">
-      <div className="bg-gradient-to-r from-purple-900 to-pink-900 rounded-2xl p-4 md:p-8 text-white">
-        <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
-          <Home className="h-7 w-7 md:h-8 md:w-8" />
-          ניהול חדרים
-        </h1>
-        <p className="text-purple-100 mt-2">שיבוץ חדרים ומערכת</p>
+    <div className="space-y-6" dir="rtl">
+      <div className="flex items-center gap-3 mb-2">
+        <Home className="h-6 w-6 text-purple-600" />
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">ניהול חדרים</h1>
+          <p className="text-sm text-slate-500">שיבוץ חדרים ומערכת</p>
+        </div>
       </div>
 
       {/* Rooms Management */}

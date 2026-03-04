@@ -79,8 +79,8 @@ export default function Journal() {
   const isAdmin = user.role === 'admin' || user.role === 'vice_principal';
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-8" dir="rtl">
-      <div className="max-w-7xl mx-auto">
+    <div className="space-y-6" dir="rtl">
+      <div>
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold text-blue-900">יומן בית הספר</h1>

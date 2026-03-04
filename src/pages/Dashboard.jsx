@@ -13,6 +13,7 @@ import StaffDashboard from '../components/dashboard/StaffDashboard';
 import HRDashboard from '../components/dashboard/HRDashboard';
 import SecretaryDashboard from '../components/dashboard/SecretaryDashboard';
 import MaintenanceDashboard from '../components/dashboard/MaintenanceDashboard';
+import { getHebrewDate } from '@/utils/hebrewDate';
 
 import SubstituteDashboard from '../components/dashboard/SubstituteDashboard';
 import VicePrincipalDashboard from '../components/dashboard/VicePrincipalDashboard';
@@ -35,8 +36,9 @@ import RoomManagement from './RoomManagement';
 import HelpCenter from '../components/help/HelpCenter';
 import InsightsDashboard from '../components/analytics/InsightsDashboard';
 
-const HEBREW_DATE = "כ״ח טבת תשפ״ו";
 const GREGORIAN_DATE = new Date().toLocaleDateString('he-IL');
+const _hd = getHebrewDate(new Date());
+const HEBREW_DATE = _hd ? _hd.full : '';
 
 function DashboardInner() {
   const { dark, toggleDark } = useTheme();
