@@ -24,44 +24,44 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
 
   return (
     <aside className={`
-      fixed inset-y-0 right-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out border-l border-slate-200
-      ${isOpen ? 'translate-x-0' : 'translate-x-full'} lg:relative lg:translate-x-0 lg:shadow-sm
+      fixed inset-y-0 right-0 z-50 w-64 transform transition-transform duration-300 ease-in-out
+      ${isOpen ? 'translate-x-0' : 'translate-x-full'} lg:relative lg:translate-x-0
     `}>
-      <div className="h-full flex flex-col">
-        <div className="p-6 border-b border-slate-100 flex items-center justify-between lg:hidden">
-          <span className="font-bold text-blue-900">תפריט</span>
+      <div className="h-full flex flex-col bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 rounded-2xl shadow-xl overflow-hidden border border-white/5">
+        <div className="p-5 border-b border-white/10 flex items-center justify-between lg:hidden">
+          <span className="font-bold text-white">תפריט</span>
           <button onClick={closeSidebar}>
-            <X className="h-6 w-6 text-slate-400" />
+            <X className="h-5 w-5 text-white/50 hover:text-white" />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto py-6 px-4">
-          <nav className="space-y-2">
+        <div className="flex-1 overflow-y-auto py-4 px-3">
+          <nav className="space-y-1">
             {menuItems
               .filter(item => item.roles.includes('all') || item.roles.includes(user.role))
               .map((item) => (
                 <button
                   key={item.id}
                   onClick={() => { setView(item.id); closeSidebar(); }}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-right group text-sm
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-right group text-sm
                     ${activeView === item.id 
-                      ? 'bg-slate-800 text-white font-semibold shadow-sm' 
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800'}
+                      ? 'bg-white/15 text-white font-semibold shadow-inner backdrop-blur-sm border border-white/10' 
+                      : 'text-white/60 hover:bg-white/8 hover:text-white/90'}
                   `}
                 >
-                  <item.icon className={`h-4 w-4 ${activeView === item.id ? 'text-white' : 'text-slate-400 group-hover:text-slate-600'}`} />
+                  <item.icon className={`h-4 w-4 flex-shrink-0 ${activeView === item.id ? 'text-blue-300' : 'text-white/40 group-hover:text-white/70'}`} />
                   <span>{item.label}</span>
                 </button>
               ))}
           </nav>
         </div>
         
-        <div className="p-4 border-t border-slate-100">
+        <div className="p-3 border-t border-white/10">
           <button 
             onClick={onLogout} 
-            className="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl w-full transition-colors font-medium"
+            className="flex items-center gap-3 px-4 py-2.5 text-red-400 hover:bg-red-500/10 rounded-xl w-full transition-colors font-medium text-sm"
           >
-            <LogOut className="h-5 w-5" />
+            <LogOut className="h-4 w-4" />
             <span>יציאה מהמערכת</span>
           </button>
         </div>

@@ -79,17 +79,17 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 font-sans text-slate-800" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50/30 to-slate-100 font-sans text-slate-800" dir="rtl">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-40">
+      <header className="sticky top-0 z-40 shadow-md">
         {/* Top Bar - School Info */}
-        <div className="bg-gradient-to-l from-blue-50 to-white border-b border-slate-100">
+        <div className="bg-gradient-to-l from-blue-900 via-blue-800 to-slate-900 text-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
             <div className="flex items-center gap-4">
               {schoolLogo ? (
-                <img src={schoolLogo} alt="לוגו בית הספר" className="h-12 w-12 object-contain rounded-lg border border-slate-200 bg-white p-1" />
+                <img src={schoolLogo} alt="לוגו בית הספר" className="h-12 w-12 object-contain rounded-xl border-2 border-white/20 bg-white/10 p-1" />
               ) : (
-                <label className="h-12 w-12 border-2 border-dashed border-slate-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all group">
+                <label className="h-12 w-12 border-2 border-dashed border-white/30 rounded-xl flex items-center justify-center cursor-pointer hover:border-white/60 hover:bg-white/10 transition-all group">
                   <input type="file" accept="image/*" className="hidden" onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
@@ -104,7 +104,7 @@ export default function Dashboard() {
                       reader.readAsDataURL(file);
                     }
                   }} />
-                  <Shield className="h-5 w-5 text-slate-400 group-hover:text-blue-500" />
+                  <Shield className="h-5 w-5 text-white/50 group-hover:text-white/80" />
                 </label>
               )}
               {isEditingSchool ? (
@@ -113,75 +113,72 @@ export default function Dashboard() {
                   value={schoolName}
                   onChange={(e) => setSchoolName(e.target.value)}
                   onBlur={() => setIsEditingSchool(false)}
-                  className="text-2xl font-bold text-slate-800 border-b-2 border-blue-500 outline-none bg-transparent"
+                  className="text-2xl font-bold text-white border-b-2 border-blue-300 outline-none bg-transparent"
                   autoFocus
                 />
               ) : (
-                <h1
-                  onClick={() => setIsEditingSchool(true)}
-                  className="text-2xl font-bold text-slate-800 cursor-pointer hover:text-blue-600 transition-colors"
-                >
-                  {schoolName}
-                </h1>
+                <div>
+                  <h1
+                    onClick={() => setIsEditingSchool(true)}
+                    className="text-2xl font-bold text-white cursor-pointer hover:text-blue-200 transition-colors"
+                  >
+                    {schoolName}
+                  </h1>
+                  <p className="text-[10px] text-blue-300 mt-0.5">BASE - בינה מנהיגותית</p>
+                </div>
               )}
             </div>
-            <div className="flex items-center gap-3 text-xs text-slate-500">
+            <div className="flex items-center gap-3 text-xs text-blue-200">
               <span>{HEBREW_DATE}</span>
-              <span className="text-slate-300">|</span>
+              <span className="text-white/20">|</span>
               <span>{GREGORIAN_DATE}</span>
             </div>
           </div>
         </div>
         
         {/* Navigation Bar */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-slate-100 lg:hidden text-slate-600">
-              <Menu className="h-6 w-6" />
-            </button>
-            <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setCurrentView('dashboard')}>
-              <div>
-                <h2 className="text-lg font-bold text-blue-900">מערכת ניהול</h2>
-                <p className="text-[10px] text-slate-500">BASE - בינה מנהיגותית</p>
-              </div>
+        <div className="bg-white/95 backdrop-blur-md border-b border-slate-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-slate-100 lg:hidden text-slate-600">
+                <Menu className="h-6 w-6" />
+              </button>
             </div>
-          </div>
-          
-          <div className="flex items-center gap-6">
-            <NotificationBell userEmail={user.email} />
             
-            {/* Role Switcher for Admin */}
-            {user.role === 'admin' && (
-              <div className="hidden md:flex items-center gap-2 bg-slate-100 p-1 rounded-lg overflow-x-auto">
-                {[
-                  { role: null, label: 'מנהלת' },
-                  { role: 'vice_principal', label: 'סגנית' },
-                  { role: 'secretary', label: 'מזכירה' },
-                  { role: 'teacher', label: 'עובדת הוראה' },
-                  { role: 'counselor', label: 'יועצת' },
-                  { role: 'maintenance', label: 'אב בית' },
-                  { role: 'substitute', label: 'ממלאת מקום' },
-                  { role: 'assistant', label: 'סייעת' },
-                  { role: 'user', label: 'עובד כללי' },
-                ].map(item => (
-                  <button
-                    key={item.role || 'admin'}
-                    onClick={() => setViewAsRole(item.role)}
-                    className={`px-3 py-1 text-xs rounded-md whitespace-nowrap transition-all ${viewAsRole === item.role ? 'bg-white shadow-sm text-blue-700 font-bold' : 'text-slate-500 hover:text-slate-700'}`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            <div className="flex flex-col items-end">
-              <div className="text-sm font-bold text-blue-900 flex items-center gap-3">
-                <div className="text-right leading-tight hidden sm:block">
-                  <div className="text-slate-900">{user.full_name}</div>
-                  <div className="text-xs text-slate-500 font-normal">{user.title || user.role}</div>
+            <div className="flex items-center gap-4">
+              <NotificationBell userEmail={user.email} />
+              
+              {/* Role Switcher for Admin */}
+              {user.role === 'admin' && (
+                <div className="hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-xl overflow-x-auto">
+                  {[
+                    { role: null, label: 'מנהלת' },
+                    { role: 'vice_principal', label: 'סגנית' },
+                    { role: 'secretary', label: 'מזכירה' },
+                    { role: 'teacher', label: 'הוראה' },
+                    { role: 'counselor', label: 'יועצת' },
+                    { role: 'maintenance', label: 'אב בית' },
+                    { role: 'substitute', label: 'ממלאת מקום' },
+                    { role: 'assistant', label: 'סייעת' },
+                    { role: 'user', label: 'עובד כללי' },
+                  ].map(item => (
+                    <button
+                      key={item.role || 'admin'}
+                      onClick={() => setViewAsRole(item.role)}
+                      className={`px-3 py-1.5 text-xs rounded-lg whitespace-nowrap transition-all font-medium ${viewAsRole === item.role ? 'bg-blue-900 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800 hover:bg-white'}`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
                 </div>
-                <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-800 font-bold border-2 border-white shadow-sm ring-1 ring-blue-100">
+              )}
+
+              <div className="flex items-center gap-3 border-r border-slate-200 pr-4">
+                <div className="text-right leading-tight hidden sm:block">
+                  <div className="text-sm font-bold text-slate-900">{user.full_name}</div>
+                  <div className="text-xs text-slate-400">{user.title || user.role}</div>
+                </div>
+                <div className="h-9 w-9 rounded-full bg-gradient-to-br from-blue-600 to-blue-900 flex items-center justify-center text-white font-bold text-sm shadow-md">
                   {user.avatar || user.full_name?.charAt(0)}
                 </div>
               </div>
