@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
-import { Shield, Menu } from 'lucide-react';
+import { Shield, Menu, Sparkles } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import NotificationBell from '../components/notifications/NotificationBell';
 import ManagementDashboard from '../components/dashboard/ManagementDashboard';
@@ -75,9 +75,11 @@ export default function Dashboard() {
           <div className="relative mx-auto mb-6 h-16 w-16">
             <div className="absolute inset-0 rounded-2xl opacity-30 blur-xl"
                  style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }} />
-            <div className="relative h-16 w-16 rounded-2xl flex items-center justify-center"
-                 style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
-              <Shield className="h-8 w-8 text-white animate-pulse" />
+            <div className="relative h-16 w-16 rounded-2xl flex items-center justify-center overflow-hidden"
+                 style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #4f46e5 100%)' }}>
+              <div className="absolute inset-0 opacity-30"
+                   style={{ background: 'radial-gradient(circle at 30% 30%, #fff, transparent 60%)' }} />
+              <Sparkles className="h-8 w-8 text-white animate-pulse relative z-10" />
             </div>
           </div>
           <div className="h-1 w-32 mx-auto rounded-full overflow-hidden bg-white/10">
@@ -154,13 +156,15 @@ export default function Dashboard() {
               <Menu className="h-5 w-5" />
             </button>
             <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => setCurrentView('dashboard')}>
-              <div className="h-7 w-7 rounded-lg flex items-center justify-center"
-                   style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
-                <Shield className="h-4 w-4 text-white" />
+              <div className="h-8 w-8 rounded-lg flex items-center justify-center relative overflow-hidden shadow-md"
+                   style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #4f46e5 100%)' }}>
+                <div className="absolute inset-0 opacity-30"
+                     style={{ background: 'radial-gradient(circle at 30% 30%, #fff, transparent 60%)' }} />
+                <Sparkles className="h-4 w-4 text-white relative z-10" />
               </div>
               <div>
-                <p className="text-white font-bold text-sm leading-tight">מערכת ניהול</p>
-                <p className="text-slate-500 text-[10px] leading-tight">BASE · בינה מנהיגותית</p>
+                <p className="text-white font-bold text-sm leading-tight tracking-widest">SMART BASE</p>
+                <p className="text-slate-500 text-[10px] leading-tight">מערכת ניהול חכמה</p>
               </div>
             </div>
           </div>

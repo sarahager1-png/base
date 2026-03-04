@@ -64,7 +64,7 @@ export default function SubstituteDashboard({ user }) {
         <div className="bg-gradient-to-br from-orange-600 via-amber-600 to-yellow-600 rounded-2xl p-8 text-white shadow-2xl relative overflow-hidden">
           <div className="relative z-10 text-center">
             <h2 className="text-3xl font-bold mb-2">שלום, {user.full_name}!</h2>
-            <p className="text-amber-100 text-lg">ממלאת מקום - מערכת BASE</p>
+            <p className="text-amber-100 text-lg">ממלאת מקום - SMART BASE</p>
           </div>
         </div>
 
@@ -246,7 +246,7 @@ export default function SubstituteDashboard({ user }) {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold mb-1">שלום, {user.full_name}!</h2>
-                <p className="text-amber-100">ממלאת מקום - מערכת BASE</p>
+                <p className="text-amber-100">ממלאת מקום - SMART BASE</p>
               </div>
               <button
                 onClick={() => setEditingName(true)}

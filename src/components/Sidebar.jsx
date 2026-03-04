@@ -1,8 +1,7 @@
 import React from 'react';
 import {
   Home, Calendar, CheckSquare, Clock, Users, UserPlus,
-  Printer, Settings, Heart, LogOut, X, Bell, Shield as ShieldIcon,
-  ChevronRight
+  Printer, Settings, Heart, LogOut, X, Bell, ChevronRight, Sparkles
 } from 'lucide-react';
 
 const NAV_COLORS = {
@@ -35,7 +34,7 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
     { id: 'onboarding',          label: 'טפסי קליטה',       icon: UserPlus,   roles: ['substitute', 'admin', 'vice_principal'] },
     { id: 'printing',            label: 'מרכז צילומים',     icon: Printer,    roles: ['secretary', 'teacher', 'assistant', 'vice_principal', 'counselor', 'coordinator'] },
     { id: 'maintenance',         label: 'תפעול ורכש',       icon: Settings,   roles: ['admin', 'vice_principal', 'secretary', 'maintenance', 'teacher', 'counselor', 'coordinator'] },
-    { id: 'duty-management',     label: 'ניהול תורנויות',   icon: ShieldIcon, roles: ['admin', 'vice_principal', 'coordinator'] },
+    { id: 'duty-management',     label: 'ניהול תורנויות',   icon: Settings,   roles: ['admin', 'vice_principal', 'coordinator'] },
     { id: 'room-management',     label: 'ניהול חדרים',      icon: Home,       roles: ['all'] },
     { id: 'community',           label: 'קהילה והווי',      icon: Heart,      roles: ['all'] },
   ];
@@ -65,13 +64,15 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
       {/* Logo / Brand */}
       <div className="px-5 pt-6 pb-5 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl flex items-center justify-center shadow-lg"
-               style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
-            <ShieldIcon className="h-5 w-5 text-white" />
+          <div className="h-10 w-10 rounded-xl flex items-center justify-center shadow-lg relative overflow-hidden"
+               style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #4f46e5 100%)' }}>
+            <div className="absolute inset-0 opacity-30"
+                 style={{ background: 'radial-gradient(circle at 30% 30%, #fff, transparent 60%)' }} />
+            <Sparkles className="h-5 w-5 text-white relative z-10" />
           </div>
           <div>
-            <p className="text-white font-bold text-sm leading-tight">מערכת בינה</p>
-            <p className="text-slate-400 text-[10px] leading-tight">ניהול בית ספר</p>
+            <p className="text-white font-bold text-sm leading-tight tracking-wide">SMART BASE</p>
+            <p className="text-slate-400 text-[10px] leading-tight">מערכת ניהול חכמה</p>
           </div>
         </div>
       </div>
