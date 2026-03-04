@@ -60,11 +60,11 @@ export default function PrintingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+    <div className="space-y-6" dir="rtl">
+      <div>
+        <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-blue-900 mb-2">מרכז צילומים והדפסות</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-blue-900 mb-2">מרכז צילומים והדפסות</h1>
             <p className="text-slate-600">
               {isSecretary ? 'ניהול תור ההדפסות' : isAdmin ? 'אישור בקשות הדפסה' : `סה״כ צילמת: ${myTotalPages} דפים`}
             </p>

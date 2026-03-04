@@ -33,16 +33,16 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50 p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-blue-900 mb-2">טפסי קליטה ומסמכים</h1>
+    <div className="space-y-6" dir="rtl">
+      <div>
+        <div className="mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-blue-900 mb-2">טפסי קליטה ומסמכים</h1>
           <p className="text-slate-600">
             {isManager ? 'ניהול מסמכי קליטה לעובדים חדשים' : 'המסמכים שלי'}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-amber-100 rounded-full">

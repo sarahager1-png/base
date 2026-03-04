@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Calendar, Plus, Palmtree } from 'lucide-react';
+import { Calendar, Plus, Palmtree, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import DailyJournal from '../components/journal/DailyJournal';
 import AddJournalEntry from '../components/journal/AddJournalEntry';
 import AddHoliday from '../components/journal/AddHoliday';
+import { getHebrewDate } from '@/utils/hebrewDate';
 
 export default function Journal() {
   const [user, setUser] = useState(null);
@@ -78,10 +79,18 @@ export default function Journal() {
   const isAdmin = user.role === 'admin' || user.role === 'vice_principal';
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-8" dir="rtl">
-      <div className="max-w-7xl mx-auto">
+    <div className="space-y-6" dir="rtl">
+      <div>
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-blue-900">יומן בית הספר</h1>
+          <div>
+            <h1 className="text-3xl font-bold text-blue-900">יומן בית הספר</h1>
+            {(() => {
+              const hd = getHebrewDate(new Date());
+              return hd ? (
+                <p className="text-sm text-slate-500 mt-1">{hd.full}</p>
+              ) : null;
+            })()}
+          </div>
           {isAdmin && (
             <div className="flex gap-2">
               <Button 
@@ -106,20 +115,20 @@ export default function Journal() {
           {/* Calendar */}
           <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
             <div className="flex justify-between items-center mb-6">
-              <button 
+              <button
                 onClick={goToPrevMonth}
                 className="p-2 hover:bg-slate-100 rounded-lg text-slate-600"
               >
-                ←
+                <ChevronRight className="h-5 w-5" />
               </button>
               <h2 className="text-xl font-bold text-slate-800">
                 {monthNames[currentMonth]} {currentYear}
               </h2>
-              <button 
+              <button
                 onClick={goToNextMonth}
                 className="p-2 hover:bg-slate-100 rounded-lg text-slate-600"
               >
-                →
+                <ChevronLeft className="h-5 w-5" />
               </button>
             </div>
 
@@ -138,37 +147,43 @@ export default function Journal() {
                 const day = i + 1;
                 const dayEntries = getEntriesForDate(day);
                 const holiday = getHolidayForDate(day);
-                const isToday = day === new Date().getDate() && 
-                               currentMonth === new Date().getMonth() && 
+                const isToday = day === new Date().getDate() &&
+                               currentMonth === new Date().getMonth() &&
                                currentYear === new Date().getFullYear();
                 const dateObj = new Date(currentYear, currentMonth, day);
-                const isSelected = selectedDate?.getDate() === day && 
+                const isSelected = selectedDate?.getDate() === day &&
                                   selectedDate?.getMonth() === currentMonth &&
                                   selectedDate?.getFullYear() === currentYear;
+                const hd = getHebrewDate(dateObj);
 
                 return (
                   <button
                     key={day}
                     onClick={() => setSelectedDate(dateObj)}
-                    className={`aspect-square p-2 rounded-xl border-2 transition-all text-sm relative group hover:border-blue-400 ${
-                      isSelected ? 'border-blue-600 bg-blue-50' : 
+                    className={`aspect-square p-1 rounded-xl border-2 transition-all text-sm relative group hover:border-blue-400 flex flex-col items-center justify-center ${
+                      isSelected ? 'border-blue-600 bg-blue-50' :
                       holiday ? 'border-green-300 bg-green-50' :
                       isToday ? 'border-blue-300 bg-blue-50' :
                       'border-slate-200 hover:bg-slate-50'
                     }`}
                   >
-                    <div className={`font-bold ${isToday ? 'text-blue-700' : 'text-slate-700'}`}>
+                    <div className={`font-bold leading-tight ${isToday ? 'text-blue-700' : 'text-slate-700'}`}>
                       {day}
                     </div>
+                    {hd && (
+                      <div className="text-[9px] leading-tight text-slate-400">
+                        {hd.day}
+                      </div>
+                    )}
                     {dayEntries.length > 0 && (
-                      <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5">
+                      <div className="absolute bottom-0.5 left-1/2 -translate-x-1/2 flex gap-0.5">
                         {dayEntries.slice(0, 3).map((_, idx) => (
                           <div key={idx} className="w-1 h-1 rounded-full bg-blue-500" />
                         ))}
                       </div>
                     )}
                     {holiday && (
-                      <div className="absolute top-1 right-1 w-2 h-2 rounded-full bg-green-500" />
+                      <div className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-green-500" />
                     )}
                   </button>
                 );
@@ -178,10 +193,18 @@ export default function Journal() {
 
           {/* Daily View */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-            <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-blue-500" />
-              {selectedDate?.toLocaleDateString('he-IL', { day: 'numeric', month: 'long' })}
-            </h3>
+            <div className="mb-4">
+              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-blue-500" />
+                {selectedDate?.toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric' })}
+              </h3>
+              {(() => {
+                const hd = selectedDate ? getHebrewDate(selectedDate) : null;
+                return hd ? (
+                  <p className="text-sm text-blue-600 font-medium mt-0.5 mr-7">{hd.full}</p>
+                ) : null;
+              })()}
+            </div>
             <DailyJournal date={selectedDate} />
           </div>
         </div>

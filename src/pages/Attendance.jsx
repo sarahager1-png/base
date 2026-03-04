@@ -85,9 +85,9 @@ export default function AttendancePage() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in" dir="rtl">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-800 mb-2">היעדרויות ודיווח</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-slate-800 mb-2">היעדרויות ודיווח</h1>
         <p className="text-slate-600 text-sm">
           {isManager ? 'צפייה וניהול כל דיווחי ההיעדרות ומילויי המקום' : 'דיווחי ההיעדרות ומילויי המקום שלי'}
         </p>
@@ -133,11 +133,11 @@ export default function AttendancePage() {
       </div>
 
       {activeTab === 'absences' && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
+          <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-amber-100 rounded-full">
-                  <Clock className="h-6 w-6 text-amber-600" />
+                <div className="p-2 md:p-3 bg-amber-100 rounded-full">
+                  <Clock className="h-5 w-5 md:h-6 md:w-6 text-amber-600" />
                 </div>
                 <div>
                   <p className="text-sm text-slate-500">ממתינים</p>
@@ -193,7 +193,7 @@ export default function AttendancePage() {
         )}
 
       {activeTab === 'substitutes' && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-6">
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-3">
                 <div className="p-3 bg-blue-100 rounded-full">
