@@ -229,9 +229,9 @@ function DashboardInner() {
                     key={item.role || 'admin'}
                     onClick={() => setViewAsRole(item.role)}
                     className={`px-2.5 py-1 text-[11px] rounded-md whitespace-nowrap transition-all font-medium
-                      ${viewAsRole === item.role
-                        ? 'bg-indigo-600 text-white shadow-sm'
-                        : 'text-slate-400 hover:text-white hover:bg-white/10'}`}
+                    ${viewAsRole === item.role
+                      ? 'bg-teal-600 text-white shadow-sm'
+                      : 'text-slate-600 hover:text-teal-700 hover:bg-teal-50/50'}`}
                   >
                     {item.label}
                   </button>
