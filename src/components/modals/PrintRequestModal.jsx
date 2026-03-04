@@ -17,6 +17,9 @@ export default function PrintRequestModal({ isOpen, onClose, user }) {
     pages_per_copy: 1,
     paper_size: 'A4',
     color_mode: 'black_white',
+    print_type: 'regular',
+    transparency_count: 0,
+    double_sided: false,
     urgent: false
   });
 
@@ -43,7 +46,7 @@ export default function PrintRequestModal({ isOpen, onClose, user }) {
       const { file_url } = await base44.integrations.Core.UploadFile({ file: formData.file });
       
       const total_pages = formData.copies * formData.pages_per_copy;
-      
+
       await base44.entities.PrintRequest.create({
         user_email: user.email,
         user_name: user.full_name,
@@ -56,33 +59,31 @@ export default function PrintRequestModal({ isOpen, onClose, user }) {
         total_pages,
         paper_size: formData.paper_size,
         color_mode: formData.color_mode,
+        print_type: formData.print_type,
+        transparency_count: formData.print_type === 'transparency' ? formData.transparency_count : 0,
+        double_sided: formData.double_sided,
         urgent: formData.urgent,
         status: 'pending'
       });
 
       queryClient.invalidateQueries({ queryKey: ['prints'] });
       queryClient.invalidateQueries({ queryKey: ['myPrints'] });
-      
       onClose();
-      setFormData({
-        file: null,
-        file_name: '',
-        subject: '',
-        class_name: '',
-        copies: 1,
-        pages_per_copy: 1,
-        paper_size: 'A4',
-        color_mode: 'black_white',
-        urgent: false
-      });
-      
       toast.success('הבקשה נשלחה לאישור');
+      setFormData({
+        file: null, file_name: '', subject: '', class_name: '',
+        copies: 1, pages_per_copy: 1, paper_size: 'A4',
+        color_mode: 'black_white', print_type: 'regular',
+        transparency_count: 0, double_sided: false, urgent: false
+      });
     } catch (error) {
       toast.error('שגיאה בהעלאת הקובץ');
     } finally {
       setUploading(false);
     }
   };
+
+  const isTransparency = formData.print_type === 'transparency';
 
   if (!isOpen) return null;
 
@@ -152,6 +153,51 @@ export default function PrintRequestModal({ isOpen, onClose, user }) {
             </div>
           </div>
 
+          {/* Print type */}
+          <div>
+            <label className="text-xs font-bold text-slate-600 block mb-2">סוג חומר</label>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { value: 'regular',      label: '📄 דף רגיל',   desc: 'נייר A4/A3 רגיל' },
+                { value: 'transparency', label: '🔲 דף שקוף',   desc: 'שקפית לתצוגה' },
+              ].map(opt => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, print_type: opt.value })}
+                  className={`p-3 rounded-xl border-2 text-right transition-all ${
+                    formData.print_type === opt.value
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-slate-200 hover:border-slate-300 bg-white'
+                  }`}
+                >
+                  <p className="text-sm font-bold text-slate-800">{opt.label}</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">{opt.desc}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Transparency count - shown only when transparency is selected */}
+          {isTransparency && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+              <label className="text-xs font-bold text-amber-800 block mb-2">
+                🔲 כמות דפים שקופים
+              </label>
+              <Input
+                type="number"
+                min="1"
+                value={formData.transparency_count}
+                onChange={(e) => setFormData({ ...formData, transparency_count: parseInt(e.target.value) || 0 })}
+                className="bg-white border-amber-300"
+                placeholder="מספר דפים שקופים"
+              />
+              <p className="text-[10px] text-amber-600 mt-1">
+                דפים שקופים נספרים בנפרד ממכסת הצילומים הרגילה
+              </p>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-bold text-slate-600 block mb-2">גודל דף</label>
@@ -159,6 +205,7 @@ export default function PrintRequestModal({ isOpen, onClose, user }) {
                 value={formData.paper_size}
                 onChange={(e) => setFormData({...formData, paper_size: e.target.value})}
                 className="w-full p-2 border border-slate-300 rounded-lg bg-white"
+                disabled={isTransparency}
               >
                 <option value="A4">A4 רגיל</option>
                 <option value="A3">A3 גדול</option>
@@ -178,17 +225,47 @@ export default function PrintRequestModal({ isOpen, onClose, user }) {
             </div>
           </div>
 
+          {/* Double-sided - only for regular paper */}
+          {!isTransparency && (
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="double_sided"
+                checked={formData.double_sided}
+                onChange={(e) => setFormData({...formData, double_sided: e.target.checked})}
+                className="w-4 h-4"
+              />
+              <label htmlFor="double_sided" className="text-sm font-medium text-slate-700">
+                הדפסה דו-צדדית
+              </label>
+            </div>
+          )}
+
+          {/* Summary */}
           <div className="bg-slate-50 p-4 rounded-lg space-y-2">
-            <p className="text-sm text-slate-600">
-              סה״כ דפים להדפסה: <span className="font-bold text-blue-600">
-                {formData.copies * formData.pages_per_copy}
-              </span>
-            </p>
-            {formData.paper_size === 'special' && (
-              <p className="text-xs text-amber-600 font-medium">⚠️ גודל מיוחד - דורש אישור מיוחד</p>
-            )}
-            {formData.color_mode === 'color' && (
-              <p className="text-xs text-purple-600 font-medium">🎨 הדפסה צבעונית</p>
+            {isTransparency ? (
+              <>
+                <p className="text-sm text-slate-600">
+                  סה״כ דפים שקופים: <span className="font-bold text-amber-600">{formData.transparency_count}</span>
+                </p>
+                <p className="text-xs text-amber-600 font-medium">🔲 שקפיות - נספרות בנפרד מהמכסה הרגילה</p>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-slate-600">
+                  סה״כ דפים להדפסה:{' '}
+                  <span className="font-bold text-blue-600">
+                    {formData.copies * formData.pages_per_copy}
+                    {formData.double_sided && <span className="text-slate-500 font-normal text-xs"> (דו-צדדי)</span>}
+                  </span>
+                </p>
+                {formData.paper_size === 'special' && (
+                  <p className="text-xs text-amber-600 font-medium">⚠️ גודל מיוחד - דורש אישור מיוחד</p>
+                )}
+                {formData.color_mode === 'color' && (
+                  <p className="text-xs text-purple-600 font-medium">🎨 הדפסה צבעונית</p>
+                )}
+              </>
             )}
           </div>
 
