@@ -85,7 +85,7 @@ export default function AttendancePage() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in p-4 md:p-0" dir="rtl">
+    <div className="space-y-6 animate-fade-in" dir="rtl">
       <div className="mb-8">
         <h1 className="text-xl md:text-2xl font-bold text-slate-800 mb-2">היעדרויות ודיווח</h1>
         <p className="text-slate-600 text-sm">

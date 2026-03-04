@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Calendar, Plus, Palmtree } from 'lucide-react';
+import { Calendar, Plus, Palmtree, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import DailyJournal from '../components/journal/DailyJournal';
 import AddJournalEntry from '../components/journal/AddJournalEntry';
@@ -115,20 +115,20 @@ export default function Journal() {
           {/* Calendar */}
           <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
             <div className="flex justify-between items-center mb-6">
-              <button 
+              <button
                 onClick={goToPrevMonth}
                 className="p-2 hover:bg-slate-100 rounded-lg text-slate-600"
               >
-                ←
+                <ChevronRight className="h-5 w-5" />
               </button>
               <h2 className="text-xl font-bold text-slate-800">
                 {monthNames[currentMonth]} {currentYear}
               </h2>
-              <button 
+              <button
                 onClick={goToNextMonth}
                 className="p-2 hover:bg-slate-100 rounded-lg text-slate-600"
               >
-                →
+                <ChevronLeft className="h-5 w-5" />
               </button>
             </div>
 

@@ -16,7 +16,7 @@ export default function FileManagementPage() {
   if (!user) return <div className="flex items-center justify-center h-screen">טוען...</div>;
 
   return (
-    <div className="space-y-6 md:space-y-8 animate-fade-in p-4 md:p-0" dir="rtl">
+    <div className="space-y-6 md:space-y-8 animate-fade-in" dir="rtl">
       {/* Header */}
       <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-4 md:p-8 border border-blue-100">
         <div className="flex items-center gap-3 mb-2">
