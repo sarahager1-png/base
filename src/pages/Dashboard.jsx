@@ -185,12 +185,7 @@ function DashboardInner() {
               <Menu className="h-5 w-5" />
             </button>
             <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => setCurrentView('dashboard')}>
-              <div className="h-8 w-8 rounded-lg flex items-center justify-center relative overflow-hidden shadow-md"
-                   style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #4f46e5 100%)' }}>
-                <div className="absolute inset-0 opacity-30"
-                     style={{ background: 'radial-gradient(circle at 30% 30%, #fff, transparent 60%)' }} />
-                <Sparkles className="h-4 w-4 text-white relative z-10" />
-              </div>
+              <img src="/logo.svg" alt="SMART BASE" className="h-9 w-9 drop-shadow-md" />
               <div>
                 <p className="text-white font-bold text-sm leading-tight tracking-widest">SMART BASE</p>
                 <p className="text-slate-500 text-[10px] leading-tight">מערכת ניהול חכמה</p>
