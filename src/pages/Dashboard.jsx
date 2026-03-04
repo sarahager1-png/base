@@ -125,34 +125,17 @@ function DashboardInner() {
       {user && <DailyAnnouncementModal user={user} />}
       {/* Header */}
       <header className="sticky top-0 z-40 shadow-sm overflow-hidden"
-              style={{ backgroundImage: "url('https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69794b7749148839a583cd2b/69b13fc24_Gemini_Generated_Image_y778u7y778u7y7781.png')", backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundColor: '#f1f5f9' }}>
-        <div className="absolute inset-0 bg-white/20" />
+              style={{ backgroundImage: "url('https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69794b7749148839a583cd2b/69b13fc24_Gemini_Generated_Image_y778u7y778u7y7781.png')", backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundColor: '#e8f5f3' }}>
+        <div className="absolute inset-0 bg-white/25" />
         {/* Top Bar - School Info */}
-        <div className="border-b border-white/10 relative">
+        <div className="border-b border-teal-200/30 relative">
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex justify-between items-center">
             <div className="flex items-center gap-3">
-              {schoolLogo ? (
-                <img src={schoolLogo} alt="לוגו בית הספר"
-                     className="h-9 w-9 object-contain rounded-lg border border-white/20 bg-white/10 p-1" />
-              ) : (
-                <label className="h-9 w-9 border border-dashed border-white/20 rounded-lg flex items-center justify-center cursor-pointer hover:border-indigo-400/60 hover:bg-indigo-500/10 transition-all group">
-                  <input type="file" accept="image/*" className="hidden" onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      const MAX_FILE_SIZE = 2 * 1024 * 1024;
-                      if (file.size > MAX_FILE_SIZE) {
-                        alert('הקובץ גדול מדי. גודל מקסימלי: 2MB');
-                        e.target.value = '';
-                        return;
-                      }
-                      const reader = new FileReader();
-                      reader.onloadend = () => setSchoolLogo(reader.result);
-                      reader.readAsDataURL(file);
-                    }
-                  }} />
-                  <Shield className="h-4 w-4 text-slate-500 group-hover:text-indigo-400" />
-                </label>
-              )}
+              <img
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69794b7749148839a583cd2b/2a1998cb5_Gemini_Generated_Image_y778u7y778u7y778.png"
+                alt="לוגו"
+                className="h-10 w-10 object-contain rounded-xl"
+              />
               {isEditingSchool ? (
                 <input
                   type="text"
