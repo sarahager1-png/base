@@ -109,7 +109,7 @@ export default function MeetingsList({ user }) {
                   <p className="font-medium text-slate-700 text-sm">{meeting.participant_name}</p>
                   <p className="text-xs text-slate-500">{meeting.purpose}</p>
                 </div>
-                <div className="text-left">
+                <div className="text-right">
                   <p className="text-xs text-slate-400">{new Date(meeting.meeting_date).toLocaleDateString('he-IL')}</p>
                   {meeting.status === 'completed' && (
                     <span className="text-[10px] text-green-600 flex items-center gap-1">
