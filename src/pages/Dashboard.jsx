@@ -165,15 +165,15 @@ function DashboardInner() {
               ) : (
                 <h1
                   onClick={() => setIsEditingSchool(true)}
-                  className="text-base font-bold text-white/90 cursor-pointer hover:text-white transition-colors"
+                  className="text-base font-bold text-slate-800 cursor-pointer hover:text-blue-700 transition-colors"
                 >
                   {schoolName}
                 </h1>
               )}
             </div>
-            <div className="flex items-center gap-2 text-xs text-slate-500">
-              <span className="bg-white/5 px-2.5 py-1 rounded-full border border-white/10">{HEBREW_DATE}</span>
-              <span className="bg-white/5 px-2.5 py-1 rounded-full border border-white/10">{GREGORIAN_DATE}</span>
+            <div className="flex items-center gap-2 text-xs text-slate-600">
+              <span className="bg-white/70 px-2.5 py-1 rounded-full border border-slate-200">{HEBREW_DATE}</span>
+              <span className="bg-white/70 px-2.5 py-1 rounded-full border border-slate-200">{GREGORIAN_DATE}</span>
             </div>
           </div>
         </div>
