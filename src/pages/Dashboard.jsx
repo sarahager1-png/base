@@ -33,6 +33,7 @@ import Notifications from './Notifications';
 import DutyManagement from './DutyManagement';
 import RoomManagement from './RoomManagement';
 import HelpCenter from '../components/help/HelpCenter';
+import InsightsDashboard from '../components/analytics/InsightsDashboard';
 
 const HEBREW_DATE = "כ״ח טבת תשפ״ו";
 const GREGORIAN_DATE = new Date().toLocaleDateString('he-IL');
@@ -359,6 +360,7 @@ function DashboardInner() {
           {currentView === 'maintenance' && <Maintenance />}
           {currentView === 'printing' && <Printing />}
           {currentView === 'onboarding' && <Onboarding />}
+          {currentView === 'analytics' && <InsightsDashboard />}
           {currentView === 'help' && <HelpCenter userRole={user.role} />}
         </main>
       </div>

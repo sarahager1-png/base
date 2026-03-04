@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Home, Calendar, CheckSquare, Clock, Users, UserPlus,
-  Printer, Settings, Heart, LogOut, X, Bell, ChevronRight, Sparkles, HelpCircle
+  Printer, Settings, Heart, LogOut, X, Bell, ChevronRight, Sparkles, HelpCircle, BarChart2
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
@@ -20,6 +20,7 @@ const NAV_COLORS = {
   'duty-management':  { from: '#ec4899', to: '#db2777' },
   'room-management':  { from: '#84cc16', to: '#65a30d' },
   community:          { from: '#f43f5e', to: '#e11d48' },
+  analytics:          { from: '#06b6d4', to: '#0891b2' },
   help:               { from: '#64748b', to: '#475569' },
 };
 
@@ -52,6 +53,7 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
     { id: 'duty-management',     label: 'ניהול תורנויות',   icon: Settings,   roles: ['admin', 'vice_principal', 'coordinator'] },
     { id: 'room-management',     label: 'ניהול חדרים',      icon: Home,       roles: ['all'] },
     { id: 'community',           label: 'קהילה והווי',      icon: Heart,      roles: ['all'] },
+    { id: 'analytics',           label: 'אנליטיקס ותובנות', icon: BarChart2,  roles: ['admin', 'vice_principal'] },
     { id: 'help',                label: 'מרכז עזרה',         icon: HelpCircle, roles: ['all'] },
   ];
 
