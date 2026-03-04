@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
-import { Shield, Menu, Sparkles } from 'lucide-react';
+import { Shield, Menu, Sparkles, Moon, Sun, Search } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import NotificationBell from '../components/notifications/NotificationBell';
+import CommandPalette from '../components/CommandPalette';
+import { ThemeProvider, useTheme } from '@/lib/ThemeContext';
 import ManagementDashboard from '../components/dashboard/ManagementDashboard';
 import StaffDashboard from '../components/dashboard/StaffDashboard';
 import HRDashboard from '../components/dashboard/HRDashboard';
@@ -32,10 +34,12 @@ import RoomManagement from './RoomManagement';
 const HEBREW_DATE = "כ״ח טבת תשפ״ו";
 const GREGORIAN_DATE = new Date().toLocaleDateString('he-IL');
 
-export default function Dashboard() {
+function DashboardInner() {
+  const { dark, toggleDark } = useTheme();
   const [user, setUser] = useState(null);
   const [currentView, setCurrentView] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [commandOpen, setCommandOpen] = useState(false);
   const [demoMode, setDemoMode] = useState(false);
   const [viewAsRole, setViewAsRole] = useState(null);
   const [schoolName, setSchoolName] = useState('בית ספר "בינה"');
@@ -67,6 +71,17 @@ export default function Dashboard() {
     await base44.auth.logout();
   };
 
+  useEffect(() => {
+    const handler = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setCommandOpen(o => !o);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center"
@@ -93,7 +108,13 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-800" dir="rtl">
+    <div className="min-h-screen bg-slate-50 dark:bg-gray-900 font-sans text-slate-800 dark:text-slate-100" dir="rtl">
+      <CommandPalette
+        isOpen={commandOpen}
+        onClose={() => setCommandOpen(false)}
+        onNavigate={(view) => { setCurrentView(view); setViewAsRole(null); }}
+        user={user}
+      />
       {/* Header */}
       <header className="sticky top-0 z-40 shadow-sm"
               style={{ background: 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)' }}>
@@ -170,6 +191,25 @@ export default function Dashboard() {
           </div>
 
           <div className="flex items-center gap-4">
+            {/* Command Palette trigger */}
+            <button
+              onClick={() => setCommandOpen(true)}
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-all border border-white/10 text-xs"
+            >
+              <Search className="h-3.5 w-3.5" />
+              <span>חיפוש</span>
+              <kbd className="text-[10px] font-mono bg-white/10 px-1 rounded">⌘K</kbd>
+            </button>
+
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={toggleDark}
+              className="p-2 rounded-lg hover:bg-white/10 transition-colors text-slate-400 hover:text-white"
+              title={dark ? 'מצב בהיר' : 'מצב כהה'}
+            >
+              {dark ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4 w-4" />}
+            </button>
+
             <NotificationBell userEmail={user.email} />
 
             {/* Role Switcher for Admin */}
@@ -304,5 +344,13 @@ export default function Dashboard() {
         <div className="fixed inset-0 bg-slate-900/20 z-40 lg:hidden backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
       )}
     </div>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <ThemeProvider>
+      <DashboardInner />
+    </ThemeProvider>
   );
 }

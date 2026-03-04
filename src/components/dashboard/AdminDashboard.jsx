@@ -6,9 +6,12 @@ import MeetingsList from '../meetings/MeetingsList';
 import { useState } from 'react';
 import AddMeeting from '../meetings/AddMeeting';
 import DailyMessageBoard from './DailyMessageBoard';
+import MorningGreeting from './MorningGreeting';
+import ActivityTimeline from './ActivityTimeline';
 import {
   Users, AlertTriangle, Clock, ShoppingCart, FileText,
-  Wrench, BarChart3, TrendingUp, Plus, Heart
+  Wrench, BarChart3, TrendingUp, Plus, Heart,
+  MessageCircle, Download, Printer
 } from 'lucide-react';
 import SendMessageModal from '../messages/SendMessageModal';
 import { useAuth } from '@/lib/AuthContext';
@@ -77,25 +80,31 @@ export default function AdminDashboard() {
     completed: purchaseRequests.filter(p => p.status === 'completed').length,
   };
 
+  const handleWhatsApp = () => {
+    const msg = encodeURIComponent(`שלום לצוות ${user?.school_name || 'בית הספר'} 👋\nעדכון מהמנהלת:\n\n`);
+    window.open(`https://web.whatsapp.com/send?text=${msg}`, '_blank');
+  };
+
+  const handleExportPDF = () => {
+    window.print();
+  };
+
   return (
-    <div className="space-y-8 animate-fade-in">
-      <SendMessageModal 
+    <div className="space-y-8 animate-fade-in" id="print-area">
+      <SendMessageModal
         isOpen={messageModalOpen}
         onClose={() => setMessageModalOpen(false)}
         user={user}
         recipientRole="staff"
       />
-      
-      {/* Header */}
-      <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-3xl p-8 text-white shadow-lg border border-slate-600/20">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-3xl font-bold mb-2">לוח נתונים ניהולי</h2>
-            <p className="text-slate-300">סקירת מערכת כוללת</p>
-          </div>
-          <BarChart3 className="h-12 w-12 text-blue-400 opacity-50" />
-        </div>
-      </div>
+
+      {/* Morning Greeting */}
+      <MorningGreeting
+        user={user}
+        pendingAbsences={pendingAbsences}
+        pendingPurchases={pendingPurchases}
+        openTickets={openTickets}
+      />
 
       {/* Daily Message Board */}
       <DailyMessageBoard user={user} />
@@ -221,14 +230,33 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Quick Send Message to Staff */}
-      <button
-        onClick={() => setMessageModalOpen(true)}
-        className="w-full p-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-2xl hover:shadow-lg transition-all font-bold text-center flex items-center justify-center gap-2"
-      >
-        <Heart className="h-5 w-5" />
-        שלח הערה מעצימה לצוות
-      </button>
+      {/* Action Buttons Row */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 no-print">
+        <button
+          onClick={() => setMessageModalOpen(true)}
+          className="p-4 text-white rounded-2xl hover:shadow-lg transition-all font-bold text-center flex items-center justify-center gap-2"
+          style={{ background: 'linear-gradient(135deg, #ec4899, #f43f5e)' }}
+        >
+          <Heart className="h-5 w-5" />
+          הערה מעצימה לצוות
+        </button>
+        <button
+          onClick={handleWhatsApp}
+          className="p-4 text-white rounded-2xl hover:shadow-lg transition-all font-bold text-center flex items-center justify-center gap-2"
+          style={{ background: 'linear-gradient(135deg, #25d366, #128c7e)' }}
+        >
+          <MessageCircle className="h-5 w-5" />
+          שלח WhatsApp לצוות
+        </button>
+        <button
+          onClick={handleExportPDF}
+          className="p-4 text-white rounded-2xl hover:shadow-lg transition-all font-bold text-center flex items-center justify-center gap-2"
+          style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}
+        >
+          <Download className="h-5 w-5" />
+          ייצוא דוח PDF
+        </button>
+      </div>
 
       {/* System Health */}
       <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
@@ -252,8 +280,11 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* Activity Timeline */}
+      <ActivityTimeline />
+
       {/* Meetings Schedule */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
             <Users className="h-5 w-5 text-blue-600" />

@@ -106,3 +106,51 @@
   transform: translateY(-3px);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
 }
+
+/* ===================== Dark Mode Base ===================== */
+.dark body {
+  background-color: #111827;
+  color: #f1f5f9;
+}
+.dark .bg-white   { background-color: #1e293b !important; }
+.dark .border-slate-200 { border-color: #334155 !important; }
+.dark .text-slate-800   { color: #f1f5f9 !important; }
+.dark .text-slate-600   { color: #94a3b8 !important; }
+.dark .text-slate-500   { color: #64748b !important; }
+.dark .bg-slate-50      { background-color: #0f172a !important; }
+.dark .bg-slate-100     { background-color: #1e293b !important; }
+
+/* ===================== Print Styles ===================== */
+@media print {
+  .no-print,
+  header,
+  aside,
+  nav {
+    display: none !important;
+  }
+
+  #print-area {
+    padding: 0;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    font-family: 'Arial', sans-serif;
+    direction: rtl;
+  }
+
+  .rounded-2xl,
+  .rounded-xl,
+  .rounded-3xl {
+    border-radius: 8px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  @page {
+    margin: 1.5cm;
+    size: A4;
+  }
+}
