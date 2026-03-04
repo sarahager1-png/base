@@ -246,7 +246,7 @@ function DashboardInner() {
                 <p className="text-slate-500 text-[10px]">{user.title || gTitle(user.role)}</p>
               </div>
               <div className="h-9 w-9 rounded-xl flex items-center justify-center text-sm font-bold text-white shadow-lg"
-                   style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', boxShadow: '0 4px 15px #6366f140' }}>
+                   style={{ background: 'linear-gradient(135deg, #0d9488, #22c55e)', boxShadow: '0 4px 15px #0d948840' }}>
                 {user.avatar || user.full_name?.charAt(0)}
               </div>
             </div>
