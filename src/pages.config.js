@@ -54,6 +54,7 @@ import DutyManagement from './pages/DutyManagement';
 import FileManagement from './pages/FileManagement';
 import Journal from './pages/Journal';
 import JournalManagement from './pages/JournalManagement';
+import Login from './pages/Login';
 import Maintenance from './pages/Maintenance';
 import Notifications from './pages/Notifications';
 import Onboarding from './pages/Onboarding';
@@ -71,6 +72,7 @@ export const PAGES = {
     "FileManagement": FileManagement,
     "Journal": Journal,
     "JournalManagement": JournalManagement,
+    "Login": Login,
     "Maintenance": Maintenance,
     "Notifications": Notifications,
     "Onboarding": Onboarding,

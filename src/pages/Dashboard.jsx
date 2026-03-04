@@ -124,10 +124,11 @@ function DashboardInner() {
       />
       {user && <DailyAnnouncementModal user={user} />}
       {/* Header */}
-      <header className="sticky top-0 z-40 shadow-sm"
-              style={{ background: 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)' }}>
+      <header className="sticky top-0 z-40 shadow-sm">
         {/* Top Bar - School Info */}
-        <div className="border-b border-white/5">
+        <div className="border-b border-white/5 relative overflow-hidden"
+             style={{ backgroundImage: "url('https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69794b7749148839a583cd2b/69b13fc24_Gemini_Generated_Image_y778u7y778u7y7781.png')", backgroundSize: 'cover', backgroundPosition: 'center top' }}>
+          <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px]" />
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex justify-between items-center">
             <div className="flex items-center gap-3">
               {schoolLogo ? (
