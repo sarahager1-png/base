@@ -84,12 +84,7 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
       {/* Logo / Brand */}
       <div className="px-5 pt-6 pb-5 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl flex items-center justify-center shadow-lg relative overflow-hidden"
-               style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #4f46e5 100%)' }}>
-            <div className="absolute inset-0 opacity-30"
-                 style={{ background: 'radial-gradient(circle at 30% 30%, #fff, transparent 60%)' }} />
-            <Sparkles className="h-5 w-5 text-white relative z-10" />
-          </div>
+          <img src="/logo.svg" alt="SMART BASE" className="h-10 w-10 drop-shadow-md" />
           <div>
             <p className="text-white font-bold text-sm leading-tight tracking-wide">SMART BASE</p>
             <p className="text-slate-400 text-[10px] leading-tight">מערכת ניהול חכמה</p>
@@ -116,7 +111,7 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
               } : {}}
             >
               {isActive && (
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-l-full"
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full"
                      style={{ background: `linear-gradient(180deg, ${colors.from}, ${colors.to})` }} />
               )}
               <div className={`p-1.5 rounded-lg transition-all duration-200 flex-shrink-0`}
