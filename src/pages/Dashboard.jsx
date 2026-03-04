@@ -171,9 +171,9 @@ function DashboardInner() {
                 </h1>
               )}
             </div>
-            <div className="flex items-center gap-2 text-xs text-slate-600">
-              <span className="bg-white/70 px-2.5 py-1 rounded-full border border-slate-200">{HEBREW_DATE}</span>
-              <span className="bg-white/70 px-2.5 py-1 rounded-full border border-slate-200">{GREGORIAN_DATE}</span>
+            <div className="flex flex-col items-end gap-0.5 text-xs text-slate-700">
+              <span className="font-semibold">{HEBREW_DATE} תשפ"ו</span>
+              <span className="text-slate-500">{GREGORIAN_DATE}</span>
             </div>
           </div>
         </div>
