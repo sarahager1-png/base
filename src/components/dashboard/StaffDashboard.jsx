@@ -10,6 +10,7 @@ import AbsenceReportModal from '../modals/AbsenceReportModal';
 import PrintRequestModal from '../modals/PrintRequestModal';
 import DailyJournal from '../journal/DailyJournal';
 import DailyMessageBoard from './DailyMessageBoard';
+import MorningGreeting from './MorningGreeting';
 import SendMessageModal from '../messages/SendMessageModal';
 import MessagesCenter from '../messages/MessagesCenter';
 import TeacherAbsenceReport from '../reports/TeacherAbsenceReport';
@@ -77,6 +78,7 @@ export default function StaffDashboard({ user, setView }) {
 
       <TeacherAbsenceReport user={user} isOpen={absenceReportOpen} onClose={() => setAbsenceReportOpen(false)} />
 
+      <MorningGreeting user={user} />
       <DailyMessageBoard user={user} />
 
       {/* Today's Journal */}

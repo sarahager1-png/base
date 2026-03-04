@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import StatCard from '../StatCard';
 import DailyMessageBoard from './DailyMessageBoard';
+import MorningGreeting from './MorningGreeting';
 import { Wrench, AlertTriangle, CheckSquare } from 'lucide-react';
 
 export default function MaintenanceDashboard({ user }) {
@@ -25,6 +26,7 @@ export default function MaintenanceDashboard({ user }) {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      <MorningGreeting user={user} />
       <DailyMessageBoard user={user} />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
