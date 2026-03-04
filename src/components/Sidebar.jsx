@@ -7,7 +7,7 @@ import { base44 } from '@/api/base44Client';
 import { useAccessibility } from '@/lib/AccessibilityContext';
 
 const NAV_COLORS = {
-  dashboard:          { from: '#6366f1', to: '#4f46e5' },
+  dashboard:          { from: '#0d9488', to: '#22c55e' },
   notifications:      { from: '#f59e0b', to: '#d97706' },
   journal:            { from: '#10b981', to: '#059669' },
   'journal-management': { from: '#06b6d4', to: '#0891b2' },
