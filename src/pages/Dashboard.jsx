@@ -5,7 +5,9 @@ import { Shield, Menu, Sparkles, Moon, Sun, Search } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import NotificationBell from '../components/notifications/NotificationBell';
 import CommandPalette from '../components/CommandPalette';
+import DailyAnnouncementModal from '../components/DailyAnnouncementModal';
 import { ThemeProvider, useTheme } from '@/lib/ThemeContext';
+import { AccessibilityProvider, useAccessibility } from '@/lib/AccessibilityContext';
 import ManagementDashboard from '../components/dashboard/ManagementDashboard';
 import StaffDashboard from '../components/dashboard/StaffDashboard';
 import HRDashboard from '../components/dashboard/HRDashboard';
@@ -36,6 +38,7 @@ const GREGORIAN_DATE = new Date().toLocaleDateString('he-IL');
 
 function DashboardInner() {
   const { dark, toggleDark } = useTheme();
+  const { fontSize, setFontSize, sizes } = useAccessibility();
   const [user, setUser] = useState(null);
   const [currentView, setCurrentView] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -115,6 +118,7 @@ function DashboardInner() {
         onNavigate={(view) => { setCurrentView(view); setViewAsRole(null); }}
         user={user}
       />
+      {user && <DailyAnnouncementModal user={user} />}
       {/* Header */}
       <header className="sticky top-0 z-40 shadow-sm"
               style={{ background: 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)' }}>
@@ -201,13 +205,29 @@ function DashboardInner() {
               <kbd className="text-[10px] font-mono bg-white/10 px-1 rounded">⌘K</kbd>
             </button>
 
+            {/* Font Size Toggle */}
+            <div className="hidden sm:flex items-center gap-0.5 bg-white/5 rounded-lg p-0.5 border border-white/10">
+              {Object.entries(sizes).map(([key, val]) => (
+                <button
+                  key={key}
+                  onClick={() => setFontSize(key)}
+                  title={val.tip}
+                  className={`px-2 py-1 rounded-md text-xs font-bold transition-all
+                    ${fontSize === key ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                  style={{ fontSize: key === 'normal' ? '11px' : key === 'large' ? '13px' : '15px' }}
+                >
+                  א
+                </button>
+              ))}
+            </div>
+
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleDark}
               className="p-2 rounded-lg hover:bg-white/10 transition-colors text-slate-400 hover:text-white"
               title={dark ? 'מצב בהיר' : 'מצב כהה'}
             >
-              {dark ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4 w-4" />}
+              {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
 
             <NotificationBell userEmail={user.email} />
@@ -349,8 +369,10 @@ function DashboardInner() {
 
 export default function Dashboard() {
   return (
-    <ThemeProvider>
-      <DashboardInner />
-    </ThemeProvider>
+    <AccessibilityProvider>
+      <ThemeProvider>
+        <DashboardInner />
+      </ThemeProvider>
+    </AccessibilityProvider>
   );
 }
