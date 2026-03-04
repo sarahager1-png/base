@@ -4,6 +4,7 @@ import {
   Printer, Settings, Heart, LogOut, X, Bell, ChevronRight, Sparkles, HelpCircle, BarChart2
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { useAccessibility } from '@/lib/AccessibilityContext';
 
 const NAV_COLORS = {
   dashboard:          { from: '#6366f1', to: '#4f46e5' },
@@ -26,6 +27,7 @@ const NAV_COLORS = {
 
 export default function Sidebar({ activeView, setView, user, isOpen, closeSidebar, onLogout, onUserGenderChange }) {
   const [savingGender, setSavingGender] = useState(false);
+  const { gTitle } = useAccessibility();
 
   const handleGenderToggle = async () => {
     if (!user?.id) return;
@@ -142,7 +144,7 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-white text-xs font-semibold truncate">{user.full_name}</p>
-                <p className="text-slate-500 text-[10px] truncate">{user.title || user.role}</p>
+                <p className="text-slate-500 text-[10px] truncate">{user.title || gTitle(user.role)}</p>
               </div>
             </div>
             {/* Gender Toggle */}
