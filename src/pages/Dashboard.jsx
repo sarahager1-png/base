@@ -130,28 +130,37 @@ function DashboardInner() {
         <div className="border-b border-white/5">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex justify-between items-center">
             <div className="flex items-center gap-3">
-              {schoolLogo ? (
-                <img src={schoolLogo} alt="לוגו בית הספר"
-                     className="h-9 w-9 object-contain rounded-lg border border-white/20 bg-white/10 p-1" />
-              ) : (
-                <label className="h-9 w-9 border border-dashed border-white/20 rounded-lg flex items-center justify-center cursor-pointer hover:border-indigo-400/60 hover:bg-indigo-500/10 transition-all group">
-                  <input type="file" accept="image/*" className="hidden" onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      const MAX_FILE_SIZE = 2 * 1024 * 1024;
-                      if (file.size > MAX_FILE_SIZE) {
-                        alert('הקובץ גדול מדי. גודל מקסימלי: 2MB');
-                        e.target.value = '';
-                        return;
-                      }
-                      const reader = new FileReader();
-                      reader.onloadend = () => setSchoolLogo(reader.result);
-                      reader.readAsDataURL(file);
+              {/* אייקון בית הספר - לחצו להעלאה */}
+              <label className="relative cursor-pointer group flex-shrink-0" title="לחצו להעלאת לוגו בית הספר">
+                <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    const MAX_FILE_SIZE = 2 * 1024 * 1024;
+                    if (file.size > MAX_FILE_SIZE) {
+                      alert('הקובץ גדול מדי. גודל מקסימלי: 2MB');
+                      e.target.value = '';
+                      return;
                     }
-                  }} />
-                  <Shield className="h-4 w-4 text-slate-500 group-hover:text-indigo-400" />
-                </label>
-              )}
+                    const reader = new FileReader();
+                    reader.onloadend = () => setSchoolLogo(reader.result);
+                    reader.readAsDataURL(file);
+                  }
+                }} />
+                {schoolLogo ? (
+                  <img src={schoolLogo} alt="לוגו בית הספר"
+                       className="h-11 w-11 object-contain rounded-xl border-2 border-white/20 bg-white/10 p-1 group-hover:border-indigo-400/70 transition-all" />
+                ) : (
+                  <div className="h-11 w-11 rounded-xl border-2 border-dashed border-white/25 flex flex-col items-center justify-center gap-0.5 bg-white/5 group-hover:border-indigo-400/70 group-hover:bg-indigo-500/10 transition-all">
+                    <Shield className="h-4 w-4 text-slate-500 group-hover:text-indigo-400 transition-colors" />
+                    <span className="text-[8px] text-slate-600 group-hover:text-indigo-400 leading-none transition-colors">לוגו</span>
+                  </div>
+                )}
+                {/* Hover overlay */}
+                <div className="absolute inset-0 rounded-xl bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <span className="text-[9px] text-white font-bold">העלה</span>
+                </div>
+              </label>
+
               {isEditingSchool ? (
                 <input
                   type="text"

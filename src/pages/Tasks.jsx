@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { CheckSquare, Clock, FileText, ShoppingCart, UserCheck } from 'lucide-react';
 import { getStatusBadgeClass } from '@/lib/utils';
+import PageHeader from '../components/PageHeader';
 
 export default function TasksPage() {
   const { data: user } = useQuery({
@@ -59,10 +60,13 @@ export default function TasksPage() {
   return (
     <div className="space-y-6" dir="rtl">
       <div>
-        <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-blue-900 mb-2">משימות ואישורים</h1>
-          <p className="text-slate-600">מעקב אחר משימות, בקשות ואישורים בהמתנה</p>
-        </div>
+        <PageHeader
+          icon={CheckSquare}
+          iconColor="#8b5cf6"
+          iconColor2="#7c3aed"
+          title="משימות ואישורים"
+          subtitle="מעקב אחר משימות, בקשות ואישורים בהמתנה"
+        />
 
         {isManager ? (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8">

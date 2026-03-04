@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { UserPlus, FileText, CheckCircle, XCircle, Clock, AlertCircle } from 'lucide-react';
 import { getStatusBadgeClass } from '@/lib/utils';
+import PageHeader from '../components/PageHeader';
 
 export default function OnboardingPage() {
   const { data: user } = useQuery({
@@ -35,12 +36,13 @@ export default function OnboardingPage() {
   return (
     <div className="space-y-6" dir="rtl">
       <div>
-        <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-blue-900 mb-2">טפסי קליטה ומסמכים</h1>
-          <p className="text-slate-600">
-            {isManager ? 'ניהול מסמכי קליטה לעובדים חדשים' : 'המסמכים שלי'}
-          </p>
-        </div>
+        <PageHeader
+          icon={UserPlus}
+          iconColor="#14b8a6"
+          iconColor2="#0d9488"
+          title="טפסי קליטה ומסמכים"
+          subtitle={isManager ? 'ניהול מסמכי קליטה לעובדים חדשים' : 'המסמכים שלי'}
+        />
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">

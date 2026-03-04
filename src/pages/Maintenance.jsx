@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Wrench, Monitor, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 
 export default function MaintenancePage() {
   const { data: user } = useQuery({
@@ -28,10 +29,13 @@ export default function MaintenancePage() {
   return (
     <div className="space-y-6" dir="rtl">
       <div>
-        <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-blue-900 mb-2">תפעול ורכש</h1>
-          <p className="text-slate-600">ניהול תחזוקה, תקלות ובקשות רכש</p>
-        </div>
+        <PageHeader
+          icon={Wrench}
+          iconColor="#64748b"
+          iconColor2="#475569"
+          title="תפעול ורכש"
+          subtitle="ניהול תחזוקה, תקלות ובקשות רכש"
+        />
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">

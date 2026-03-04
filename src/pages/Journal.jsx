@@ -7,6 +7,7 @@ import DailyJournal from '../components/journal/DailyJournal';
 import AddJournalEntry from '../components/journal/AddJournalEntry';
 import AddHoliday from '../components/journal/AddHoliday';
 import { getHebrewDate } from '@/utils/hebrewDate';
+import PageHeader from '../components/PageHeader';
 
 export default function Journal() {
   const [user, setUser] = useState(null);
@@ -78,38 +79,39 @@ export default function Journal() {
 
   const isAdmin = user.role === 'admin' || user.role === 'vice_principal';
 
+  const hebrewMonthName = (() => {
+    const hd = getHebrewDate(new Date(currentYear, currentMonth, 1));
+    return hd ? `${hd.month} ${hd.year}` : '';
+  })();
+
   return (
     <div className="space-y-6" dir="rtl">
       <div>
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-blue-900">יומן בית הספר</h1>
-            {(() => {
-              const hd = getHebrewDate(new Date());
-              return hd ? (
-                <p className="text-sm text-slate-500 mt-1">{hd.full}</p>
-              ) : null;
-            })()}
-          </div>
-          {isAdmin && (
-            <div className="flex gap-2">
-              <Button 
+        <PageHeader
+          icon={Calendar}
+          iconColor="#3b82f6"
+          iconColor2="#2563eb"
+          title="יומן בית הספר"
+          subtitle={hebrewMonthName}
+          actions={isAdmin && (
+            <>
+              <Button
                 onClick={() => setShowAddHoliday(true)}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-green-600 hover:bg-green-700 text-white text-sm"
               >
-                <Palmtree className="h-4 w-4 mr-2" />
+                <Palmtree className="h-4 w-4 ml-1" />
                 הוסף חופשה
               </Button>
-              <Button 
+              <Button
                 onClick={() => setShowAddEntry(true)}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 ml-1" />
                 רשומה חדשה
               </Button>
-            </div>
+            </>
           )}
-        </div>
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Calendar */}
@@ -160,18 +162,28 @@ export default function Journal() {
                   <button
                     key={day}
                     onClick={() => setSelectedDate(dateObj)}
-                    className={`aspect-square p-1 rounded-xl border-2 transition-all text-sm relative group hover:border-blue-400 flex flex-col items-center justify-center ${
-                      isSelected ? 'border-blue-600 bg-blue-50' :
+                    className={`aspect-square p-1 rounded-xl border-2 transition-all relative group hover:border-blue-400 flex flex-col items-center justify-center gap-0 ${
+                      isSelected ? 'border-blue-600 bg-blue-50 shadow-md' :
                       holiday ? 'border-green-300 bg-green-50' :
                       isToday ? 'border-blue-300 bg-blue-50' :
                       'border-slate-200 hover:bg-slate-50'
                     }`}
                   >
-                    <div className={`font-bold leading-tight ${isToday ? 'text-blue-700' : 'text-slate-700'}`}>
+                    {/* מספר לועזי */}
+                    <div className={`font-bold text-sm leading-none ${
+                      isSelected ? 'text-blue-700' :
+                      isToday ? 'text-blue-700' :
+                      'text-slate-800'
+                    }`}>
                       {day}
                     </div>
+                    {/* תאריך עברי */}
                     {hd && (
-                      <div className="text-[9px] leading-tight text-slate-400">
+                      <div className={`text-[9px] leading-none mt-0.5 ${
+                        isSelected ? 'text-blue-500' :
+                        isToday ? 'text-blue-400' :
+                        'text-slate-400'
+                      }`}>
                         {hd.day}
                       </div>
                     )}

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { BookOpen, Plus, Pencil, Trash2, X, Calendar, Filter } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 import { toast } from 'sonner';
 
 export default function JournalManagementPage() {
@@ -113,19 +114,22 @@ export default function JournalManagementPage() {
   return (
     <div className="space-y-6" dir="rtl">
       <div>
-        <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-blue-900 mb-2">ניהול יומן בית הספר</h1>
-            <p className="text-slate-600">יצירה ועריכת רשומות ביומן</p>
-          </div>
-          <Button
-            onClick={() => setShowForm(true)}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            רשומה חדשה
-          </Button>
-        </div>
+        <PageHeader
+          icon={BookOpen}
+          iconColor="#06b6d4"
+          iconColor2="#0891b2"
+          title="ניהול יומן בית הספר"
+          subtitle="יצירה ועריכת רשומות ביומן"
+          actions={
+            <Button
+              onClick={() => setShowForm(true)}
+              className="bg-cyan-500 hover:bg-cyan-400 text-white text-sm"
+            >
+              <Plus className="h-4 w-4 ml-1" />
+              רשומה חדשה
+            </Button>
+          }
+        />
 
         {/* Filters */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 mb-6">

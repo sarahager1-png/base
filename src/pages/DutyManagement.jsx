@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Shield, Plus, Calendar, MapPin, Clock, X, Trash2, Edit2, Save } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 
 export default function DutyManagementPage() {
   const [showAddSetting, setShowAddSetting] = useState(false);
@@ -105,13 +106,13 @@ export default function DutyManagementPage() {
 
   return (
     <div className="space-y-6" dir="rtl">
-      <div className="flex items-center gap-3 mb-2">
-        <Shield className="h-6 w-6 text-blue-600" />
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">ניהול תורנויות</h1>
-          <p className="text-sm text-slate-500">הגדרת תורנויות ושיבוץ צוות</p>
-        </div>
-      </div>
+      <PageHeader
+        icon={Shield}
+        iconColor="#ec4899"
+        iconColor2="#db2777"
+        title="ניהול תורנויות"
+        subtitle="הגדרת תורנויות ושיבוץ צוות"
+      />
 
       {/* Settings Management */}
       <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-4 md:p-6">
