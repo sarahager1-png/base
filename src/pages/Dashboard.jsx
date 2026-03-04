@@ -105,8 +105,8 @@ function DashboardInner() {
             </div>
           </div>
           <div className="h-1 w-32 mx-auto rounded-full overflow-hidden bg-white/10">
-            <div className="h-full rounded-full animate-loading-bar"
-                 style={{ background: 'linear-gradient(90deg, #6366f1, #4f46e5)' }} />
+          <div className="h-full rounded-full animate-loading-bar"
+               style={{ background: 'linear-gradient(90deg, #0d9488, #22c55e)' }} />
           </div>
           <p className="text-slate-400 mt-4 text-sm">טוען את המערכת...</p>
         </div>
