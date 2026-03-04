@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Heart, Calendar, Users, PartyPopper, Coffee, BookOpen } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 
 export default function CommunityPage() {
   const { data: events = [] } = useQuery({
@@ -29,12 +30,13 @@ export default function CommunityPage() {
   return (
     <div className="space-y-6" dir="rtl">
       <div>
-        <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-2">
-            קהילה והווי בית ספרי
-          </h1>
-          <p className="text-slate-600">אירועים חברתיים, חגיגות והודעות לקהילה</p>
-        </div>
+        <PageHeader
+          icon={Heart}
+          iconColor="#f43f5e"
+          iconColor2="#db2777"
+          title="קהילה והווי בית ספרי"
+          subtitle="אירועים חברתיים, חגיגות והודעות לקהילה"
+        />
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8">
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-pink-100">

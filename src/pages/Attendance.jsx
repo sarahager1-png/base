@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Clock, Calendar, CheckCircle, XCircle, AlertCircle, Users, FileText } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 
 export default function AttendancePage() {
   const [activeTab, setActiveTab] = useState('absences');
@@ -86,12 +87,13 @@ export default function AttendancePage() {
 
   return (
     <div className="space-y-6 animate-fade-in" dir="rtl">
-      <div className="mb-8">
-        <h1 className="text-xl md:text-2xl font-bold text-slate-800 mb-2">היעדרויות ודיווח</h1>
-        <p className="text-slate-600 text-sm">
-          {isManager ? 'צפייה וניהול כל דיווחי ההיעדרות ומילויי המקום' : 'דיווחי ההיעדרות ומילויי המקום שלי'}
-        </p>
-      </div>
+      <PageHeader
+        icon={Clock}
+        iconColor="#ef4444"
+        iconColor2="#dc2626"
+        title="היעדרויות ודיווח"
+        subtitle={isManager ? 'צפייה וניהול כל דיווחי ההיעדרות ומילויי המקום' : 'דיווחי ההיעדרות ומילויי המקום שלי'}
+      />
 
       {/* Tabs */}
       <div className="mb-6 flex gap-2 bg-white p-1 rounded-xl shadow-sm border border-slate-200 flex-wrap">

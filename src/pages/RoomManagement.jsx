@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Home, Plus, X, Trash2, Edit2, Calendar, Clock } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 
 export default function RoomManagementPage() {
   const [showAddRoom, setShowAddRoom] = useState(false);
@@ -108,13 +109,13 @@ export default function RoomManagementPage() {
 
   return (
     <div className="space-y-6" dir="rtl">
-      <div className="flex items-center gap-3 mb-2">
-        <Home className="h-6 w-6 text-purple-600" />
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">ניהול חדרים</h1>
-          <p className="text-sm text-slate-500">שיבוץ חדרים ומערכת</p>
-        </div>
-      </div>
+      <PageHeader
+        icon={Home}
+        iconColor="#84cc16"
+        iconColor2="#65a30d"
+        title="ניהול חדרים"
+        subtitle="שיבוץ חדרים ומערכת"
+      />
 
       {/* Rooms Management */}
       <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-4 md:p-6">

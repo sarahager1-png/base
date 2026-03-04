@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { CalendarDays, Plus, MapPin, Calendar, Clock } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 
 const WEEK_DAYS = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
 const _today = new Date();
@@ -135,23 +136,21 @@ export default function Schedule() {
           </div>
         )}
 
-        <div className="flex flex-wrap justify-between items-center gap-4">
-          <div>
-            <h2 className="text-xl md:text-2xl font-bold text-blue-900 flex items-center gap-2">
-              <CalendarDays className="h-6 w-6 text-amber-500" />
-              מערכת שעות ויומן
-            </h2>
-            <p className="text-slate-500">מערכת שעות שבועית ואירועים מיוחדים</p>
-          </div>
-          {canSchedule && (
-            <button 
+        <PageHeader
+          icon={CalendarDays}
+          iconColor="#3b82f6"
+          iconColor2="#2563eb"
+          title="מערכת שעות ויומן"
+          subtitle="מערכת שעות שבועית ואירועים מיוחדים"
+          actions={canSchedule && (
+            <button
               onClick={() => setIsEventModalOpen(true)}
-              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-blue-700 transition-colors shadow-sm"
+              className="flex items-center gap-2 bg-indigo-500 hover:bg-indigo-400 text-white px-4 py-2 rounded-xl font-bold transition-colors text-sm"
             >
               <Plus className="h-4 w-4" /> אירוע חדש
             </button>
           )}
-        </div>
+        />
 
         {/* Weekly Schedule */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">

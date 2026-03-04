@@ -5,6 +5,7 @@ import { Bell, Check, Trash2, Filter, AlertTriangle, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { timeAgo } from '@/lib/utils';
+import PageHeader from '../components/PageHeader';
 
 const PAGE_SIZE = 25;
 
@@ -132,23 +133,23 @@ export default function NotificationsPage() {
   return (
     <div className="space-y-6" dir="rtl">
       <div>
-        <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-blue-900 mb-2">התראות</h1>
-            <p className="text-slate-600">
-              {unreadCount > 0 ? `יש לך ${unreadCount} התראות שלא נקראו` : 'כל ההתראות נקראו'}
-            </p>
-          </div>
-          {unreadCount > 0 && (
+        <PageHeader
+          icon={Bell}
+          iconColor="#f59e0b"
+          iconColor2="#d97706"
+          title="התראות"
+          subtitle={unreadCount > 0 ? `יש לך ${unreadCount} התראות שלא נקראו` : 'כל ההתראות נקראו'}
+          actions={unreadCount > 0 && (
             <Button
               onClick={() => markAllAsRead.mutate()}
               variant="outline"
+              className="border-white/20 text-white hover:bg-white/10 text-sm"
             >
-              <Check className="h-4 w-4 mr-2" />
+              <Check className="h-4 w-4 ml-1" />
               סמן הכל כנקרא
             </Button>
           )}
-        </div>
+        />
 
         {/* Filters */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-3 md:p-4 mb-6">

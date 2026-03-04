@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Printer, AlertCircle, Upload } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { PrintStats } from '@/components/printing/PrintStats';
@@ -62,19 +63,18 @@ export default function PrintingPage() {
   return (
     <div className="space-y-6" dir="rtl">
       <div>
-        <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-blue-900 mb-2">מרכז צילומים והדפסות</h1>
-            <p className="text-slate-600">
-              {isSecretary ? 'ניהול תור ההדפסות' : isAdmin ? 'אישור בקשות הדפסה' : `סה״כ צילמת: ${myTotalPages} דפים`}
-            </p>
-          </div>
-          {isTeacher && (
-            <Button onClick={() => setShowUploadForm(true)} className="bg-blue-600 hover:bg-blue-700">
-              <Upload className="h-4 w-4 mr-2" />בקשת צילום חדשה
+        <PageHeader
+          icon={Printer}
+          iconColor="#6366f1"
+          iconColor2="#4f46e5"
+          title="מרכז צילומים והדפסות"
+          subtitle={isSecretary ? 'ניהול תור ההדפסות' : isAdmin ? 'אישור בקשות הדפסה' : `סה״כ צילמת: ${myTotalPages} דפים`}
+          actions={isTeacher && (
+            <Button onClick={() => setShowUploadForm(true)} className="bg-indigo-500 hover:bg-indigo-400 text-white text-sm">
+              <Upload className="h-4 w-4 ml-1" />בקשת צילום חדשה
             </Button>
           )}
-        </div>
+        />
 
         <PrintStats
           pending={pendingRequests.length} approved={approvedRequests.length}
