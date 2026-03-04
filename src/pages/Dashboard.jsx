@@ -187,7 +187,6 @@ function DashboardInner() {
               <Menu className="h-5 w-5" />
             </button>
             <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => setCurrentView('dashboard')}>
-              <img src="/logo.svg" alt="SMART BASE" className="h-9 w-9 drop-shadow-md" />
               <div>
                 <p className="text-white font-bold text-sm leading-tight tracking-widest">SMART BASE</p>
                 <p className="text-slate-500 text-[10px] leading-tight">מערכת ניהול חכמה</p>
