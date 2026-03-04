@@ -30,7 +30,7 @@ export default function PrintingPage() {
 
   const isSecretary = user?.role === 'secretary';
   const isAdmin = user?.role === 'admin' || user?.role === 'vice_principal';
-  const isTeacher = ['teacher', 'coordinator', 'counselor'].includes(user?.role);
+  const isTeacher = ['teacher', 'coordinator', 'counselor', 'assistant'].includes(user?.role);
 
   const pendingRequests = allPrintRequests.filter(r => r.status === 'pending');
   const approvedRequests = allPrintRequests.filter(r => r.status === 'approved');

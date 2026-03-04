@@ -79,9 +79,12 @@ export default function Journal() {
 
   const isAdmin = user.role === 'admin' || user.role === 'vice_principal';
 
-  const hebrewMonthName = (() => {
-    const hd = getHebrewDate(new Date(currentYear, currentMonth, 1));
-    return hd ? `${hd.month} ${hd.year}` : '';
+  const hebrewMonthLabel = (() => {
+    const firstHd = getHebrewDate(new Date(currentYear, currentMonth, 1));
+    const lastHd  = getHebrewDate(new Date(currentYear, currentMonth + 1, 0));
+    if (!firstHd) return '';
+    if (firstHd.month === lastHd?.month) return `${firstHd.month} ${firstHd.year}`;
+    return `${firstHd.month} - ${lastHd?.month} ${lastHd?.year}`;
   })();
 
   return (
@@ -92,7 +95,7 @@ export default function Journal() {
           iconColor="#3b82f6"
           iconColor2="#2563eb"
           title="יומן בית הספר"
-          subtitle={hebrewMonthName}
+          subtitle={`${monthNames[currentMonth]} ${currentYear}  |  ${hebrewMonthLabel}`}
           actions={isAdmin && (
             <>
               <Button
@@ -123,9 +126,12 @@ export default function Journal() {
               >
                 <ChevronRight className="h-5 w-5" />
               </button>
-              <h2 className="text-xl font-bold text-slate-800">
-                {monthNames[currentMonth]} {currentYear}
-              </h2>
+              <div className="text-center">
+                <h2 className="text-lg font-bold text-slate-800 leading-tight">
+                  {monthNames[currentMonth]} {currentYear}
+                </h2>
+                <p className="text-xs text-blue-600 font-medium mt-0.5">{hebrewMonthLabel}</p>
+              </div>
               <button
                 onClick={goToNextMonth}
                 className="p-2 hover:bg-slate-100 rounded-lg text-slate-600"

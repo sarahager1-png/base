@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Clock, Calendar, CheckCircle, XCircle, AlertCircle, Users, FileText } from 'lucide-react';
+import { Clock, Calendar, CheckCircle, XCircle, AlertCircle, Users, FileText, Plus, X } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
+import { toast } from 'sonner';
 
 export default function AttendancePage() {
   const [activeTab, setActiveTab] = useState('absences');
+  const [showAbsenceForm, setShowAbsenceForm] = useState(false);
+  const [showSubstituteForm, setShowSubstituteForm] = useState(false);
+  const [absenceForm, setAbsenceForm] = useState({ absence_reason: 'sick_child', start_date: '', end_date: '', notes: '' });
+  const [subForm, setSubForm] = useState({ date: '', hours_count: 1, original_teacher: '', class_name: '', subject: '' });
   const { data: user } = useQuery({
     queryKey: ['user'],
     queryFn: () => base44.auth.me(),
@@ -36,6 +41,30 @@ export default function AttendancePage() {
   });
 
   const queryClient = useQueryClient();
+
+  const createAbsenceMutation = useMutation({
+    mutationFn: (data) => base44.entities.Absence.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['myAbsences'] });
+      queryClient.invalidateQueries({ queryKey: ['absences'] });
+      setShowAbsenceForm(false);
+      setAbsenceForm({ absence_reason: 'sick_child', start_date: '', end_date: '', notes: '' });
+      toast.success('דיווח ההיעדרות נשלח');
+    },
+    onError: () => toast.error('שגיאה בשליחת הדיווח'),
+  });
+
+  const createSubMutation = useMutation({
+    mutationFn: (data) => base44.entities.SubstituteReport.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['mySubstitutes'] });
+      queryClient.invalidateQueries({ queryKey: ['substitutes'] });
+      setShowSubstituteForm(false);
+      setSubForm({ date: '', hours_count: 1, original_teacher: '', class_name: '', subject: '' });
+      toast.success('דיווח מילוי המקום נשלח');
+    },
+    onError: () => toast.error('שגיאה בשליחת הדיווח'),
+  });
 
   useEffect(() => {
     const unsubAbsence = base44.entities.Absence.subscribe((event) => {
@@ -93,6 +122,20 @@ export default function AttendancePage() {
         iconColor2="#dc2626"
         title="היעדרויות ודיווח"
         subtitle={isManager ? 'צפייה וניהול כל דיווחי ההיעדרות ומילויי המקום' : 'דיווחי ההיעדרות ומילויי המקום שלי'}
+        actions={!isManager && (
+          <div className="flex gap-2">
+            <button onClick={() => { setActiveTab('absences'); setShowAbsenceForm(true); }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white transition-all"
+                    style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}>
+              <Plus className="h-3.5 w-3.5" />דווח היעדרות
+            </button>
+            <button onClick={() => { setActiveTab('substitutes'); setShowSubstituteForm(true); }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white transition-all"
+                    style={{ background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)' }}>
+              <Plus className="h-3.5 w-3.5" />דווח מילוי מקום
+            </button>
+          </div>
+        )}
       />
 
       {/* Tabs */}
@@ -402,6 +445,155 @@ export default function AttendancePage() {
                 );
               })()}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Absence Report Modal */}
+      {showAbsenceForm && (
+        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
+            <div className="p-5 border-b border-slate-100 flex justify-between items-center">
+              <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <div className="p-2 rounded-lg" style={{ background: 'linear-gradient(135deg,#ef4444,#dc2626)' }}>
+                  <Clock className="h-4 w-4 text-white" />
+                </div>
+                דיווח היעדרות
+              </h2>
+              <button onClick={() => setShowAbsenceForm(false)} className="p-1.5 rounded-lg hover:bg-slate-100">
+                <X className="h-4 w-4 text-slate-500" />
+              </button>
+            </div>
+            <form className="p-5 space-y-4" onSubmit={(e) => {
+              e.preventDefault();
+              createAbsenceMutation.mutate({
+                user_email: user.email,
+                user_name: user.full_name,
+                status: 'pending',
+                ...absenceForm,
+              });
+            }}>
+              <div>
+                <label className="text-xs font-bold text-slate-600 block mb-1.5">סיבת היעדרות</label>
+                <select value={absenceForm.absence_reason}
+                        onChange={e => setAbsenceForm({ ...absenceForm, absence_reason: e.target.value })}
+                        className="w-full p-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
+                  <option value="sick_child">ילד חולה</option>
+                  <option value="choice_day">יום בחירה</option>
+                  <option value="declaration_days">יום הצהרה</option>
+                  <option value="other">אחר</option>
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-600 block mb-1.5">מתאריך</label>
+                  <input type="date" required value={absenceForm.start_date}
+                         onChange={e => setAbsenceForm({ ...absenceForm, start_date: e.target.value })}
+                         className="w-full p-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-400" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-600 block mb-1.5">עד תאריך</label>
+                  <input type="date" required value={absenceForm.end_date}
+                         onChange={e => setAbsenceForm({ ...absenceForm, end_date: e.target.value })}
+                         className="w-full p-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-400" />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-600 block mb-1.5">הערות (אופציונלי)</label>
+                <textarea value={absenceForm.notes}
+                          onChange={e => setAbsenceForm({ ...absenceForm, notes: e.target.value })}
+                          rows={2} placeholder="פרטים נוספים..."
+                          className="w-full p-2.5 border border-slate-300 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-red-400" />
+              </div>
+              <div className="flex gap-3 pt-1">
+                <button type="button" onClick={() => setShowAbsenceForm(false)}
+                        className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-semibold hover:bg-slate-50">
+                  ביטול
+                </button>
+                <button type="submit" disabled={createAbsenceMutation.isPending}
+                        className="flex-1 py-2.5 rounded-xl text-white text-sm font-semibold transition-all disabled:opacity-60"
+                        style={{ background: 'linear-gradient(135deg,#ef4444,#dc2626)' }}>
+                  {createAbsenceMutation.isPending ? 'שולח...' : 'שלח דיווח'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Substitute Report Modal */}
+      {showSubstituteForm && (
+        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
+            <div className="p-5 border-b border-slate-100 flex justify-between items-center">
+              <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <div className="p-2 rounded-lg" style={{ background: 'linear-gradient(135deg,#8b5cf6,#7c3aed)' }}>
+                  <Users className="h-4 w-4 text-white" />
+                </div>
+                דיווח מילוי מקום
+              </h2>
+              <button onClick={() => setShowSubstituteForm(false)} className="p-1.5 rounded-lg hover:bg-slate-100">
+                <X className="h-4 w-4 text-slate-500" />
+              </button>
+            </div>
+            <form className="p-5 space-y-4" onSubmit={(e) => {
+              e.preventDefault();
+              createSubMutation.mutate({
+                reporter_email: user.email,
+                reporter_name: user.full_name,
+                status: 'reported',
+                ...subForm,
+              });
+            }}>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-600 block mb-1.5">תאריך</label>
+                  <input type="date" required value={subForm.date}
+                         onChange={e => setSubForm({ ...subForm, date: e.target.value })}
+                         className="w-full p-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-400" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-600 block mb-1.5">מספר שעות</label>
+                  <input type="number" min="1" max="12" required value={subForm.hours_count}
+                         onChange={e => setSubForm({ ...subForm, hours_count: parseInt(e.target.value) })}
+                         className="w-full p-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-400" />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-600 block mb-1.5">במקום (שם המורה הנעדרת)</label>
+                <input type="text" required value={subForm.original_teacher}
+                       onChange={e => setSubForm({ ...subForm, original_teacher: e.target.value })}
+                       placeholder="שם המורה שהחלפת"
+                       className="w-full p-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-400" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-600 block mb-1.5">כיתה</label>
+                  <input type="text" value={subForm.class_name}
+                         onChange={e => setSubForm({ ...subForm, class_name: e.target.value })}
+                         placeholder="לדוגמה: ז׳1"
+                         className="w-full p-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-400" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-600 block mb-1.5">מקצוע</label>
+                  <input type="text" value={subForm.subject}
+                         onChange={e => setSubForm({ ...subForm, subject: e.target.value })}
+                         placeholder="לדוגמה: מתמטיקה"
+                         className="w-full p-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-400" />
+                </div>
+              </div>
+              <div className="flex gap-3 pt-1">
+                <button type="button" onClick={() => setShowSubstituteForm(false)}
+                        className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-semibold hover:bg-slate-50">
+                  ביטול
+                </button>
+                <button type="submit" disabled={createSubMutation.isPending}
+                        className="flex-1 py-2.5 rounded-xl text-white text-sm font-semibold transition-all disabled:opacity-60"
+                        style={{ background: 'linear-gradient(135deg,#8b5cf6,#7c3aed)' }}>
+                  {createSubMutation.isPending ? 'שולח...' : 'שלח דיווח'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
