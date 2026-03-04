@@ -32,6 +32,7 @@ import Onboarding from './Onboarding';
 import Notifications from './Notifications';
 import DutyManagement from './DutyManagement';
 import RoomManagement from './RoomManagement';
+import HelpCenter from '../components/help/HelpCenter';
 
 const HEBREW_DATE = "כ״ח טבת תשפ״ו";
 const GREGORIAN_DATE = new Date().toLocaleDateString('he-IL');
@@ -283,6 +284,7 @@ function DashboardInner() {
           isOpen={sidebarOpen}
           closeSidebar={() => setSidebarOpen(false)}
           onLogout={handleLogout}
+          onUserGenderChange={(g) => setUser(u => ({ ...u, gender: g }))}
         />
 
         <main className="flex-1 pb-10 min-w-0">
@@ -357,6 +359,7 @@ function DashboardInner() {
           {currentView === 'maintenance' && <Maintenance />}
           {currentView === 'printing' && <Printing />}
           {currentView === 'onboarding' && <Onboarding />}
+          {currentView === 'help' && <HelpCenter userRole={user.role} />}
         </main>
       </div>
 

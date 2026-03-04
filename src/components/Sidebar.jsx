@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Home, Calendar, CheckSquare, Clock, Users, UserPlus,
-  Printer, Settings, Heart, LogOut, X, Bell, ChevronRight, Sparkles
+  Printer, Settings, Heart, LogOut, X, Bell, ChevronRight, Sparkles, HelpCircle
 } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
 
 const NAV_COLORS = {
   dashboard:          { from: '#6366f1', to: '#4f46e5' },
@@ -19,9 +20,23 @@ const NAV_COLORS = {
   'duty-management':  { from: '#ec4899', to: '#db2777' },
   'room-management':  { from: '#84cc16', to: '#65a30d' },
   community:          { from: '#f43f5e', to: '#e11d48' },
+  help:               { from: '#64748b', to: '#475569' },
 };
 
-export default function Sidebar({ activeView, setView, user, isOpen, closeSidebar, onLogout }) {
+export default function Sidebar({ activeView, setView, user, isOpen, closeSidebar, onLogout, onUserGenderChange }) {
+  const [savingGender, setSavingGender] = useState(false);
+
+  const handleGenderToggle = async () => {
+    if (!user?.id) return;
+    const newGender = user.gender === 'male' ? 'female' : 'male';
+    setSavingGender(true);
+    try {
+      await base44.entities.User.update(user.id, { gender: newGender });
+      onUserGenderChange?.(newGender);
+    } finally {
+      setSavingGender(false);
+    }
+  };
   const menuItems = [
     { id: 'dashboard',           label: 'לוח בקרה ראשי',   icon: Home,       roles: ['all'] },
     { id: 'notifications',       label: 'התראות',           icon: Bell,       roles: ['all'] },
@@ -37,6 +52,7 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
     { id: 'duty-management',     label: 'ניהול תורנויות',   icon: Settings,   roles: ['admin', 'vice_principal', 'coordinator'] },
     { id: 'room-management',     label: 'ניהול חדרים',      icon: Home,       roles: ['all'] },
     { id: 'community',           label: 'קהילה והווי',      icon: Heart,      roles: ['all'] },
+    { id: 'help',                label: 'מרכז עזרה',         icon: HelpCircle, roles: ['all'] },
   ];
 
   const filtered = menuItems.filter(item =>
@@ -116,14 +132,34 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
       {/* User + Logout */}
       <div className="p-4 border-t border-white/10 space-y-3">
         {user && (
-          <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/5">
-            <div className="h-8 w-8 rounded-lg flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
-                 style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
-              {user.avatar || user.full_name?.charAt(0)}
+          <div className="px-3 py-2.5 rounded-xl bg-white/5 space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-lg flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
+                   style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
+                {user.avatar || user.full_name?.charAt(0)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-white text-xs font-semibold truncate">{user.full_name}</p>
+                <p className="text-slate-500 text-[10px] truncate">{user.title || user.role}</p>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-white text-xs font-semibold truncate">{user.full_name}</p>
-              <p className="text-slate-500 text-[10px] truncate">{user.title || user.role}</p>
+            {/* Gender Toggle */}
+            <div className="flex items-center gap-2 pt-1">
+              <span className="text-slate-500 text-[10px]">מגדר:</span>
+              <button
+                onClick={handleGenderToggle}
+                disabled={savingGender}
+                className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold transition-all disabled:opacity-50"
+                style={{
+                  background: user.gender === 'male' ? 'rgba(99,102,241,0.3)' : 'rgba(236,72,153,0.3)',
+                  color: user.gender === 'male' ? '#a5b4fc' : '#f9a8d4',
+                  border: `1px solid ${user.gender === 'male' ? 'rgba(99,102,241,0.4)' : 'rgba(236,72,153,0.4)'}`,
+                }}
+                title="לחצו לשינוי מגדר"
+              >
+                {user.gender === 'male' ? '👨 בן' : '👩 בת'}
+              </button>
+              <span className="text-slate-600 text-[9px]">לחצו לשינוי</span>
             </div>
           </div>
         )}
