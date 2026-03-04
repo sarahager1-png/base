@@ -2,10 +2,82 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Scrollbar styling */
+/* ===================== Custom Keyframes ===================== */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes loading-bar {
+  0%   { width: 0%;   margin-right: 0; }
+  50%  { width: 60%;  margin-right: 0; }
+  100% { width: 0%;   margin-right: 100%; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+  50%       { box-shadow: 0 0 20px 4px rgba(99, 102, 241, 0.3); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-4px); }
+}
+
+/* ===================== Animation Utilities ===================== */
+.animate-fade-in      { animation: fade-in 0.4s ease-out both; }
+.animate-slide-in     { animation: slide-in-right 0.35s ease-out both; }
+.animate-loading-bar  { animation: loading-bar 1.4s ease-in-out infinite; }
+.animate-pulse-glow   { animation: pulse-glow 2s ease-in-out infinite; }
+.animate-float        { animation: float 3s ease-in-out infinite; }
+
+/* Staggered children */
+.stagger > *:nth-child(1) { animation-delay: 0ms; }
+.stagger > *:nth-child(2) { animation-delay: 60ms; }
+.stagger > *:nth-child(3) { animation-delay: 120ms; }
+.stagger > *:nth-child(4) { animation-delay: 180ms; }
+.stagger > *:nth-child(5) { animation-delay: 240ms; }
+.stagger > *:nth-child(6) { animation-delay: 300ms; }
+
+/* ===================== Glass Effect ===================== */
+.glass {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.glass-light {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* ===================== Gradient Text ===================== */
+.gradient-text-indigo {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-blue {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===================== Scrollbar ===================== */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -13,18 +85,72 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #2563eb, #1e3a8a);
-  border-radius: 4px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: linear-gradient(to bottom, #6366f1, #4f46e5);
+  border-radius: 99px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #1d4ed8, #1e40af);
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  background: linear-gradient(to bottom, #4f46e5, #3730a3);
 }
 
-/* Firefox scrollbar */
 * {
-  scrollbar-color: #2563eb transparent;
+  scrollbar-color: #6366f1 transparent;
   scrollbar-width: thin;
+}
+
+/* ===================== Card Hover Utilities ===================== */
+.card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* ===================== Dark Mode Base ===================== */
+.dark body {
+  background-color: #111827;
+  color: #f1f5f9;
+}
+.dark .bg-white   { background-color: #1e293b !important; }
+.dark .border-slate-200 { border-color: #334155 !important; }
+.dark .text-slate-800   { color: #f1f5f9 !important; }
+.dark .text-slate-600   { color: #94a3b8 !important; }
+.dark .text-slate-500   { color: #64748b !important; }
+.dark .bg-slate-50      { background-color: #0f172a !important; }
+.dark .bg-slate-100     { background-color: #1e293b !important; }
+
+/* ===================== Print Styles ===================== */
+@media print {
+  .no-print,
+  header,
+  aside,
+  nav {
+    display: none !important;
+  }
+
+  #print-area {
+    padding: 0;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    font-family: 'Arial', sans-serif;
+    direction: rtl;
+  }
+
+  .rounded-2xl,
+  .rounded-xl,
+  .rounded-3xl {
+    border-radius: 8px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  @page {
+    margin: 1.5cm;
+    size: A4;
+  }
 }

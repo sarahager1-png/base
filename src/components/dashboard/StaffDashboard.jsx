@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { 
-  Calendar, Stethoscope, Clock, Map, Printer, 
-  ShoppingCart, Wrench, Monitor, Shield, Hammer, Timer, Sparkles, Heart, Mail
+import {
+  Calendar, Stethoscope, Clock, Map, Printer,
+  ShoppingCart, Wrench, Monitor, Shield, Hammer, Timer, Sparkles, Heart, Mail, FileText
 } from 'lucide-react';
 import ReportingModal from '../modals/ReportingModal';
 import AbsenceReportModal from '../modals/AbsenceReportModal';
@@ -12,6 +12,7 @@ import DailyJournal from '../journal/DailyJournal';
 import DailyMessageBoard from './DailyMessageBoard';
 import SendMessageModal from '../messages/SendMessageModal';
 import MessagesCenter from '../messages/MessagesCenter';
+import TeacherAbsenceReport from '../reports/TeacherAbsenceReport';
 
 const TEACHER_BASE_SCHEDULE = {
   0: { 1: 'הסטוריה - ח׳2', 2: 'הסטוריה - ח׳2', 3: 'פרטני', 4: 'חלון', 5: 'אזרחות - ט׳1', 6: 'אזרחות - ט׳1' },
@@ -28,6 +29,7 @@ export default function StaffDashboard({ user, setView }) {
   const [absenceModalOpen, setAbsenceModalOpen] = useState(false);
   const [printModalOpen, setPrintModalOpen] = useState(false);
   const [messageModalOpen, setMessageModalOpen] = useState(false);
+  const [absenceReportOpen, setAbsenceReportOpen] = useState(false);
 
   const { data: myDuty } = useQuery({
     queryKey: ['duty', user.email, new Date().getDate()],
@@ -73,6 +75,8 @@ export default function StaffDashboard({ user, setView }) {
         recipientRole="leadership"
       />
 
+      <TeacherAbsenceReport user={user} isOpen={absenceReportOpen} onClose={() => setAbsenceReportOpen(false)} />
+
       <DailyMessageBoard user={user} />
 
       {/* Today's Journal */}
@@ -94,6 +98,14 @@ export default function StaffDashboard({ user, setView }) {
             <Stethoscope className="h-6 w-6" />
           </div>
           <span className="text-xs font-bold text-slate-700 leading-tight">העדרויות</span>
+        </button>
+
+        <button onClick={() => setAbsenceReportOpen(true)} className="flex flex-col items-center p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl shadow-sm border-2 border-indigo-200 hover:border-indigo-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+          <div className="p-2.5 bg-indigo-100 rounded-full text-indigo-600 group-hover:scale-110 transition-transform mb-2">
+            <FileText className="h-6 w-6" />
+          </div>
+          <span className="text-xs font-bold text-slate-700 leading-tight">דוח היעדרויות</span>
+          <span className="text-[10px] text-indigo-500 mt-0.5">הדפסה / PDF</span>
         </button>
       
         <button onClick={() => openFeature('substitute')} className="flex flex-col items-center p-4 bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl shadow-sm border-2 border-purple-200 hover:border-purple-400 hover:shadow-md transition-all group text-center h-28 justify-center">
