@@ -16,12 +16,12 @@ export default function FileManagementPage() {
   if (!user) return <div className="flex items-center justify-center h-screen">טוען...</div>;
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-6 md:space-y-8 animate-fade-in p-4 md:p-0" dir="rtl">
       {/* Header */}
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100">
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-4 md:p-8 border border-blue-100">
         <div className="flex items-center gap-3 mb-2">
-          <Files className="h-8 w-8 text-blue-600" />
-          <h1 className="text-3xl font-bold text-blue-900">ניהול קבצים</h1>
+          <Files className="h-7 w-7 md:h-8 md:w-8 text-blue-600" />
+          <h1 className="text-2xl md:text-3xl font-bold text-blue-900">ניהול קבצים</h1>
         </div>
         <p className="text-slate-600">עלה, ארגן וחפש קבצים בצורה קלה</p>
       </div>
@@ -59,7 +59,7 @@ export default function FileManagementPage() {
         )}
 
         {activeTab === 'upload' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
             <div>
               <h2 className="text-xl font-bold text-slate-800 mb-4">העלה קובץ חדש</h2>
               <FileUploadWidget 

@@ -104,18 +104,18 @@ export default function DutyManagementPage() {
   const dayNames = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="bg-gradient-to-r from-blue-900 to-indigo-900 rounded-2xl p-8 text-white">
-        <h1 className="text-3xl font-bold flex items-center gap-3">
-          <Shield className="h-8 w-8" />
+    <div className="space-y-6 p-4 md:p-6" dir="rtl">
+      <div className="bg-gradient-to-r from-blue-900 to-indigo-900 rounded-2xl p-4 md:p-8 text-white">
+        <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
+          <Shield className="h-7 w-7 md:h-8 md:w-8" />
           ניהול תורנויות
         </h1>
         <p className="text-blue-100 mt-2">הגדרת תורנויות ושיבוץ צוות</p>
       </div>
 
       {/* Settings Management */}
-      <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
-        <div className="flex justify-between items-center mb-6">
+      <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-4 md:p-6">
+        <div className="flex flex-wrap justify-between items-center mb-6 gap-3">
           <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
             <MapPin className="h-5 w-5 text-blue-600" />
             הגדרות תורנויות
@@ -290,8 +290,8 @@ export default function DutyManagementPage() {
       </div>
 
       {/* Monthly Schedule */}
-      <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
-        <div className="flex justify-between items-center mb-6">
+      <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-4 md:p-6">
+        <div className="flex flex-wrap justify-between items-center mb-6 gap-3">
           <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
             <Calendar className="h-5 w-5 text-green-600" />
             לוח תורנויות חודשי

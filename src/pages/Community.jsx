@@ -27,16 +27,16 @@ export default function CommunityPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 p-4 md:p-6" dir="rtl">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-2">
             קהילה והווי בית ספרי
           </h1>
           <p className="text-slate-600">אירועים חברתיים, חגיגות והודעות לקהילה</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8">
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-pink-100">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-pink-100 rounded-full">
@@ -74,7 +74,7 @@ export default function CommunityPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
             <h2 className="text-xl font-bold text-blue-900 mb-6 flex items-center gap-2">
               <PartyPopper className="h-5 w-5 text-pink-500" />

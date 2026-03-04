@@ -75,12 +75,12 @@ export default function Schedule() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6" dir="rtl">
+    <div className="min-h-screen bg-slate-50 p-4 md:p-6" dir="rtl">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Event Modal */}
         {isEventModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div className="bg-white rounded-xl p-6 w-96 shadow-2xl">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div className="bg-white rounded-xl p-6 w-full max-w-sm shadow-2xl">
               <h3 className="text-lg font-bold text-slate-800 mb-4">הוספת אירוע ללוח</h3>
               <div className="space-y-3">
                 <div>
@@ -135,9 +135,9 @@ export default function Schedule() {
           </div>
         )}
 
-        <div className="flex justify-between items-center">
+        <div className="flex flex-wrap justify-between items-center gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-blue-900 flex items-center gap-2">
+            <h2 className="text-xl md:text-2xl font-bold text-blue-900 flex items-center gap-2">
               <CalendarDays className="h-6 w-6 text-amber-500" />
               מערכת שעות ויומן
             </h2>
@@ -154,7 +154,7 @@ export default function Schedule() {
         </div>
 
         {/* Weekly Schedule */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
           <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
             <Clock className="h-5 w-5 text-blue-500" />
             מערכת שעות שבועית
@@ -216,9 +216,9 @@ export default function Schedule() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
           {/* Calendar Grid */}
-          <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+          <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-slate-800">
                 {new Date().toLocaleDateString('he-IL', { month: 'long', year: 'numeric' })}
@@ -239,19 +239,19 @@ export default function Schedule() {
               ))}
               
               {Array.from({length: FIRST_DAY_OF_MONTH}).map((_, i) => (
-                <div key={`empty-${i}`} className="bg-white min-h-[100px]" />
+                <div key={`empty-${i}`} className="bg-white min-h-[50px] md:min-h-[100px]" />
               ))}
 
               {Array.from({length: DAYS_IN_MONTH}).map((_, i) => {
                 const day = i + 1;
                 const dayEvents = getEventsForDay(day);
                 const isSelected = selectedDate === day;
-                
+
                 return (
-                  <div 
-                    key={day} 
+                  <div
+                    key={day}
                     onClick={() => setSelectedDate(day)}
-                    className={`bg-white min-h-[100px] p-2 cursor-pointer transition-colors relative hover:bg-blue-50/50 ${isSelected ? 'ring-2 ring-inset ring-blue-500' : ''}`}
+                    className={`bg-white min-h-[50px] md:min-h-[100px] p-1 md:p-2 cursor-pointer transition-colors relative hover:bg-blue-50/50 ${isSelected ? 'ring-2 ring-inset ring-blue-500' : ''}`}
                   >
                     <span className={`text-sm font-bold ${isSelected ? 'text-blue-600' : 'text-slate-700'}`}>{day}</span>
                     <div className="mt-1 space-y-1">

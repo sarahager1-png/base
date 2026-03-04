@@ -107,18 +107,18 @@ export default function RoomManagementPage() {
   const dayNames = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="bg-gradient-to-r from-purple-900 to-pink-900 rounded-2xl p-8 text-white">
-        <h1 className="text-3xl font-bold flex items-center gap-3">
-          <Home className="h-8 w-8" />
+    <div className="space-y-6 p-4 md:p-6" dir="rtl">
+      <div className="bg-gradient-to-r from-purple-900 to-pink-900 rounded-2xl p-4 md:p-8 text-white">
+        <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
+          <Home className="h-7 w-7 md:h-8 md:w-8" />
           ניהול חדרים
         </h1>
         <p className="text-purple-100 mt-2">שיבוץ חדרים ומערכת</p>
       </div>
 
       {/* Rooms Management */}
-      <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
-        <div className="flex justify-between items-center mb-6">
+      <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-4 md:p-6">
+        <div className="flex flex-wrap justify-between items-center mb-6 gap-3">
           <h2 className="text-xl font-bold text-slate-800">רשימת חדרים</h2>
           <button
             onClick={() => {
@@ -212,7 +212,7 @@ export default function RoomManagementPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {rooms.map(room => (
             <div key={room.id} className="border-2 border-slate-200 rounded-xl p-4 hover:border-purple-300 transition-colors">
               <div className="flex justify-between items-start mb-3">
@@ -372,7 +372,7 @@ export default function RoomManagementPage() {
       )}
 
       {/* Current Bookings */}
-      <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
+      <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-4 md:p-6">
         <h2 className="text-xl font-bold text-slate-800 mb-4">תפיסות נוכחיות</h2>
         <div className="space-y-3">
           {bookings.map(booking => (

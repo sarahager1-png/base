@@ -130,11 +130,11 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 md:p-6" dir="rtl">
       <div className="max-w-5xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-blue-900 mb-2">התראות</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-blue-900 mb-2">התראות</h1>
             <p className="text-slate-600">
               {unreadCount > 0 ? `יש לך ${unreadCount} התראות שלא נקראו` : 'כל ההתראות נקראו'}
             </p>
@@ -151,8 +151,8 @@ export default function NotificationsPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 mb-6">
-          <div className="flex items-center gap-4 flex-wrap">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-3 md:p-4 mb-6">
+          <div className="flex items-center gap-3 flex-wrap">
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-slate-400" />
               <span className="text-sm font-medium text-slate-600">סינון:</span>
