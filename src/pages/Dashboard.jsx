@@ -33,6 +33,7 @@ import Onboarding from './Onboarding';
 import Notifications from './Notifications';
 import DutyManagement from './DutyManagement';
 import RoomManagement from './RoomManagement';
+import FileManagement from './FileManagement';
 import HelpCenter from '../components/help/HelpCenter';
 import InsightsDashboard from '../components/analytics/InsightsDashboard';
 
@@ -362,6 +363,7 @@ function DashboardInner() {
           {currentView === 'attendance' && <Attendance />}
           {currentView === 'duty-management' && <DutyManagement />}
           {currentView === 'room-management' && <RoomManagement />}
+          {currentView === 'file-management' && <FileManagement />}
           {currentView === 'community' && <Community />}
           {currentView === 'maintenance' && <Maintenance />}
           {currentView === 'printing' && <Printing />}
