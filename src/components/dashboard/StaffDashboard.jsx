@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import {
   Calendar, Stethoscope, Clock, Map, Printer,
-  ShoppingCart, Wrench, Monitor, Shield, Hammer, Timer, Sparkles, Heart, Mail, FileText
+  ShoppingCart, Wrench, Monitor, Shield, Hammer, Timer, Sparkles, Heart, Mail, FileText, Camera
 } from 'lucide-react';
 import ReportingModal from '../modals/ReportingModal';
 import AbsenceReportModal from '../modals/AbsenceReportModal';
@@ -155,6 +155,14 @@ export default function StaffDashboard({ user, setView }) {
             <Sparkles className="h-6 w-6" />
           </div>
           <span className="text-xs font-bold text-slate-700 leading-tight">שעות מיוחדות</span>
+        </button>
+
+        <button onClick={() => setPrintModalOpen(true)} className="flex flex-col items-center p-4 bg-gradient-to-br from-blue-50 to-sky-50 rounded-xl shadow-sm border-2 border-blue-200 hover:border-blue-400 hover:shadow-md transition-all group text-center h-28 justify-center">
+          <div className="p-2.5 bg-blue-100 rounded-full text-blue-600 group-hover:scale-110 transition-transform mb-2">
+            <Camera className="h-6 w-6" />
+          </div>
+          <span className="text-xs font-bold text-slate-700 leading-tight">צילומים</span>
+          <span className="text-[10px] text-blue-500 mt-0.5">שלח לאישור</span>
         </button>
       </div>
 

@@ -40,7 +40,7 @@ const GREGORIAN_DATE = new Date().toLocaleDateString('he-IL');
 
 function DashboardInner() {
   const { dark, toggleDark } = useTheme();
-  const { fontSize, setFontSize, sizes } = useAccessibility();
+  const { fontSize, setFontSize, sizes, gTitle } = useAccessibility();
   const [user, setUser] = useState(null);
   const [currentView, setCurrentView] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -266,7 +266,7 @@ function DashboardInner() {
             <div className="flex items-center gap-2.5">
               <div className="hidden sm:block text-right leading-tight">
                 <p className="text-white text-xs font-semibold">{user.full_name}</p>
-                <p className="text-slate-500 text-[10px]">{user.title || user.role}</p>
+                <p className="text-slate-500 text-[10px]">{user.title || gTitle(user.role)}</p>
               </div>
               <div className="h-9 w-9 rounded-xl flex items-center justify-center text-sm font-bold text-white shadow-lg"
                    style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', boxShadow: '0 4px 15px #6366f140' }}>
