@@ -143,88 +143,169 @@ export default function AdminDashboard() {
 
       {/* More Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-purple-100 rounded-xl">
-              <FileText className="h-6 w-6 text-purple-600" />
+        {/* Onboarding card */}
+        <div className="relative rounded-2xl p-6 overflow-hidden group"
+             style={{
+               background: 'linear-gradient(145deg, #f5f3ff 0%, #ffffff 50%, #ede9fe 100%)',
+               border: '1px solid #8b5cf620',
+               boxShadow: '0 2px 8px rgba(139,92,246,0.08)',
+             }}>
+          <div className="absolute -top-8 -left-8 h-32 w-32 rounded-full opacity-20 blur-2xl"
+               style={{ background: 'radial-gradient(circle, #8b5cf6, transparent)' }} />
+          <div className="relative flex items-center gap-3 mb-4">
+            <div className="p-3 rounded-xl shadow-md" style={{ background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)', boxShadow: '0 6px 20px #8b5cf640' }}>
+              <FileText className="h-5 w-5 text-white" />
             </div>
-            <h3 className="font-bold text-slate-800">טפסי קליטה</h3>
+            <h3 className="font-bold text-slate-700">טפסי קליטה</h3>
           </div>
-          <div className="text-3xl font-bold text-purple-600 mb-2">{pendingOnboarding}</div>
-          <p className="text-sm text-slate-600">ממתינים לאישור</p>
+          <div className="relative text-4xl font-black mb-1"
+               style={{ background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+            {pendingOnboarding}
+          </div>
+          <p className="text-sm text-slate-500">ממתינים לאישור</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-cyan-100 rounded-xl">
-              <TrendingUp className="h-6 w-6 text-cyan-600" />
+        {/* Prints card */}
+        <div className="relative rounded-2xl p-6 overflow-hidden group"
+             style={{
+               background: 'linear-gradient(145deg, #ecfeff 0%, #ffffff 50%, #cffafe 100%)',
+               border: '1px solid #06b6d420',
+               boxShadow: '0 2px 8px rgba(6,182,212,0.08)',
+             }}>
+          <div className="absolute -top-8 -left-8 h-32 w-32 rounded-full opacity-20 blur-2xl"
+               style={{ background: 'radial-gradient(circle, #06b6d4, transparent)' }} />
+          <div className="relative flex items-center gap-3 mb-4">
+            <div className="p-3 rounded-xl shadow-md" style={{ background: 'linear-gradient(135deg, #06b6d4, #0891b2)', boxShadow: '0 6px 20px #06b6d440' }}>
+              <TrendingUp className="h-5 w-5 text-white" />
             </div>
-            <h3 className="font-bold text-slate-800">הדפסות</h3>
+            <h3 className="font-bold text-slate-700">הדפסות</h3>
           </div>
-          <div className="text-3xl font-bold text-cyan-600 mb-2">{pendingPrints}</div>
-          <p className="text-sm text-slate-600">ממתינות לעיבוד</p>
+          <div className="relative text-4xl font-black mb-1"
+               style={{ background: 'linear-gradient(135deg, #06b6d4, #0891b2)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+            {pendingPrints}
+          </div>
+          <p className="text-sm text-slate-500">ממתינות לעיבוד</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-orange-100 rounded-xl">
-              <Users className="h-6 w-6 text-orange-600" />
+        {/* Substitutes card */}
+        <div className="relative rounded-2xl p-6 overflow-hidden group"
+             style={{
+               background: 'linear-gradient(145deg, #fff7ed 0%, #ffffff 50%, #ffedd5 100%)',
+               border: '1px solid #f9731620',
+               boxShadow: '0 2px 8px rgba(249,115,22,0.08)',
+             }}>
+          <div className="absolute -top-8 -left-8 h-32 w-32 rounded-full opacity-20 blur-2xl"
+               style={{ background: 'radial-gradient(circle, #f97316, transparent)' }} />
+          <div className="relative flex items-center gap-3 mb-4">
+            <div className="p-3 rounded-xl shadow-md" style={{ background: 'linear-gradient(135deg, #f97316, #ea580c)', boxShadow: '0 6px 20px #f9731640' }}>
+              <Users className="h-5 w-5 text-white" />
             </div>
-            <h3 className="font-bold text-slate-800">מילוי מקום</h3>
+            <h3 className="font-bold text-slate-700">מילוי מקום</h3>
           </div>
-          <div className="text-3xl font-bold text-orange-600 mb-2">{reportedSubstitutes}</div>
-          <p className="text-sm text-slate-600">דוחות לאישור</p>
+          <div className="relative text-4xl font-black mb-1"
+               style={{ background: 'linear-gradient(135deg, #f97316, #ea580c)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+            {reportedSubstitutes}
+          </div>
+          <p className="text-sm text-slate-500">דוחות לאישור</p>
         </div>
       </div>
 
       {/* Detailed Stats */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Absences Overview */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-3 bg-amber-100 rounded-xl">
-              <Clock className="h-6 w-6 text-amber-600" />
+        <div className="relative bg-white rounded-2xl overflow-hidden"
+             style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #f59e0b15' }}>
+          {/* Header gradient band */}
+          <div className="p-5 flex items-center gap-3"
+               style={{ background: 'linear-gradient(135deg, #fffbeb, #fef3c7)' }}>
+            <div className="p-3 rounded-xl shadow-md" style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', boxShadow: '0 6px 20px #f59e0b40' }}>
+              <Clock className="h-5 w-5 text-white" />
             </div>
-            <h3 className="text-lg font-bold text-slate-800">היעדרויות</h3>
+            <h3 className="text-base font-bold text-amber-900">היעדרויות</h3>
           </div>
-          
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-amber-50 rounded-lg border border-amber-100">
-              <span className="text-sm text-amber-900">ממתינות לאישור</span>
-              <span className="text-2xl font-bold text-amber-600">{absenceStats.pending}</span>
+
+          <div className="p-5 space-y-2.5">
+            {/* Pending row */}
+            <div className="flex items-center justify-between p-3.5 rounded-xl"
+                 style={{ background: 'linear-gradient(135deg, #fffbeb, #fef9c3)', border: '1px solid #f59e0b25' }}>
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-amber-400" />
+                <span className="text-sm font-medium text-amber-800">ממתינות לאישור</span>
+              </div>
+              <span className="text-2xl font-black" style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                {absenceStats.pending}
+              </span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100">
-              <span className="text-sm text-green-900">אושרו</span>
-              <span className="text-2xl font-bold text-green-600">{absenceStats.approved}</span>
+            {/* Approved row */}
+            <div className="flex items-center justify-between p-3.5 rounded-xl"
+                 style={{ background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)', border: '1px solid #10b98125' }}>
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-emerald-400" />
+                <span className="text-sm font-medium text-emerald-800">אושרו</span>
+              </div>
+              <span className="text-2xl font-black" style={{ background: 'linear-gradient(135deg, #10b981, #059669)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                {absenceStats.approved}
+              </span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-100">
-              <span className="text-sm text-red-900">נדחו</span>
-              <span className="text-2xl font-bold text-red-600">{absenceStats.rejected}</span>
+            {/* Rejected row */}
+            <div className="flex items-center justify-between p-3.5 rounded-xl"
+                 style={{ background: 'linear-gradient(135deg, #fef2f2, #fee2e2)', border: '1px solid #ef444425' }}>
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-red-400" />
+                <span className="text-sm font-medium text-red-800">נדחו</span>
+              </div>
+              <span className="text-2xl font-black" style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                {absenceStats.rejected}
+              </span>
             </div>
           </div>
         </div>
 
         {/* Purchase Requests Overview */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-3 bg-green-100 rounded-xl">
-              <ShoppingCart className="h-6 w-6 text-green-600" />
+        <div className="relative bg-white rounded-2xl overflow-hidden"
+             style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #10b98115' }}>
+          {/* Header gradient band */}
+          <div className="p-5 flex items-center gap-3"
+               style={{ background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)' }}>
+            <div className="p-3 rounded-xl shadow-md" style={{ background: 'linear-gradient(135deg, #10b981, #059669)', boxShadow: '0 6px 20px #10b98140' }}>
+              <ShoppingCart className="h-5 w-5 text-white" />
             </div>
-            <h3 className="text-lg font-bold text-slate-800">בקשות רכש</h3>
+            <h3 className="text-base font-bold text-emerald-900">בקשות רכש</h3>
           </div>
-          
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-100">
-              <span className="text-sm text-yellow-900">ממתינות</span>
-              <span className="text-2xl font-bold text-yellow-600">{purchaseStats.pending}</span>
+
+          <div className="p-5 space-y-2.5">
+            {/* Pending row */}
+            <div className="flex items-center justify-between p-3.5 rounded-xl"
+                 style={{ background: 'linear-gradient(135deg, #fffbeb, #fef9c3)', border: '1px solid #eab30825' }}>
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-yellow-400" />
+                <span className="text-sm font-medium text-yellow-800">ממתינות</span>
+              </div>
+              <span className="text-2xl font-black" style={{ background: 'linear-gradient(135deg, #eab308, #d97706)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                {purchaseStats.pending}
+              </span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100">
-              <span className="text-sm text-green-900">אושרו</span>
-              <span className="text-2xl font-bold text-green-600">{purchaseStats.approved}</span>
+            {/* Approved row */}
+            <div className="flex items-center justify-between p-3.5 rounded-xl"
+                 style={{ background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)', border: '1px solid #10b98125' }}>
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-emerald-400" />
+                <span className="text-sm font-medium text-emerald-800">אושרו</span>
+              </div>
+              <span className="text-2xl font-black" style={{ background: 'linear-gradient(135deg, #10b981, #059669)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                {purchaseStats.approved}
+              </span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-100">
-              <span className="text-sm text-blue-900">הושלמו</span>
-              <span className="text-2xl font-bold text-blue-600">{purchaseStats.completed}</span>
+            {/* Completed row */}
+            <div className="flex items-center justify-between p-3.5 rounded-xl"
+                 style={{ background: 'linear-gradient(135deg, #eff6ff, #dbeafe)', border: '1px solid #3b82f625' }}>
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-blue-400" />
+                <span className="text-sm font-medium text-blue-800">הושלמו</span>
+              </div>
+              <span className="text-2xl font-black" style={{ background: 'linear-gradient(135deg, #3b82f6, #2563eb)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                {purchaseStats.completed}
+              </span>
             </div>
           </div>
         </div>
