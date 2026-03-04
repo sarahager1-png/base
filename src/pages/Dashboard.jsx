@@ -192,7 +192,7 @@ function DashboardInner() {
                   onClick={() => setFontSize(key)}
                   title={val.tip}
                   className={`px-2 py-1 rounded-md text-xs font-bold transition-all
-                    ${fontSize === key ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                    ${fontSize === key ? 'bg-teal-600 text-white shadow-sm' : 'text-slate-500 hover:text-teal-700'}`}
                   style={{ fontSize: key === 'normal' ? '11px' : key === 'large' ? '13px' : '15px' }}
                 >
                   א
