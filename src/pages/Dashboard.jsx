@@ -92,13 +92,13 @@ function DashboardInner() {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center"
-           style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)' }}>
+           style={{ background: 'linear-gradient(135deg, #0d2b28 0%, #0f4540 50%, #0d2b28 100%)' }}>
         <div className="text-center">
           <div className="relative mx-auto mb-6 h-16 w-16">
             <div className="absolute inset-0 rounded-2xl opacity-30 blur-xl"
-                 style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }} />
+                 style={{ background: 'linear-gradient(135deg, #0d9488, #22c55e)' }} />
             <div className="relative h-16 w-16 rounded-2xl flex items-center justify-center overflow-hidden"
-                 style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #4f46e5 100%)' }}>
+                 style={{ background: 'linear-gradient(135deg, #0d9488 0%, #22c55e 100%)' }}>
               <div className="absolute inset-0 opacity-30"
                    style={{ background: 'radial-gradient(circle at 30% 30%, #fff, transparent 60%)' }} />
               <Sparkles className="h-8 w-8 text-white animate-pulse relative z-10" />
