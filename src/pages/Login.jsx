@@ -237,29 +237,35 @@ export default function Login({ onLogin }) {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {MODULES.map(({ icon: Icon, label, color, desc }, idx) => (
-              <div key={label}
-                   onMouseEnter={() => setHoveredModule(idx)}
-                   onMouseLeave={() => setHoveredModule(null)}
-                   className="relative group rounded-2xl p-4 border cursor-default transition-all duration-300"
-                   style={{
-                     background: hoveredModule === idx ? `linear-gradient(135deg, ${color}18, ${color}08)` : 'rgba(255,255,255,0.03)',
-                     borderColor: hoveredModule === idx ? `${color}50` : 'rgba(255,255,255,0.07)',
-                     transform: hoveredModule === idx ? 'translateY(-4px)' : 'none',
-                     boxShadow: hoveredModule === idx ? `0 20px 40px ${color}20` : 'none',
-                   }}>
-                <div className="h-11 w-11 rounded-xl flex items-center justify-center mb-3 transition-all duration-300"
+            {MODULES.map(({ icon: Icon, label, color, desc }, idx) => {
+              const isHov = hoveredModule === idx;
+              return (
+                <div key={label}
+                     onMouseEnter={() => setHoveredModule(idx)}
+                     onMouseLeave={() => setHoveredModule(null)}
+                     className="relative group rounded-2xl p-4 cursor-default transition-all duration-300"
                      style={{
-                       background: `linear-gradient(135deg, ${color}30, ${color}15)`,
-                       border: `1px solid ${color}40`,
-                       boxShadow: hoveredModule === idx ? `0 0 20px ${color}40` : 'none',
+                       background: `linear-gradient(135deg, ${color}15, ${color}08)`,
+                       border: `1px solid ${color}35`,
+                       transform: isHov ? 'translateY(-5px) scale(1.02)' : 'none',
+                       boxShadow: isHov ? `0 24px 48px ${color}30, 0 0 0 1px ${color}50` : `0 2px 12px ${color}15`,
                      }}>
-                  <Icon className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" style={{ color }} />
+                  {/* Subtle top glow stripe */}
+                  <div className="absolute top-0 left-0 right-0 h-0.5 rounded-t-2xl"
+                       style={{ background: `linear-gradient(90deg, transparent, ${color}80, transparent)` }} />
+                  <div className="h-11 w-11 rounded-xl flex items-center justify-center mb-3 transition-all duration-300"
+                       style={{
+                         background: `linear-gradient(135deg, ${color}45, ${color}25)`,
+                         border: `1px solid ${color}60`,
+                         boxShadow: isHov ? `0 0 24px ${color}50` : `0 4px 12px ${color}25`,
+                       }}>
+                    <Icon className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" style={{ color }} />
+                  </div>
+                  <p className="text-white text-sm font-bold mb-1 leading-tight">{label}</p>
+                  <p className="text-slate-400 text-xs leading-snug">{desc}</p>
                 </div>
-                <p className="text-white text-sm font-bold mb-1 leading-tight">{label}</p>
-                <p className="text-slate-500 text-xs leading-snug">{desc}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
