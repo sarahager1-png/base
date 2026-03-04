@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import StatCard from '../StatCard';
 import MeetingsList from '../meetings/MeetingsList';
@@ -8,17 +8,17 @@ import AddMeeting from '../meetings/AddMeeting';
 import DailyMessageBoard from './DailyMessageBoard';
 import {
   Users, AlertTriangle, Clock, ShoppingCart, FileText,
-  Wrench, BarChart3, TrendingUp, Plus, Calendar, Send, Bell, Heart
+  Wrench, BarChart3, TrendingUp, Plus, Heart
 } from 'lucide-react';
 import SendMessageModal from '../messages/SendMessageModal';
-import { toast } from 'sonner';
+import { useAuth } from '@/lib/AuthContext';
 
 export default function AdminDashboard() {
   const [showAddMeeting, setShowAddMeeting] = useState(false);
   const [messageModalOpen, setMessageModalOpen] = useState(false);
   const queryClient = useQueryClient();
-  
-  const user = { email: 'admin@school.local', full_name: 'מנהלת', role: 'admin' };
+
+  const { user } = useAuth();
 
   // Fetch all data
   const { data: users = [] } = useQuery({
@@ -54,27 +54,6 @@ export default function AdminDashboard() {
   const { data: substituteReports = [] } = useQuery({
     queryKey: ['substitutes-all'],
     queryFn: () => base44.entities.SubstituteReport.list('-created_date', 100),
-  });
-
-  const { data: dailyMessages = [] } = useQuery({
-    queryKey: ['daily-messages'],
-    queryFn: () => base44.entities.DailyMessage.list('-created_date', 5),
-  });
-
-  const createMessage = useMutation({
-    mutationFn: async (content) => {
-      const user = await base44.auth.me();
-      return base44.entities.DailyMessage.create({
-        content,
-        active: true,
-        created_by_name: user.full_name
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['daily-messages'] });
-      toast.success('ההודעה פורסמה בהצלחה');
-      setMessageContent('');
-    },
   });
 
   // Calculate stats
@@ -119,7 +98,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Daily Message Board */}
-      <DailyMessageBoard user={{ email: 'admin' }} />
+      <DailyMessageBoard user={user} />
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -288,11 +267,11 @@ export default function AdminDashboard() {
             פגישה חדשה
           </button>
         </div>
-        <MeetingsList user={{ email: users[0]?.email || 'admin@school.local', full_name: 'מנהלת' }} />
+        <MeetingsList user={user} />
       </div>
 
       {showAddMeeting && (
-        <AddMeeting user={{ email: users[0]?.email || 'admin@school.local', full_name: 'מנהלת' }} onClose={() => setShowAddMeeting(false)} />
+        <AddMeeting user={user} onClose={() => setShowAddMeeting(false)} />
       )}
     </div>
   );

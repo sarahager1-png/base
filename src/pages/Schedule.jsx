@@ -4,6 +4,9 @@ import { base44 } from '@/api/base44Client';
 import { CalendarDays, Plus, MapPin, Calendar, Clock } from 'lucide-react';
 
 const WEEK_DAYS = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
+const _today = new Date();
+const FIRST_DAY_OF_MONTH = new Date(_today.getFullYear(), _today.getMonth(), 1).getDay();
+const DAYS_IN_MONTH = new Date(_today.getFullYear(), _today.getMonth() + 1, 0).getDate();
 
 export default function Schedule() {
   const [user, setUser] = useState(null);
@@ -235,11 +238,11 @@ export default function Schedule() {
                 </div>
               ))}
               
-              {Array.from({length: 4}).map((_, i) => (
+              {Array.from({length: FIRST_DAY_OF_MONTH}).map((_, i) => (
                 <div key={`empty-${i}`} className="bg-white min-h-[100px]" />
               ))}
 
-              {Array.from({length: 31}).map((_, i) => {
+              {Array.from({length: DAYS_IN_MONTH}).map((_, i) => {
                 const day = i + 1;
                 const dayEvents = getEventsForDay(day);
                 const isSelected = selectedDate === day;
@@ -271,7 +274,7 @@ export default function Schedule() {
           <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-0 flex flex-col overflow-hidden">
             <div className="bg-blue-600 p-6 text-white">
               <h3 className="text-3xl font-bold mb-1">{selectedDate}</h3>
-              <p className="opacity-90 text-lg">בינואר</p>
+              <p className="opacity-90 text-lg">{new Date().toLocaleDateString('he-IL', { month: 'long' })}</p>
               <div className="mt-4 flex items-center gap-2 text-blue-100 text-sm">
                 <MapPin className="h-4 w-4" />
                 <span>בית הספר "בינה מנהיגותית"</span>

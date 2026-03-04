@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Users, Upload, FileText, Calendar, Table, UserPlus, Mail, CheckCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function HRDashboard() {
   const [inviteEmail, setInviteEmail] = useState('');
@@ -29,6 +30,9 @@ export default function HRDashboard() {
       setInviteTitle('');
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
+    },
+    onError: (error) => {
+      toast.error(`שגיאה בשליחת ההזמנה: ${error?.message || 'נסה שוב'}`);
     },
   });
 

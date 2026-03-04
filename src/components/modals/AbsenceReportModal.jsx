@@ -42,6 +42,9 @@ export default function AbsenceReportModal({ isOpen, onClose, user }) {
     mutationFn: async (data) => base44.entities.Absence.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['absences'] });
+      queryClient.invalidateQueries({ queryKey: ['myAbsences', user.email] });
+      queryClient.invalidateQueries({ queryKey: ['choiceDays', user.email] });
+      queryClient.invalidateQueries({ queryKey: ['declarationDays', user.email] });
       onClose();
       resetForm();
     },

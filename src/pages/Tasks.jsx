@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { CheckSquare, Clock, FileText, ShoppingCart, UserCheck } from 'lucide-react';
+import { getStatusBadgeClass } from '@/lib/utils';
 
 export default function TasksPage() {
   const { data: user } = useQuery({
@@ -46,6 +47,14 @@ export default function TasksPage() {
   });
 
   const isManager = user && ['admin', 'vice_principal'].includes(user.role);
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
@@ -109,13 +118,8 @@ export default function TasksPage() {
                       <p className="font-bold text-slate-800">{absence.start_date} - {absence.end_date}</p>
                       <p className="text-sm text-slate-500">סיבה: {absence.absence_reason}</p>
                     </div>
-                    <div className={`px-3 py-1 rounded-full text-xs font-bold ${
-                      absence.status === 'approved' ? 'bg-green-100 text-green-700' :
-                      absence.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                      'bg-amber-100 text-amber-700'
-                    }`}>
-                      {absence.status === 'approved' ? 'מאושר' :
-                       absence.status === 'rejected' ? 'נדחה' : 'ממתין'}
+                    <div className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusBadgeClass(absence.status).badgeClass}`}>
+                      {getStatusBadgeClass(absence.status).label}
                     </div>
                   </div>
                 ))
@@ -172,13 +176,8 @@ export default function TasksPage() {
                         <p className="font-bold text-slate-800">{doc.document_type}</p>
                         <p className="text-sm text-slate-500">הועלה: {new Date(doc.created_date).toLocaleDateString('he-IL')}</p>
                       </div>
-                      <div className={`px-3 py-1 rounded-full text-xs font-bold ${
-                        doc.status === 'approved' ? 'bg-green-100 text-green-700' :
-                        doc.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                        'bg-amber-100 text-amber-700'
-                      }`}>
-                        {doc.status === 'approved' ? 'מאושר' :
-                         doc.status === 'rejected' ? 'נדחה' : 'ממתין'}
+                      <div className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusBadgeClass(doc.status).badgeClass}`}>
+                        {getStatusBadgeClass(doc.status).label}
                       </div>
                     </div>
                   ))

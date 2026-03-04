@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Bell, X, Check, AlertTriangle, Clock } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { he } from 'date-fns/locale';
+import { timeAgo } from '@/lib/utils';
 
 export default function NotificationBell({ userEmail }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,8 +18,19 @@ export default function NotificationBell({ userEmail }) {
 
   const markAsRead = useMutation({
     mutationFn: (id) => base44.entities.Notification.update(id, { read: true }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['notifications', userEmail] });
+      const prev = queryClient.getQueryData(['notifications', userEmail]);
+      queryClient.setQueryData(['notifications', userEmail], (old = []) =>
+        old.map(n => n.id === id ? { ...n, read: true } : n)
+      );
+      return { prev };
+    },
+    onError: (_, __, ctx) => {
+      queryClient.setQueryData(['notifications', userEmail], ctx?.prev);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications', userEmail] });
     },
   });
 
@@ -31,8 +41,19 @@ export default function NotificationBell({ userEmail }) {
         await base44.entities.Notification.update(notif.id, { read: true });
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['notifications', userEmail] });
+      const prev = queryClient.getQueryData(['notifications', userEmail]);
+      queryClient.setQueryData(['notifications', userEmail], (old = []) =>
+        old.map(n => ({ ...n, read: true }))
+      );
+      return { prev };
+    },
+    onError: (_, __, ctx) => {
+      queryClient.setQueryData(['notifications', userEmail], ctx?.prev);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications', userEmail] });
     },
   });
 
@@ -135,7 +156,7 @@ export default function NotificationBell({ userEmail }) {
                           </div>
                           <p className="text-xs text-slate-600 mt-1">{notif.message}</p>
                           <p className="text-xs text-slate-400 mt-2">
-                            {formatDistanceToNow(new Date(notif.created_date), { addSuffix: true, locale: he })}
+                            {timeAgo(notif.created_date)}
                           </p>
                         </div>
                       </div>

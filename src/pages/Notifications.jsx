@@ -4,11 +4,15 @@ import { base44 } from '@/api/base44Client';
 import { Bell, Check, Trash2, Filter, AlertTriangle, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { timeAgo } from '@/lib/utils';
+
+const PAGE_SIZE = 25;
 
 export default function NotificationsPage() {
   const [typeFilter, setTypeFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [showUnread, setShowUnread] = useState(false);
+  const [limit, setLimit] = useState(PAGE_SIZE);
 
   const queryClient = useQueryClient();
 
@@ -18,15 +22,26 @@ export default function NotificationsPage() {
   });
 
   const { data: notifications = [] } = useQuery({
-    queryKey: ['notifications', user?.email],
-    queryFn: () => base44.entities.Notification.filter({ user_email: user.email }, '-created_date'),
+    queryKey: ['notifications', user?.email, limit],
+    queryFn: () => base44.entities.Notification.filter({ user_email: user.email }, '-created_date', limit),
     enabled: !!user,
   });
 
   const markAsRead = useMutation({
     mutationFn: (id) => base44.entities.Notification.update(id, { read: true }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['notifications', user?.email] });
+      const prev = queryClient.getQueryData(['notifications', user?.email, limit]);
+      queryClient.setQueryData(['notifications', user?.email, limit], (old = []) =>
+        old.map(n => n.id === id ? { ...n, read: true } : n)
+      );
+      return { prev };
+    },
+    onError: (_, __, ctx) => {
+      queryClient.setQueryData(['notifications', user?.email, limit], ctx?.prev);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications', user?.email] });
     },
   });
 
@@ -37,19 +52,49 @@ export default function NotificationsPage() {
         await base44.entities.Notification.update(notif.id, { read: true });
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['notifications', user?.email] });
+      const prev = queryClient.getQueryData(['notifications', user?.email, limit]);
+      queryClient.setQueryData(['notifications', user?.email, limit], (old = []) =>
+        old.map(n => ({ ...n, read: true }))
+      );
+      return { prev };
+    },
+    onError: (_, __, ctx) => {
+      queryClient.setQueryData(['notifications', user?.email, limit], ctx?.prev);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications', user?.email] });
       toast.success('כל ההתראות סומנו כנקראו');
     },
   });
 
   const deleteNotification = useMutation({
     mutationFn: (id) => base44.entities.Notification.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['notifications', user?.email] });
+      const prev = queryClient.getQueryData(['notifications', user?.email, limit]);
+      queryClient.setQueryData(['notifications', user?.email, limit], (old = []) =>
+        old.filter(n => n.id !== id)
+      );
+      return { prev };
+    },
+    onError: (_, __, ctx) => {
+      queryClient.setQueryData(['notifications', user?.email, limit], ctx?.prev);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications', user?.email] });
       toast.success('ההתראה נמחקה');
     },
   });
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800"></div>
+      </div>
+    );
+  }
 
   const filteredNotifications = notifications.filter(n => {
     const typeMatch = typeFilter === 'all' || n.type === typeFilter;
@@ -188,7 +233,7 @@ export default function NotificationsPage() {
                         <div className="flex items-center gap-3 text-xs text-slate-400">
                           <span>{typeLabels[notif.type]}</span>
                           <span>•</span>
-                          <span>{formatDistanceToNow(new Date(notif.created_date), { addSuffix: true, locale: he })}</span>
+                          <span>{timeAgo(notif.created_date)}</span>
                         </div>
                         
                         <div className="flex items-center gap-2">
@@ -230,6 +275,17 @@ export default function NotificationsPage() {
             </div>
           )}
         </div>
+
+        {notifications.length === limit && (
+          <div className="text-center mt-6">
+            <button
+              onClick={() => setLimit(l => l + PAGE_SIZE)}
+              className="px-6 py-2 bg-white border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 text-sm font-medium transition-colors"
+            >
+              טען עוד
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

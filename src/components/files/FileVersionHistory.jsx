@@ -2,8 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Clock, Download } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { he } from 'date-fns/locale';
+import { timeAgo } from '@/lib/utils';
 
 export default function FileVersionHistory({ fileId }) {
   const { data: versions = [] } = useQuery({
@@ -48,7 +47,7 @@ export default function FileVersionHistory({ fileId }) {
               </div>
               <p className="text-xs text-slate-500 flex items-center gap-1 mt-1">
                 <Clock className="h-3 w-3" />
-                {formatDistanceToNow(new Date(version.created_date), { addSuffix: true, locale: he })}
+                {timeAgo(version.created_date)}
               </p>
             </div>
 

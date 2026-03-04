@@ -5,8 +5,7 @@ import FileSearch from './FileSearch';
 import FilePreview from './FilePreview';
 import FileVersionHistory from './FileVersionHistory';
 import { File, FileText, Image as ImageIcon, Video, Sheet } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { he } from 'date-fns/locale';
+import { timeAgo } from '@/lib/utils';
 
 export default function FileManager({ userEmail = null, category = null }) {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -116,7 +115,7 @@ export default function FileManager({ userEmail = null, category = null }) {
                           {(file.file_size / 1024).toFixed(0)} KB
                         </span>
                         <span className="text-xs text-slate-400">
-                          {formatDistanceToNow(new Date(file.created_date), { locale: he })}
+                          {timeAgo(file.created_date)}
                         </span>
                       </div>
                     </div>
