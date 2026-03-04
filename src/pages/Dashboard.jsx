@@ -180,7 +180,7 @@ function DashboardInner() {
 
         {/* Navigation Bar */}
         <div className="bg-slate-900/95 backdrop-blur-md max-w-full">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex justify-between items-center">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <button onClick={() => setSidebarOpen(true)}
                     className="p-2 rounded-lg hover:bg-white/10 lg:hidden text-slate-400 hover:text-white transition-colors">
