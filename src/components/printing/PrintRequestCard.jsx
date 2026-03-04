@@ -5,11 +5,23 @@ import { Button } from '@/components/ui/button';
 function handlePrint(fileUrl) {
   const win = window.open(fileUrl, '_blank');
   if (win) {
-    win.onload = () => {
+    setTimeout(() => {
       win.focus();
       win.print();
-    };
+    }, 500);
   }
+}
+
+function PrintButton({ fileUrl, className = 'hover:bg-slate-100 text-slate-500', title = 'הדפס' }) {
+  return (
+    <button
+      onClick={() => handlePrint(fileUrl)}
+      className={`p-2 rounded-lg transition-colors ${className}`}
+      title={title}
+    >
+      <Printer className="h-4 w-4" />
+    </button>
+  );
 }
 
 function PaperSizeBadge({ paperSize }) {
@@ -50,13 +62,7 @@ export function AdminRequestCard({ request, onApprove }) {
             className="p-2 hover:bg-blue-100 rounded-lg text-blue-600" title="הורד PDF">
             <Download className="h-4 w-4" />
           </a>
-          <button
-            onClick={() => handlePrint(request.file_url)}
-            className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors"
-            title="תצוגה מקדימה להדפסה"
-          >
-            <Printer className="h-4 w-4" />
-          </button>
+          <PrintButton fileUrl={request.file_url} title="תצוגה מקדימה להדפסה" />
           <Button size="sm" onClick={() => onApprove(request.id)} className="bg-green-600 hover:bg-green-700">
             <Check className="h-4 w-4 mr-1" />אשר
           </Button>
@@ -95,13 +101,7 @@ export function SecretaryRequestCard({ request, isSelected, onToggle }) {
             className="p-2 hover:bg-blue-100 rounded-lg text-blue-600" title="הורד PDF">
             <Download className="h-4 w-4" />
           </a>
-          <button
-            onClick={() => handlePrint(request.file_url)}
-            className="p-2 hover:bg-green-100 rounded-lg text-green-700 transition-colors"
-            title="הדפס ישירות"
-          >
-            <Printer className="h-4 w-4" />
-          </button>
+          <PrintButton fileUrl={request.file_url} className="hover:bg-green-100 text-green-700" title="הדפס ישירות" />
         </div>
       </div>
     </div>
@@ -116,9 +116,6 @@ export function TeacherRequestCard({ request }) {
     completed: { bg: 'bg-slate-50 border-slate-200', badge: 'bg-slate-100 text-slate-700', label: 'הושלם' },
   };
   const { bg, badge, label } = statusConfig[request.status] || statusConfig.completed;
-  const paperLabel = request.paper_size === 'special' ? 'גודל מיוחד' : request.paper_size === 'A3' ? 'A3' : 'A4';
-  const paperCls = request.paper_size === 'special' ? 'bg-amber-100 text-amber-700' : request.paper_size === 'A3' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600';
-
   return (
     <div className={`p-4 rounded-xl border ${bg}`}>
       <div className="flex items-center gap-2 mb-2">
@@ -130,7 +127,7 @@ export function TeacherRequestCard({ request }) {
         <span>📚 {request.subject}</span>
         <span>🏫 {request.class_name}</span>
         <span>📄 {request.total_pages} דפים</span>
-        <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${paperCls}`}>{paperLabel}</span>
+        <PaperSizeBadge paperSize={request.paper_size} />
         {request.color_mode === 'color' && (
           <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-purple-100 text-purple-700">🎨 צבעוני</span>
         )}
