@@ -280,7 +280,7 @@ export default function Schedule() {
               </div>
             </div>
             
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
               <div>
                 <h4 className="font-bold text-slate-800 mb-3 flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-blue-500" />

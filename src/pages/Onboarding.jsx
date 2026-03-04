@@ -101,7 +101,7 @@ export default function OnboardingPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100">
-          <div className="p-6 border-b border-slate-100">
+          <div className="p-4 md:p-6 border-b border-slate-100">
             <h2 className="text-xl font-bold text-blue-900 flex items-center gap-2">
               <FileText className="h-5 w-5 text-purple-500" />
               מסמכים

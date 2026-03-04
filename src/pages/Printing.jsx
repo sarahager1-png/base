@@ -86,13 +86,13 @@ export default function PrintingPage() {
 
         {isAdmin && pendingRequests.length > 0 && (
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 mb-6">
-            <div className="p-6 border-b border-slate-100">
+            <div className="p-4 md:p-6 border-b border-slate-100">
               <h2 className="text-xl font-bold text-blue-900 flex items-center gap-2">
                 <AlertCircle className="h-5 w-5 text-amber-500" />
                 בקשות ממתינות לאישור
               </h2>
             </div>
-            <div className="p-6 space-y-3">
+            <div className="p-4 md:p-6 space-y-3">
               {pendingRequests.map(r => (
                 <AdminRequestCard key={r.id} request={r} onApprove={(id) => approveMutation.mutate(id)} />
               ))}
@@ -102,7 +102,7 @@ export default function PrintingPage() {
 
         {isSecretary && approvedRequests.length > 0 && (
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 mb-6">
-            <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+            <div className="p-4 md:p-6 border-b border-slate-100 flex justify-between items-center">
               <h2 className="text-xl font-bold text-blue-900 flex items-center gap-2">
                 <Printer className="h-5 w-5 text-green-500" />
                 מאושר להדפסה ({approvedRequests.length})
@@ -120,7 +120,7 @@ export default function PrintingPage() {
                 </div>
               )}
             </div>
-            <div className="p-6 space-y-3">
+            <div className="p-4 md:p-6 space-y-3">
               {approvedRequests.map(r => (
                 <SecretaryRequestCard key={r.id} request={r}
                   isSelected={selectedRequests.includes(r.id)} onToggle={() => toggleSelection(r.id)} />
@@ -131,10 +131,10 @@ export default function PrintingPage() {
 
         {isTeacher && (
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100">
-            <div className="p-6 border-b border-slate-100">
+            <div className="p-4 md:p-6 border-b border-slate-100">
               <h2 className="text-xl font-bold text-blue-900">הבקשות שלי</h2>
             </div>
-            <div className="p-6 space-y-3">
+            <div className="p-4 md:p-6 space-y-3">
               {myPrintRequests.length > 0
                 ? myPrintRequests.map(r => <TeacherRequestCard key={r.id} request={r} />)
                 : <p className="text-slate-400 text-center py-12">אין בקשות הדפסה</p>}

@@ -15,26 +15,26 @@ export default function PageHeader({ icon: Icon, iconColor = '#6366f1', iconColo
 
   return (
     <div
-      className="rounded-2xl px-6 py-5 mb-6 flex items-center justify-between gap-4 shadow-lg"
+      className="rounded-2xl px-4 py-3.5 md:px-6 md:py-5 mb-4 md:mb-6 flex flex-wrap items-center justify-between gap-3 shadow-lg"
       style={{
         background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
       }}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         {Icon && (
           <div
-            className="h-12 w-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg"
+            className="h-10 w-10 md:h-12 md:w-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg"
             style={{
               background: `linear-gradient(135deg, ${iconColor}, ${to})`,
               boxShadow: `0 4px 18px ${iconColor}55`,
             }}
           >
-            <Icon className="h-6 w-6 text-white" />
+            <Icon className="h-5 w-5 md:h-6 md:w-6 text-white" />
           </div>
         )}
         <div>
-          <h1 className="text-xl font-bold text-white leading-tight">{title}</h1>
-          {subtitle && <p className="text-slate-400 text-sm mt-0.5">{subtitle}</p>}
+          <h1 className="text-lg md:text-xl font-bold text-white leading-tight">{title}</h1>
+          {subtitle && <p className="text-slate-400 text-xs md:text-sm mt-0.5 leading-snug">{subtitle}</p>}
         </div>
       </div>
       {actions && (

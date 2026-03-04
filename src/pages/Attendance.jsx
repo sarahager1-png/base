@@ -86,7 +86,7 @@ export default function AttendancePage() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in" dir="rtl">
+    <div className="space-y-4 md:space-y-6 animate-fade-in" dir="rtl">
       <PageHeader
         icon={Clock}
         iconColor="#ef4444"
@@ -242,7 +242,7 @@ export default function AttendancePage() {
 
       {activeTab === 'absences' && (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200">
-          <div className="p-6 border-b border-slate-100">
+          <div className="p-4 md:p-6 border-b border-slate-100">
             <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
               <div className="p-2 bg-blue-50 rounded-xl border border-blue-100">
                 <Calendar className="h-4 w-4 text-blue-600" />
@@ -298,7 +298,7 @@ export default function AttendancePage() {
 
       {activeTab === 'substitutes' && (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200">
-          <div className="p-6 border-b border-slate-100">
+          <div className="p-4 md:p-6 border-b border-slate-100">
             <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
               <div className="p-2 bg-purple-50 rounded-xl border border-purple-100">
                 <Users className="h-4 w-4 text-purple-600" />
@@ -359,7 +359,7 @@ export default function AttendancePage() {
 
       {activeTab === 'statistics' && (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200">
-          <div className="p-6 border-b border-slate-100">
+          <div className="p-4 md:p-6 border-b border-slate-100">
             <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
               <div className="p-2 bg-blue-50 rounded-xl border border-blue-100">
                 <FileText className="h-4 w-4 text-blue-600" />

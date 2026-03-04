@@ -91,7 +91,7 @@ export default function MaintenancePage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100">
-            <div className="p-6 border-b border-slate-100">
+            <div className="p-4 md:p-6 border-b border-slate-100">
               <h2 className="text-xl font-bold text-blue-900 flex items-center gap-2">
                 <Wrench className="h-5 w-5 text-slate-500" />
                 קריאות תחזוקה
@@ -144,7 +144,7 @@ export default function MaintenancePage() {
           </div>
 
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100">
-            <div className="p-6 border-b border-slate-100">
+            <div className="p-4 md:p-6 border-b border-slate-100">
               <h2 className="text-xl font-bold text-blue-900 flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-green-500" />
                 בקשות רכש

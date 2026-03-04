@@ -189,7 +189,7 @@ export default function JournalManagementPage() {
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4">
                 <div>
                   <label className="text-xs font-bold text-slate-600 block mb-2">תאריך</label>
                   <Input
@@ -262,7 +262,7 @@ export default function JournalManagementPage() {
 
         {/* Entries Table */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-          <div className="p-6 border-b border-slate-100">
+          <div className="p-4 md:p-6 border-b border-slate-100">
             <h2 className="text-xl font-bold text-blue-900 flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-blue-500" />
               רשומות ביומן ({filteredEntries.length})
