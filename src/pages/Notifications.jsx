@@ -5,6 +5,7 @@ import { Bell, Check, Trash2, Filter, AlertTriangle, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { timeAgo } from '@/lib/utils';
+import { useAuth } from '@/lib/AuthContext';
 
 const PAGE_SIZE = 25;
 
@@ -16,10 +17,7 @@ export default function NotificationsPage() {
 
   const queryClient = useQueryClient();
 
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me(),
-  });
+  const { user } = useAuth();
 
   const { data: notifications = [] } = useQuery({
     queryKey: ['notifications', user?.email, limit],

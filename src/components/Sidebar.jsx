@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import {
   Home, Calendar, CheckSquare, Clock, Users, UserPlus,
-  Printer, Settings, Heart, LogOut, X, Bell, ChevronRight, Sparkles, HelpCircle, BarChart2
+  Printer, Settings, Heart, LogOut, X, Bell, ChevronRight, Sparkles, HelpCircle, BarChart2,
+  Sun, Moon, Monitor, UserCircle, FolderOpen, Shield
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useAccessibility } from '@/lib/AccessibilityContext';
+import { useTheme } from '@/lib/ThemeContext';
 
 const NAV_COLORS = {
   dashboard:          { from: '#0d9488', to: '#22c55e' },
@@ -22,12 +24,22 @@ const NAV_COLORS = {
   'room-management':  { from: '#84cc16', to: '#65a30d' },
   community:          { from: '#f43f5e', to: '#e11d48' },
   analytics:          { from: '#06b6d4', to: '#0891b2' },
+  'file-management':  { from: '#3b82f6', to: '#1d4ed8' },
   help:               { from: '#64748b', to: '#475569' },
+  profile:            { from: '#0d9488', to: '#22c55e' },
+  'dev-admin':        { from: '#7c3aed', to: '#4f46e5' },
 };
 
 export default function Sidebar({ activeView, setView, user, isOpen, closeSidebar, onLogout, onUserGenderChange }) {
   const [savingGender, setSavingGender] = useState(false);
   const { gTitle } = useAccessibility();
+  const { theme, setTheme } = useTheme();
+
+  const THEME_OPTIONS = [
+    { key: 'light', icon: Sun,     label: 'בהיר' },
+    { key: 'system', icon: Monitor, label: 'מערכת' },
+    { key: 'dark',  icon: Moon,    label: 'כהה' },
+  ];
 
   const handleGenderToggle = async () => {
     if (!user?.id) return;
@@ -50,13 +62,16 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
     { id: 'attendance',          label: 'היעדרויות ודיווח', icon: Clock,      roles: ['teacher', 'admin', 'vice_principal', 'secretary', 'assistant', 'substitute', 'counselor', 'coordinator'] },
     { id: 'hr',                  label: 'ניהול צוות',       icon: Users,      roles: ['admin', 'vice_principal', 'secretary'] },
     { id: 'onboarding',          label: 'טפסי קליטה',       icon: UserPlus,   roles: ['substitute', 'admin', 'vice_principal'] },
-    { id: 'printing',            label: 'מרכז צילומים',     icon: Printer,    roles: ['secretary', 'teacher', 'assistant', 'vice_principal', 'counselor', 'coordinator'] },
+    { id: 'printing',            label: 'מרכז צילומים',     icon: Printer,    roles: ['admin', 'vice_principal', 'secretary', 'teacher', 'assistant', 'counselor', 'coordinator'] },
     { id: 'maintenance',         label: 'תפעול ורכש',       icon: Settings,   roles: ['admin', 'vice_principal', 'secretary', 'maintenance', 'teacher', 'counselor', 'coordinator'] },
     { id: 'duty-management',     label: 'ניהול תורנויות',   icon: Settings,   roles: ['admin', 'vice_principal', 'coordinator'] },
     { id: 'room-management',     label: 'ניהול חדרים',      icon: Home,       roles: ['all'] },
     { id: 'community',           label: 'קהילה והווי',      icon: Heart,      roles: ['all'] },
     { id: 'analytics',           label: 'אנליטיקס ותובנות', icon: BarChart2,  roles: ['admin', 'vice_principal'] },
+    { id: 'file-management',     label: 'ניהול קבצים',       icon: FolderOpen, roles: ['all'] },
     { id: 'help',                label: 'מרכז עזרה',         icon: HelpCircle, roles: ['all'] },
+    { id: 'profile',             label: 'הפרופיל שלי',       icon: UserCircle, roles: ['all'] },
+    { id: 'dev-admin',           label: 'פאנל מפתח',          icon: Shield,     roles: ['admin'] },
   ];
 
   const filtered = menuItems.filter(item =>
@@ -84,7 +99,7 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
       {/* Logo / Brand */}
       <div className="px-5 pt-6 pb-5 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <img src="/logo.svg" alt="SMART BASE" className="h-10 w-10 drop-shadow-md" />
+          <img src="/icon.jpeg" alt="SMART BASE" className="h-10 w-10 rounded-xl drop-shadow-md object-cover" />
           <div>
             <p className="text-white font-bold text-sm leading-tight tracking-wide">SMART BASE</p>
             <p className="text-slate-400 text-[10px] leading-tight">מערכת ניהול חכמה</p>
@@ -134,7 +149,7 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
           <div className="px-3 py-2.5 rounded-xl bg-white/5 space-y-2">
             <div className="flex items-center gap-3">
               <div className="h-8 w-8 rounded-lg flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
-                   style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
+                   style={{ background: 'linear-gradient(135deg, #0d9488, #22c55e)' }}>
                 {user.avatar || user.full_name?.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
@@ -150,9 +165,9 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
                 disabled={savingGender}
                 className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold transition-all disabled:opacity-50"
                 style={{
-                  background: user.gender === 'male' ? 'rgba(99,102,241,0.3)' : 'rgba(236,72,153,0.3)',
-                  color: user.gender === 'male' ? '#a5b4fc' : '#f9a8d4',
-                  border: `1px solid ${user.gender === 'male' ? 'rgba(99,102,241,0.4)' : 'rgba(236,72,153,0.4)'}`,
+                  background: user.gender === 'male' ? 'rgba(13,148,136,0.3)' : 'rgba(236,72,153,0.3)',
+                  color: user.gender === 'male' ? '#5eead4' : '#f9a8d4',
+                  border: `1px solid ${user.gender === 'male' ? 'rgba(13,148,136,0.4)' : 'rgba(236,72,153,0.4)'}`,
                 }}
                 title="לחצו לשינוי מגדר"
               >
@@ -162,6 +177,25 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
             </div>
           </div>
         )}
+        {/* Theme selector */}
+        <div className="flex items-center gap-1 px-1 py-1 rounded-xl bg-white/5">
+          {THEME_OPTIONS.map(({ key, icon: Icon, label }) => (
+            <button
+              key={key}
+              onClick={() => setTheme(key)}
+              title={label}
+              className={`flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg transition-all duration-200 text-[10px] font-medium ${
+                theme === key
+                  ? 'bg-white/15 text-white shadow-sm'
+                  : 'text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              <Icon className="h-3.5 w-3.5" />
+              <span className="hidden xl:inline">{label}</span>
+            </button>
+          ))}
+        </div>
+
         <button
           onClick={onLogout}
           className="flex items-center gap-3 px-3 py-2.5 rounded-xl w-full transition-all duration-200 text-slate-400 hover:text-red-400 hover:bg-red-500/10 group"

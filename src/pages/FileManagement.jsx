@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import FileManager from '../components/files/FileManager';
 import FileUploadWidget from '../components/files/FileUploadWidget';
 import { Files, Upload } from 'lucide-react';
 
 export default function FileManagementPage() {
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('browse');
   const [selectedCategory, setSelectedCategory] = useState(null);
-
-  React.useEffect(() => {
-    base44.auth.me().then(setUser);
-  }, []);
 
   if (!user) return <div className="flex items-center justify-center h-screen">טוען...</div>;
 

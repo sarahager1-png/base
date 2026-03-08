@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Clock, Calendar, CheckCircle, XCircle, AlertCircle, Users, FileText } from 'lucide-react';
+import { Clock, Calendar, CheckCircle, XCircle, AlertCircle, Users, FileText, Download } from 'lucide-react';
+import { useAuth } from '@/lib/AuthContext';
 
 export default function AttendancePage() {
   const [activeTab, setActiveTab] = useState('absences');
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me(),
-  });
+  const { user } = useAuth();
 
   const { data: allAbsences = [] } = useQuery({
     queryKey: ['absences'],
@@ -56,6 +54,28 @@ export default function AttendancePage() {
   const displayAbsences = isManager ? allAbsences : myAbsences;
   const displaySubstitutes = isManager ? allSubstitutes : mySubstitutes;
 
+  const exportAbsencesToCSV = () => {
+    const headers = ['שם', 'סיבה', 'תאריך התחלה', 'תאריך סיום', 'סטטוס', 'ממלאת מקום'];
+    const reasonLabelsLocal = { sick_child: 'ילד חולה', choice_day: 'יום בחירה', declaration_days: 'יום הצהרה', other: 'אחר' };
+    const statusLabelsLocal = { pending: 'ממתין', approved: 'מאושר', rejected: 'נדחה', awaiting_certificate: 'ממתין לאישור' };
+    const rows = displayAbsences.map(a => [
+      a.user_name || '',
+      reasonLabelsLocal[a.absence_reason] || a.absence_reason || '',
+      a.start_date || '',
+      a.end_date || '',
+      statusLabelsLocal[a.status] || a.status || '',
+      a.substitute_teacher_name || '',
+    ]);
+    const csvContent = '\uFEFF' + [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `היעדרויות_${new Date().toLocaleDateString('he-IL')}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const absenceStatusConfig = {
     pending: { icon: Clock, badgeClass: 'bg-amber-100 text-amber-700', iconClass: 'text-amber-600', labelClass: 'text-amber-700', label: 'ממתין' },
     approved: { icon: CheckCircle, badgeClass: 'bg-green-100 text-green-700', iconClass: 'text-green-600', labelClass: 'text-green-700', label: 'מאושר' },
@@ -86,11 +106,22 @@ export default function AttendancePage() {
 
   return (
     <div className="space-y-6 animate-fade-in" dir="rtl">
-      <div className="mb-8">
-        <h1 className="text-xl md:text-2xl font-bold text-slate-800 mb-2">היעדרויות ודיווח</h1>
-        <p className="text-slate-600 text-sm">
-          {isManager ? 'צפייה וניהול כל דיווחי ההיעדרות ומילויי המקום' : 'דיווחי ההיעדרות ומילויי המקום שלי'}
-        </p>
+      <div className="mb-8 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl md:text-2xl font-bold text-slate-800 mb-2">היעדרויות ודיווח</h1>
+          <p className="text-slate-600 text-sm">
+            {isManager ? 'צפייה וניהול כל דיווחי ההיעדרות ומילויי המקום' : 'דיווחי ההיעדרות ומילויי המקום שלי'}
+          </p>
+        </div>
+        {isManager && (
+          <button
+            onClick={exportAbsencesToCSV}
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl font-bold text-sm hover:bg-green-700 shadow-sm whitespace-nowrap"
+          >
+            <Download className="h-4 w-4" />
+            ייצוא CSV
+          </button>
+        )}
       </div>
 
       {/* Tabs */}

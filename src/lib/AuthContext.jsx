@@ -18,6 +18,16 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const checkAppState = async () => {
+    // If service API key is set, skip auth entirely
+    const apiKey = import.meta.env.VITE_BASE44_API_KEY;
+    if (apiKey) {
+      setUser({ email: 'admin@app', full_name: 'מנהל ראשי', role: 'admin' });
+      setIsAuthenticated(true);
+      setIsLoadingAuth(false);
+      setIsLoadingPublicSettings(false);
+      return;
+    }
+
     try {
       setIsLoadingPublicSettings(true);
       setAuthError(null);

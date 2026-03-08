@@ -144,7 +144,7 @@ html, body {
 /* ===================== Section Divider ===================== */
 .section-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.2), rgba(99, 102, 241, 0.35), rgba(99, 102, 241, 0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(13, 148, 136, 0.2), rgba(13, 148, 136, 0.35), rgba(13, 148, 136, 0.2), transparent);
   margin: 1.5rem 0;
   border: none;
 }
@@ -171,33 +171,33 @@ html, body {
 
 /* ===================== Badge Glow ===================== */
 .badge-glow {
-  box-shadow: 0 0 12px rgba(99, 102, 241, 0.35);
+  box-shadow: 0 0 12px rgba(13, 148, 136, 0.35);
 }
 
 /* ===================== Button Gradient Primary ===================== */
 .btn-gradient {
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  background: linear-gradient(135deg, #0d9488, #22c55e);
   color: #ffffff;
   border: none;
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.35);
   transition: box-shadow 0.2s ease, transform 0.15s ease, filter 0.2s ease;
 }
 .btn-gradient:hover {
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+  box-shadow: 0 6px 20px rgba(13, 148, 136, 0.45);
   filter: brightness(1.05);
   transform: translateY(-1px);
 }
 .btn-gradient:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.3);
 }
 
 /* ===================== Input Focus Enhancement ===================== */
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus,
 textarea:focus,
 select:focus {
-  border-color: #6366f1 !important;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
+  border-color: #0d9488 !important;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15) !important;
   outline: none;
 }
 

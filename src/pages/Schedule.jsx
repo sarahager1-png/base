@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { CalendarDays, Plus, MapPin, Calendar, Clock } from 'lucide-react';
 
 const WEEK_DAYS = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
@@ -9,7 +10,7 @@ const FIRST_DAY_OF_MONTH = new Date(_today.getFullYear(), _today.getMonth(), 1).
 const DAYS_IN_MONTH = new Date(_today.getFullYear(), _today.getMonth() + 1, 0).getDate();
 
 export default function Schedule() {
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState(new Date().getDate());
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [newEventData, setNewEventData] = useState({ 
@@ -29,15 +30,6 @@ export default function Schedule() {
     3: { 1: 'הסטוריה - ח׳3', 2: 'הסטוריה - ח׳3', 3: 'חלון', 4: 'פרטני', 5: 'חינוך - ח׳2' },
     4: { 1: 'חלון', 2: 'חלון', 3: 'הסטוריה - ח׳2', 4: 'הסטוריה - ח׳2', 5: 'אזרחות - ט׳1' },
     5: { 1: 'סיכום שבוע - ח׳2', 2: 'פרטני' },
-  };
-
-  useEffect(() => {
-    loadUser();
-  }, []);
-
-  const loadUser = async () => {
-    const currentUser = await base44.auth.me();
-    setUser(currentUser);
   };
 
   const { data: events = [] } = useQuery({

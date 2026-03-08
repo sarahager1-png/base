@@ -1,29 +1,40 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Calendar, Plus, Palmtree, ChevronRight, ChevronLeft } from 'lucide-react';
+import { useAuth } from '@/lib/AuthContext';
+import { Calendar, Plus, Palmtree, ChevronRight, ChevronLeft, BookMarked, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import DailyJournal from '../components/journal/DailyJournal';
 import AddJournalEntry from '../components/journal/AddJournalEntry';
 import AddHoliday from '../components/journal/AddHoliday';
 import { getHebrewDate } from '@/utils/hebrewDate';
 
+const MOE_HOLIDAYS_5786 = [
+  { name: 'ראש השנה תשפ"ו', start_date: '2025-09-22', end_date: '2025-09-24', type: 'holiday' },
+  { name: 'יום כיפור', start_date: '2025-10-01', end_date: '2025-10-02', type: 'holiday' },
+  { name: 'סוכות ושמחת תורה', start_date: '2025-10-06', end_date: '2025-10-14', type: 'holiday' },
+  { name: 'חנוכה', start_date: '2025-12-24', end_date: '2026-01-02', type: 'vacation' },
+  { name: 'טו בשבט', start_date: '2026-02-12', end_date: '2026-02-12', type: 'holiday' },
+  { name: 'פורים', start_date: '2026-03-12', end_date: '2026-03-13', type: 'vacation' },
+  { name: 'פסח', start_date: '2026-04-01', end_date: '2026-04-09', type: 'holiday' },
+  { name: 'חול המועד פסח', start_date: '2026-04-02', end_date: '2026-04-08', type: 'vacation' },
+  { name: 'יום הזיכרון', start_date: '2026-04-21', end_date: '2026-04-21', type: 'holiday' },
+  { name: 'יום העצמאות', start_date: '2026-04-22', end_date: '2026-04-22', type: 'holiday' },
+  { name: 'ל"ג בעומר', start_date: '2026-05-06', end_date: '2026-05-06', type: 'holiday' },
+  { name: 'שבועות', start_date: '2026-05-20', end_date: '2026-05-21', type: 'holiday' },
+  { name: 'חופשת קיץ', start_date: '2026-06-22', end_date: '2026-08-31', type: 'vacation' },
+];
+
 export default function Journal() {
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showAddEntry, setShowAddEntry] = useState(false);
   const [showAddHoliday, setShowAddHoliday] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
-  React.useEffect(() => {
-    loadUser();
-  }, []);
-
-  const loadUser = async () => {
-    const currentUser = await base44.auth.me();
-    setUser(currentUser);
-  };
+  const queryClient = useQueryClient();
 
   const { data: entries = [] } = useQuery({
     queryKey: ['journal', currentMonth, currentYear],
@@ -34,6 +45,36 @@ export default function Journal() {
     queryKey: ['holidays'],
     queryFn: () => base44.entities.Holiday.list(),
   });
+
+  const [loadingMOE, setLoadingMOE] = useState(false);
+  const [showMOEConfirm, setShowMOEConfirm] = useState(false);
+
+  const loadMOEHolidays = async () => {
+    setShowMOEConfirm(false);
+    setLoadingMOE(true);
+    let added = 0;
+    try {
+      for (const h of MOE_HOLIDAYS_5786) {
+        const exists = holidays.some(
+          ex => ex.name === h.name && ex.start_date === h.start_date
+        );
+        if (!exists) {
+          await base44.entities.Holiday.create(h);
+          added++;
+        }
+      }
+      await queryClient.invalidateQueries({ queryKey: ['holidays'] });
+      if (added > 0) {
+        toast.success(`נטענו ${added} חגים וחופשות של משרד החינוך תשפ"ו`);
+      } else {
+        toast.info('כל החגים כבר קיימים במערכת');
+      }
+    } catch (e) {
+      toast.error('שגיאה בטעינת החגים: ' + (e?.message || String(e)));
+    } finally {
+      setLoadingMOE(false);
+    }
+  };
 
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const firstDay = new Date(currentYear, currentMonth, 1).getDay();
@@ -92,15 +133,37 @@ export default function Journal() {
             })()}
           </div>
           {isAdmin && (
-            <div className="flex gap-2">
-              <Button 
+            <div className="flex flex-wrap gap-2">
+              {showMOEConfirm ? (
+                <div className="flex items-center gap-2 bg-purple-50 border border-purple-300 rounded-xl px-3 py-1.5">
+                  <span className="text-xs text-purple-800 font-medium">לטעון חגים רשמיים?</span>
+                  <button onClick={loadMOEHolidays}
+                    className="px-2 py-1 bg-purple-600 text-white text-xs rounded-lg font-bold hover:bg-purple-700">
+                    כן
+                  </button>
+                  <button onClick={() => setShowMOEConfirm(false)}
+                    className="px-2 py-1 bg-white border border-slate-300 text-slate-600 text-xs rounded-lg hover:bg-slate-50">
+                    ביטול
+                  </button>
+                </div>
+              ) : (
+                <Button
+                  onClick={() => setShowMOEConfirm(true)}
+                  disabled={loadingMOE}
+                  className="bg-purple-600 hover:bg-purple-700 text-white text-sm"
+                >
+                  <BookMarked className="h-4 w-4 mr-1" />
+                  {loadingMOE ? 'טוען...' : 'חגי משרד החינוך תשפ"ו'}
+                </Button>
+              )}
+              <Button
                 onClick={() => setShowAddHoliday(true)}
                 className="bg-green-600 hover:bg-green-700"
               >
                 <Palmtree className="h-4 w-4 mr-2" />
                 הוסף חופשה
               </Button>
-              <Button 
+              <Button
                 onClick={() => setShowAddEntry(true)}
                 className="bg-blue-600 hover:bg-blue-700"
               >

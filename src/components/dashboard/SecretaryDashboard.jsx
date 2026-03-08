@@ -5,7 +5,7 @@ import StatCard from '../StatCard';
 import DailyMessageBoard from './DailyMessageBoard';
 import MeetingsList from '../meetings/MeetingsList';
 import AddMeeting from '../meetings/AddMeeting';
-import { Printer, ShoppingCart, FileText, ClipboardCheck, Download, Users, Plus } from 'lucide-react';
+import { Printer, ShoppingCart, FileText, ClipboardCheck, Download, Users, Plus, Wrench, AlertTriangle } from 'lucide-react';
 
 export default function SecretaryDashboard({ user }) {
   const [showAddMeeting, setShowAddMeeting] = useState(false);
@@ -19,6 +19,11 @@ export default function SecretaryDashboard({ user }) {
   const { data: purchases = [] } = useQuery({
     queryKey: ['purchases', 'approved'],
     queryFn: () => base44.entities.PurchaseRequest.filter({ status: 'approved' }),
+  });
+
+  const { data: tickets = [] } = useQuery({
+    queryKey: ['maintenance', 'open'],
+    queryFn: () => base44.entities.MaintenanceTicket.filter({ status: 'open' }),
   });
 
   const completePrint = useMutation({
@@ -62,12 +67,12 @@ export default function SecretaryDashboard({ user }) {
           color="amber" 
           subtext="מאושרים תקציבית" 
         />
-        <StatCard 
-          title="דוחות לעיבוד" 
-          value="0" 
-          icon={FileText} 
-          color="purple" 
-          subtext="הכל מעודכן" 
+        <StatCard
+          title="תקלות פתוחות"
+          value={tickets.length}
+          icon={Wrench}
+          color="red"
+          subtext={tickets.filter(t => t.urgency === 'urgent' || t.urgency === 'safety').length > 0 ? `${tickets.filter(t => t.urgency === 'urgent' || t.urgency === 'safety').length} דחופות` : 'אין דחופות'}
         />
       </div>
 
@@ -149,6 +154,34 @@ export default function SecretaryDashboard({ user }) {
           </div>
         </div>
       </div>
+
+      {/* Maintenance Tickets */}
+      {tickets.length > 0 && (
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+          <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <Wrench className="h-5 w-5 text-red-500" />
+            תקלות פתוחות ({tickets.length})
+          </h3>
+          <div className="space-y-3">
+            {tickets.map(ticket => (
+              <div key={ticket.id} className={`flex items-center justify-between p-3 rounded-xl border ${ticket.urgency === 'urgent' || ticket.urgency === 'safety' ? 'bg-red-50 border-red-200' : 'bg-slate-50 border-slate-200'}`}>
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className={`h-4 w-4 flex-shrink-0 ${ticket.urgency === 'urgent' || ticket.urgency === 'safety' ? 'text-red-500' : 'text-slate-400'}`} />
+                  <div>
+                    <p className="font-semibold text-slate-800 text-sm">{ticket.location} — {ticket.issue}</p>
+                    <p className="text-xs text-slate-500">דיווח: {ticket.reporter_name}</p>
+                  </div>
+                </div>
+                {(ticket.urgency === 'urgent' || ticket.urgency === 'safety') && (
+                  <span className="text-[10px] bg-red-200 text-red-800 px-2 py-0.5 rounded-full font-bold flex-shrink-0">
+                    {ticket.urgency === 'safety' ? 'בטיחות!' : 'דחוף'}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Meetings Schedule */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">

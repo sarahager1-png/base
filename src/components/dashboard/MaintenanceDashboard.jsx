@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import StatCard from '../StatCard';
 import DailyMessageBoard from './DailyMessageBoard';
-import { Wrench, AlertTriangle, CheckSquare } from 'lucide-react';
+import { Wrench, AlertTriangle, CheckSquare, ShoppingCart } from 'lucide-react';
 
 export default function MaintenanceDashboard({ user }) {
   const queryClient = useQueryClient();
@@ -11,6 +11,11 @@ export default function MaintenanceDashboard({ user }) {
   const { data: tickets = [] } = useQuery({
     queryKey: ['maintenance'],
     queryFn: () => base44.entities.MaintenanceTicket.list('-created_date'),
+  });
+
+  const { data: purchases = [] } = useQuery({
+    queryKey: ['purchases', 'pending-maintenance'],
+    queryFn: () => base44.entities.PurchaseRequest.filter({ status: 'pending' }),
   });
 
   const updateTicket = useMutation({
@@ -42,12 +47,12 @@ export default function MaintenanceDashboard({ user }) {
           color="red" 
           subtext={urgentTickets[0]?.issue || 'הכל תקין'} 
         />
-        <StatCard 
-          title="מלאי ציוד" 
-          value="תקין" 
-          icon={CheckSquare} 
-          color="green" 
-          subtext="נבדק לאחרונה: אתמול" 
+        <StatCard
+          title="בקשות רכש"
+          value={purchases.length}
+          icon={ShoppingCart}
+          color="amber"
+          subtext="ממתינות לאישור"
         />
       </div>
 
@@ -123,6 +128,26 @@ export default function MaintenanceDashboard({ user }) {
           )}
         </div>
       </div>
+      {/* Purchase Requests */}
+      {purchases.length > 0 && (
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+          <h3 className="text-xl font-bold text-blue-900 flex items-center gap-2 mb-4">
+            <ShoppingCart className="h-5 w-5 text-amber-500" />
+            בקשות רכש ממתינות ({purchases.length})
+          </h3>
+          <div className="space-y-3">
+            {purchases.map(p => (
+              <div key={p.id} className="flex items-center justify-between p-3 bg-amber-50 rounded-xl border border-amber-200">
+                <div>
+                  <p className="font-semibold text-slate-800 text-sm">{p.item_name}</p>
+                  <p className="text-xs text-slate-500">{p.user_name}{p.estimated_cost ? ` • ₪${p.estimated_cost}` : ''}</p>
+                </div>
+                <span className="text-[10px] bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full font-bold">ממתין</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

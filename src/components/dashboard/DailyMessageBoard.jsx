@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Shield, Megaphone, X, Bell, Edit2 } from 'lucide-react';
+import { Megaphone, X, Bell, Edit2 } from 'lucide-react';
 
 export default function DailyMessageBoard({ user }) {
   const [showMessageModal, setShowMessageModal] = useState(false);
@@ -78,96 +78,59 @@ export default function DailyMessageBoard({ user }) {
 
   return (
     <>
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-900 to-indigo-800 p-8 text-white">
-          <div className="flex justify-between items-start">
-            <div className="flex-1">
-              <div className="w-20 h-20 bg-white/10 rounded-lg flex items-center justify-center border border-white/30 cursor-pointer hover:bg-white/20 transition-colors">
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  className="hidden" 
-                  id="logoUpload"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onload = (event) => {
-                        // TODO: Save logo to storage
-                      };
-                      reader.readAsDataURL(file);
-                    }
-                  }}
-                />
-                <label htmlFor="logoUpload" className="cursor-pointer flex items-center justify-center w-full h-full">
-                  <Shield className="h-8 w-8 text-blue-100" />
-                </label>
-              </div>
-              <p className="text-blue-100 text-xs mt-2">לחץ להעלאת לוגו</p>
+      <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden"
+           style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl" style={{ background: 'linear-gradient(135deg, #3b82f6, #2563eb)' }}>
+              <Megaphone className="h-4 w-4 text-white" />
             </div>
-            <div className="text-right">
-              <p className="text-blue-100 text-sm">ברוך הבא,</p>
-              <p className="text-xl font-bold">{user?.full_name}</p>
-            </div>
+            <span className="font-bold text-slate-700 text-sm">הודעה יומית לצוות</span>
+            {dailyMessage && (
+              <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium border border-blue-100">פעיל</span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {dailyMessage && (
+              <button
+                onClick={() => updateMessageStatus.mutate({ id: dailyMessage.id, active: false })}
+                className="text-xs text-slate-400 hover:text-red-500 transition-colors px-2 py-1 rounded-lg hover:bg-red-50"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+            <button
+              onClick={() => {
+                if (dailyMessage) {
+                  setEditingMessageId(dailyMessage.id);
+                  setMessageText(dailyMessage.content);
+                } else {
+                  setMessageText('');
+                  setEditingMessageId(null);
+                }
+                setShowMessageModal(true);
+              }}
+              className="text-xs font-semibold text-blue-600 hover:text-blue-700 px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors flex items-center gap-1"
+            >
+              {dailyMessage ? <><Edit2 className="h-3 w-3" /> ערוך</> : <><Bell className="h-3 w-3" /> הוסף הודעה</>}
+            </button>
           </div>
         </div>
-        <div className="p-6 bg-blue-50/50 border-b border-blue-100">
-          <div className="flex flex-col md:flex-row items-start gap-4">
-            <div className="p-3 bg-white rounded-full text-blue-600 shadow-sm border border-blue-100">
-              <Megaphone className="h-6 w-6" />
-            </div>
-            <div className="flex-1 w-full">
-              <h3 className="font-bold text-blue-900 text-lg mb-1 flex items-center justify-between w-full">
-                <span>לוח הודעות יומי</span>
-                <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-normal">פעיל באתר</span>
-              </h3>
-              <div 
-                onClick={() => {
-                  if (dailyMessage) {
-                    setEditingMessageId(dailyMessage.id);
-                    setMessageText(dailyMessage.content);
-                  } else {
-                    setMessageText(getGreetingByHour());
-                  }
-                  setShowMessageModal(true);
-                }}
-                className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mt-2 cursor-pointer hover:border-blue-400 hover:shadow-md transition-all"
-              >
-                <p className="text-slate-800 font-serif text-lg leading-relaxed">
-                  {dailyMessage?.content || 'אין הודעה פעילה כרגע'}
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-row md:flex-col gap-2 mt-2 md:mt-0 w-full md:w-auto pointer-events-auto">
-              {dailyMessage && (
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    updateMessageStatus.mutate({ id: dailyMessage.id, active: false });
-                  }}
-                  className="flex-1 md:flex-none text-xs bg-white text-red-600 px-4 py-2 rounded-lg font-bold border border-red-200 hover:bg-red-50 transition-colors flex items-center justify-center gap-1"
-                >
-                  ❌ ביטול
-                </button>
-              )}
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (dailyMessage) {
-                    setEditingMessageId(dailyMessage.id);
-                    setMessageText(dailyMessage.content);
-                  } else {
-                    setMessageText('');
-                    setEditingMessageId(null);
-                  }
-                  setShowMessageModal(true);
-                }}
-                className="flex-1 md:flex-none text-xs bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-sm flex items-center justify-center gap-1"
-              >
-                {dailyMessage ? <><Edit2 className="h-3 w-3" /> ערוך</> : <><Bell className="h-3 w-3" /> הודעה חדשה</>}
-              </button>
-            </div>
-          </div>
+        <div
+          onClick={() => {
+            if (dailyMessage) {
+              setEditingMessageId(dailyMessage.id);
+              setMessageText(dailyMessage.content);
+            } else {
+              setMessageText(getGreetingByHour());
+            }
+            setShowMessageModal(true);
+          }}
+          className="px-5 py-4 cursor-pointer hover:bg-slate-50 transition-colors"
+        >
+          <p className={`text-base leading-relaxed ${dailyMessage ? 'text-slate-700 font-medium' : 'text-slate-400 italic'}`}>
+            {dailyMessage?.content || 'לחץ כאן להוספת הודעה יומית לצוות...'}
+          </p>
         </div>
       </div>
 

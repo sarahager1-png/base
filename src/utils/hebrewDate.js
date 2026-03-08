@@ -1,4 +1,4 @@
-import { HDate, months } from '@hebcal/core';
+import { HDate, months, gematriya } from '@hebcal/core';
 
 const hebrewMonthNames = {
   [months.NISAN]: 'ניסן',
@@ -30,7 +30,7 @@ export function getHebrewDate(date) {
     const hDate = new HDate(date);
     const day = hebrewNumerals[hDate.getDate()] || hDate.getDate();
     const month = hebrewMonthNames[hDate.getMonth()] || '';
-    const year = hDate.getFullYear();
+    const year = gematriya(hDate.getFullYear());
     return { day, month, year, full: `${day} ${month} ${year}` };
   } catch {
     return null;

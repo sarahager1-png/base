@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Printer, AlertCircle, Upload } from 'lucide-react';
+import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { PrintStats } from '@/components/printing/PrintStats';
@@ -12,8 +13,7 @@ export default function PrintingPage() {
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [selectedRequests, setSelectedRequests] = useState([]);
   const queryClient = useQueryClient();
-
-  const { data: user } = useQuery({ queryKey: ['user'], queryFn: () => base44.auth.me() });
+  const { user } = useAuth();
 
   const { data: allPrintRequests = [] } = useQuery({
     queryKey: ['prints'],

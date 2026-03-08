@@ -2,12 +2,10 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Wrench, Monitor, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import { useAuth } from '@/lib/AuthContext';
 
 export default function MaintenancePage() {
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me(),
-  });
+  const { user } = useAuth();
 
   const { data: tickets = [] } = useQuery({
     queryKey: ['maintenance'],

@@ -3,12 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { UserPlus, FileText, CheckCircle, XCircle, Clock, AlertCircle } from 'lucide-react';
 import { getStatusBadgeClass } from '@/lib/utils';
+import { useAuth } from '@/lib/AuthContext';
 
 export default function OnboardingPage() {
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me(),
-  });
+  const { user } = useAuth();
 
   const { data: allDocs = [] } = useQuery({
     queryKey: ['onboarding'],

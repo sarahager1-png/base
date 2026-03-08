@@ -1,0 +1,13 @@
+{
+  "buildCommand": "node node_modules/vite/bin/vite.js build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "build": {
+    "env": {
+      "VITE_BASE44_APP_BASE_URL": "https://app.base44.com",
+      "VITE_BASE44_APP_ID": "69794b7749148839a583cd2b",
+      "VITE_BASE44_API_KEY": "4002c112b24e443bb2433c938c6fcd02"
+    }
+  }
+}

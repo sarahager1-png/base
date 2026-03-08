@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Home, Plus, X, Trash2, Edit2, Calendar, Clock } from 'lucide-react';
+import { useAuth } from '@/lib/AuthContext';
 
 export default function RoomManagementPage() {
   const [showAddRoom, setShowAddRoom] = useState(false);
@@ -30,10 +31,7 @@ export default function RoomManagementPage() {
 
   const queryClient = useQueryClient();
 
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me(),
-  });
+  const { user } = useAuth();
 
   const { data: rooms = [] } = useQuery({
     queryKey: ['rooms'],

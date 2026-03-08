@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Shield, Plus, Calendar, MapPin, Clock, X, Trash2, Edit2, Save } from 'lucide-react';
+import { useAuth } from '@/lib/AuthContext';
+import { Shield, Plus, Calendar, MapPin, Clock, X, Trash2, Edit2, Save, CheckCircle, XCircle, Bell } from 'lucide-react';
 
 export default function DutyManagementPage() {
+  const { user } = useAuth();
   const [showAddSetting, setShowAddSetting] = useState(false);
   const [showScheduler, setShowScheduler] = useState(false);
   const [editingSetting, setEditingSetting] = useState(null);
@@ -79,6 +81,20 @@ export default function DutyManagementPage() {
     },
   });
 
+  const updateAssignmentStatus = useMutation({
+    mutationFn: ({ id, status }) => base44.entities.DutyAssignment.update(id, { status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dutyAssignments'] });
+    },
+  });
+
+  const isManager = user && ['admin', 'vice_principal', 'principal'].includes(user.role);
+
+  // Teacher's own pending duty assignments
+  const myPendingDuties = assignments.filter(a =>
+    a.staff_email === user?.email && (!a.status || a.status === 'pending')
+  );
+
   const handleSubmit = () => {
     if (editingSetting) {
       updateSetting.mutate({ id: editingSetting, data: formData });
@@ -112,6 +128,42 @@ export default function DutyManagementPage() {
           <p className="text-sm text-slate-500">הגדרת תורנויות ושיבוץ צוות</p>
         </div>
       </div>
+
+      {/* Teacher: Pending Duty Approvals */}
+      {myPendingDuties.length > 0 && (
+        <div className="bg-amber-50 border border-amber-300 rounded-2xl p-5">
+          <h3 className="font-bold text-amber-900 flex items-center gap-2 mb-3">
+            <Bell className="h-5 w-5 text-amber-600" />
+            תורנויות הממתינות לאישורך ({myPendingDuties.length})
+          </h3>
+          <div className="space-y-2">
+            {myPendingDuties.map(duty => (
+              <div key={duty.id} className="flex items-center justify-between p-3 bg-white rounded-xl border border-amber-200">
+                <div>
+                  <p className="font-semibold text-slate-800">{duty.duty_type}</p>
+                  <p className="text-sm text-slate-500">{duty.day}/{selectedMonth + 1}/{selectedYear} • {duty.time}</p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => updateAssignmentStatus.mutate({ id: duty.id, status: 'confirmed' })}
+                    className="px-3 py-1.5 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700 flex items-center gap-1"
+                  >
+                    <CheckCircle className="h-4 w-4" />
+                    אישור
+                  </button>
+                  <button
+                    onClick={() => updateAssignmentStatus.mutate({ id: duty.id, status: 'declined' })}
+                    className="px-3 py-1.5 bg-red-100 text-red-700 border border-red-300 rounded-lg text-sm font-bold hover:bg-red-200 flex items-center gap-1"
+                  >
+                    <XCircle className="h-4 w-4" />
+                    דחייה
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Settings Management */}
       <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-4 md:p-6">
@@ -354,15 +406,23 @@ export default function DutyManagementPage() {
                           {isDutyDay ? (
                             assignment ? (
                               <div className="flex items-center justify-center gap-1">
-                                <span className="text-xs font-medium text-green-700 bg-green-100 px-2 py-1 rounded">
+                                <span className={`text-xs font-medium px-2 py-1 rounded ${
+                                  assignment.status === 'confirmed' ? 'bg-green-100 text-green-700' :
+                                  assignment.status === 'declined' ? 'bg-red-100 text-red-700 line-through' :
+                                  'bg-amber-100 text-amber-700'
+                                }`}>
                                   {assignment.staff_name}
+                                  {assignment.status === 'confirmed' && ' ✓'}
+                                  {assignment.status === 'declined' && ' ✗'}
                                 </span>
+                                {isManager && (
                                 <button
                                   onClick={() => deleteAssignment.mutate(assignment.id)}
                                   className="text-red-500 hover:text-red-700"
                                 >
                                   <X className="h-3 w-3" />
                                 </button>
+                                )}
                               </div>
                             ) : (
                               <select
