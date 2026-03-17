@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Printer, AlertCircle, Upload } from 'lucide-react';
+import { Printer, AlertCircle, Upload, BarChart2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -58,6 +58,22 @@ export default function PrintingPage() {
   const toggleSelection = (id) => {
     setSelectedRequests(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
+
+  // Build printing summary by teacher → class → subject
+  const printingSummary = useMemo(() => {
+    const byTeacher = {};
+    allPrintRequests.forEach(r => {
+      const name = r.user_name || r.user_email || 'לא ידוע';
+      if (!byTeacher[name]) byTeacher[name] = { total: 0, rows: {} };
+      const key = `${r.class_name || '—'}|${r.subject || '—'}`;
+      if (!byTeacher[name].rows[key]) byTeacher[name].rows[key] = 0;
+      byTeacher[name].rows[key] += r.total_pages || 0;
+      byTeacher[name].total += r.total_pages || 0;
+    });
+    return Object.entries(byTeacher).sort((a, b) => b[1].total - a[1].total);
+  }, [allPrintRequests]);
+
+  const [expandedTeacher, setExpandedTeacher] = useState(null);
 
   return (
     <div className="space-y-6" dir="rtl">
@@ -138,6 +154,81 @@ export default function PrintingPage() {
               {myPrintRequests.length > 0
                 ? myPrintRequests.map(r => <TeacherRequestCard key={r.id} request={r} />)
                 : <p className="text-slate-400 text-center py-12">אין בקשות הדפסה</p>}
+            </div>
+          </div>
+        )}
+
+        {/* מעקב צילומים לפי מורה/כיתה/מקצוע — נראה למנהל ומזכירה */}
+        {(isAdmin || isSecretary) && printingSummary.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100">
+            <div className="p-6 border-b border-slate-100 flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-indigo-50">
+                <BarChart2 className="h-5 w-5 text-indigo-600" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-blue-900">מעקב צילומים לפי מורה</h2>
+                <p className="text-sm text-slate-400">סה״כ דפים לפי מורה, כיתה ומקצוע</p>
+              </div>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-right">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-100">
+                    <th className="p-4 text-xs font-bold text-slate-500">מורה</th>
+                    <th className="p-4 text-xs font-bold text-slate-500">כיתה</th>
+                    <th className="p-4 text-xs font-bold text-slate-500">מקצוע</th>
+                    <th className="p-4 text-xs font-bold text-slate-500 text-left">סה״כ דפים</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {printingSummary.map(([teacherName, data]) => {
+                    const rows = Object.entries(data.rows);
+                    const isExpanded = expandedTeacher === teacherName;
+                    return (
+                      <React.Fragment key={teacherName}>
+                        {/* שורת מורה — לחיץ */}
+                        <tr
+                          className="border-b border-slate-100 cursor-pointer hover:bg-slate-50 transition-colors"
+                          onClick={() => setExpandedTeacher(isExpanded ? null : teacherName)}
+                        >
+                          <td className="p-4 font-bold text-slate-800 flex items-center gap-2">
+                            {isExpanded
+                              ? <ChevronUp className="h-4 w-4 text-indigo-500" />
+                              : <ChevronDown className="h-4 w-4 text-slate-400" />}
+                            {teacherName}
+                          </td>
+                          <td className="p-4 text-slate-400 text-sm" colSpan={2}>
+                            {rows.length} שילובי כיתה/מקצוע
+                          </td>
+                          <td className="p-4 text-left">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">
+                              {data.total} דפים
+                            </span>
+                          </td>
+                        </tr>
+                        {/* שורות פירוט */}
+                        {isExpanded && rows.map(([key, pages]) => {
+                          const [className, subject] = key.split('|');
+                          return (
+                            <tr key={key} className="border-b border-slate-50 bg-indigo-50/30">
+                              <td className="p-3 pr-10 text-slate-400 text-xs"></td>
+                              <td className="p-3 text-sm text-slate-700 font-medium">{className}</td>
+                              <td className="p-3 text-sm text-slate-700">{subject}</td>
+                              <td className="p-3 text-left text-sm text-slate-600">{pages} דפים</td>
+                            </tr>
+                          );
+                        })}
+                      </React.Fragment>
+                    );
+                  })}
+                </tbody>
+                <tfoot>
+                  <tr className="bg-slate-50 border-t-2 border-slate-200">
+                    <td className="p-4 font-bold text-slate-800" colSpan={3}>סה״כ כולל</td>
+                    <td className="p-4 text-left font-bold text-indigo-700">{totalPages} דפים</td>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
           </div>
         )}

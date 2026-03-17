@@ -96,14 +96,11 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
         </button>
       </div>
 
-      {/* Logo / Brand */}
+      {/* Brand */}
       <div className="px-5 pt-6 pb-5 border-b border-white/10">
-        <div className="flex items-center gap-3">
-          <img src="/icon.jpeg" alt="SMART BASE" className="h-10 w-10 rounded-xl drop-shadow-md object-cover" />
-          <div>
-            <p className="text-white font-bold text-sm leading-tight tracking-wide">SMART BASE</p>
-            <p className="text-slate-400 text-[10px] leading-tight">מערכת ניהול חכמה</p>
-          </div>
+        <div>
+          <p className="text-white font-bold text-sm leading-tight tracking-wide">SMART BASE</p>
+          <p className="text-slate-400 text-[10px] leading-tight">מערכת ניהול חכמה</p>
         </div>
       </div>
 

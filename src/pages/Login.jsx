@@ -81,10 +81,9 @@ export default function Login() {
 
       {/* ─── LEFT PANEL: Features showcase ─── */}
       <div className={`hidden lg:flex flex-col justify-center flex-1 px-12 xl:px-20 py-12 relative z-10 transition-all duration-700 ${visible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
-        {/* Logo */}
+        {/* Title */}
         <div className="mb-10">
-          <img src="/logo-full.jpeg" alt="Smart Base"
-               className="h-16 rounded-2xl shadow-xl object-contain" />
+          <p className="text-white text-3xl font-black tracking-wide">SMART BASE</p>
           <p className="text-purple-300 text-sm mt-3 font-medium">מערכת ניהול חכמה לבית הספר</p>
         </div>
 
@@ -140,10 +139,9 @@ export default function Login() {
       {/* ─── RIGHT PANEL: Login form ─── */}
       <div className={`flex items-center justify-center w-full lg:w-[420px] xl:w-[460px] flex-shrink-0 p-6 relative z-10 transition-all duration-700 delay-100 ${visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}>
         <div className="w-full max-w-sm">
-          {/* Mobile logo */}
+          {/* Mobile title */}
           <div className="lg:hidden text-center mb-8">
-            <img src="/logo-full.jpeg" alt="Smart Base"
-                 className="h-16 rounded-2xl shadow-xl object-contain mx-auto mb-3" />
+            <p className="text-white text-2xl font-black tracking-wide mb-2">SMART BASE</p>
             <p className="text-purple-300 text-sm">מערכת ניהול חכמה לבית הספר</p>
           </div>
 

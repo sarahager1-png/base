@@ -36,20 +36,6 @@ export default function MorningGreeting({ user, pendingAbsences = 0, pendingPurc
 
         {/* Left: greeting */}
         <div className="flex items-center gap-5">
-          {/* Logo badge */}
-          <div className="relative flex-shrink-0">
-            <div className="h-16 w-16 rounded-2xl overflow-hidden"
-                 style={{
-                   border: '1px solid rgba(255,255,255,0.25)',
-                   boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(167,139,250,0.3)',
-                 }}>
-              <img src="/icon.jpeg" alt="לוגו" className="h-full w-full object-cover" />
-            </div>
-            {/* glow dot */}
-            <div className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-[#0f0c29]"
-                 style={{ background: greeting.color, boxShadow: `0 0 8px ${greeting.color}` }} />
-          </div>
-
           <div>
             <p className="text-xs font-medium tracking-widest uppercase mb-1"
                style={{ color: greeting.color, textShadow: `0 0 12px ${greeting.color}66` }}>

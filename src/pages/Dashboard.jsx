@@ -175,18 +175,10 @@ function DashboardInner() {
               <Menu className="h-5 w-5" />
             </button>
 
-            {/* Logo — click goes home */}
+            {/* Home button */}
             <button onClick={() => setCurrentView('dashboard')}
                     className="flex items-center gap-2.5 group flex-shrink-0">
-              <div className="relative h-9 w-9 rounded-xl overflow-hidden flex-shrink-0 ring-1 ring-white/20 group-hover:ring-violet-400/60 transition-all"
-                   style={{ boxShadow: '0 2px 12px rgba(109,40,217,0.5)' }}>
-                <img src="/icon.jpeg" alt="לוגו" className="h-full w-full object-cover" />
-                <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 55%)' }} />
-              </div>
-              <img src="/logo-full.jpeg" alt="Smart Base"
-                   className="hidden sm:block h-7 object-contain opacity-90 group-hover:opacity-100 transition-opacity"
-                   style={{ filter: 'brightness(1.2) drop-shadow(0 1px 6px rgba(109,40,217,0.6))' }}
-                   onError={e => { e.target.style.display='none'; }} />
+              <span className="hidden sm:block text-white font-bold text-sm tracking-wide opacity-90 group-hover:opacity-100 transition-opacity">SMART BASE</span>
             </button>
 
             {/* Divider */}

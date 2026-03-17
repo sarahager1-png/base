@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Settings, Save, Users, Bell, UserCog } from 'lucide-react';
+import { Settings, Save, Users, Bell, UserCog, BookOpen, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import DailyAnnouncementsManager from './DailyAnnouncementsManager';
 import { useAccessibility } from '@/lib/AccessibilityContext';
@@ -165,6 +165,7 @@ export default function InstitutionSettingsPanel() {
     { id: 'features',      label: 'תכונות',          icon: Settings },
     { id: 'gender',        label: 'סוג בית הספר',    icon: Users },
     { id: 'team',          label: 'מגדר צוות',       icon: UserCog },
+    { id: 'staff_hours',   label: 'כוח אדם',         icon: BookOpen },
     { id: 'announcements', label: 'הודעות יומיות',   icon: Bell },
   ];
 
@@ -279,8 +280,151 @@ export default function InstitutionSettingsPanel() {
       {/* Team Gender Tab */}
       {activeTab === 'team' && <TeamGenderPanel />}
 
+      {/* Staff Hours Tab */}
+      {activeTab === 'staff_hours' && <StaffHoursPanel />}
+
       {/* Announcements Tab */}
       {activeTab === 'announcements' && <DailyAnnouncementsManager />}
+    </div>
+  );
+}
+
+function StaffHoursPanel() {
+  const qc = useQueryClient();
+  const { data: users = [], isLoading } = useQuery({
+    queryKey: ['all-users-hours'],
+    queryFn: () => base44.entities.User.list(),
+  });
+
+  const updateHours = useMutation({
+    mutationFn: ({ id, frontline_hours, pregnancy_hours_quota, declaration_days_quota }) =>
+      base44.entities.User.update(id, { frontline_hours, pregnancy_hours_quota, declaration_days_quota }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['all-users-hours'] });
+      toast.success('שעות עודכנו בהצלחה');
+    },
+  });
+
+  const [editing, setEditing] = useState({});
+
+  const teachingStaff = users.filter(u =>
+    ['teacher', 'coordinator', 'counselor', 'vice_principal', 'admin'].includes(u.role)
+  );
+
+  const handleChange = (id, field, value) => {
+    setEditing(prev => ({
+      ...prev,
+      [id]: { ...prev[id], [field]: parseInt(value) || 0 },
+    }));
+  };
+
+  const handleSave = (user) => {
+    const changes = editing[user.id] || {};
+    updateHours.mutate({
+      id: user.id,
+      frontline_hours: changes.frontline_hours ?? user.frontline_hours ?? 24,
+      pregnancy_hours_quota: changes.pregnancy_hours_quota ?? user.pregnancy_hours_quota ?? 40,
+      declaration_days_quota: changes.declaration_days_quota ?? user.declaration_days_quota ?? 2,
+    });
+    setEditing(prev => { const n = { ...prev }; delete n[user.id]; return n; });
+  };
+
+  if (isLoading) return <div className="text-center py-8 text-slate-400">טוען...</div>;
+
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-2 rounded-lg" style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
+          <BookOpen className="h-5 w-5 text-white" />
+        </div>
+        <div>
+          <h3 className="font-bold text-slate-800 dark:text-white">שעות תקן וקיצבות שנתיות</h3>
+          <p className="text-xs text-slate-400">הגדרת שעות פרונטליות ומכסות לכל עובד/ת הוראה</p>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-right text-sm">
+          <thead>
+            <tr className="border-b border-slate-100 dark:border-slate-600">
+              <th className="pb-3 pr-0 text-xs font-bold text-slate-500">שם</th>
+              <th className="pb-3 px-3 text-xs font-bold text-slate-500">
+                <div className="flex items-center gap-1 justify-end"><Clock className="h-3 w-3" />שעות פרונטליות</div>
+              </th>
+              <th className="pb-3 px-3 text-xs font-bold text-slate-500">מכסת הריון (שעות)</th>
+              <th className="pb-3 px-3 text-xs font-bold text-slate-500">ימי הצהרה</th>
+              <th className="pb-3 pl-0 text-xs font-bold text-slate-500"></th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-50 dark:divide-slate-700">
+            {teachingStaff.map(u => {
+              const e = editing[u.id] || {};
+              const isDirty = Object.keys(e).length > 0;
+              return (
+                <tr key={u.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                  <td className="py-3 pr-0">
+                    <div className="flex items-center gap-2">
+                      <div className="h-7 w-7 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                           style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
+                        {u.full_name?.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-slate-800 dark:text-white text-xs">{u.full_name}</p>
+                        <p className="text-xs text-slate-400">{ROLE_LABELS[u.role] || u.role}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-3 px-3">
+                    <input
+                      type="number" min="0" max="40"
+                      value={e.frontline_hours ?? u.frontline_hours ?? 24}
+                      onChange={(e2) => handleChange(u.id, 'frontline_hours', e2.target.value)}
+                      className="w-16 text-center p-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white text-xs focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    />
+                  </td>
+                  <td className="py-3 px-3">
+                    <input
+                      type="number" min="0" max="80"
+                      value={e.pregnancy_hours_quota ?? u.pregnancy_hours_quota ?? 40}
+                      onChange={(e2) => handleChange(u.id, 'pregnancy_hours_quota', e2.target.value)}
+                      className="w-16 text-center p-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white text-xs focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    />
+                  </td>
+                  <td className="py-3 px-3">
+                    <input
+                      type="number" min="0" max="10"
+                      value={e.declaration_days_quota ?? u.declaration_days_quota ?? 2}
+                      onChange={(e2) => handleChange(u.id, 'declaration_days_quota', e2.target.value)}
+                      className="w-16 text-center p-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white text-xs focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    />
+                  </td>
+                  <td className="py-3 pl-0">
+                    {isDirty && (
+                      <button
+                        onClick={() => handleSave(u)}
+                        disabled={updateHours.isPending}
+                        className="flex items-center gap-1 px-3 py-1.5 text-white text-xs font-bold rounded-lg disabled:opacity-50"
+                        style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}
+                      >
+                        <Save className="h-3 w-3" />שמור
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        {teachingStaff.length === 0 && (
+          <p className="text-center text-slate-400 py-8">אין עובדי הוראה במערכת</p>
+        )}
+      </div>
+
+      <div className="mt-4 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl">
+        <p className="text-xs text-indigo-700 dark:text-indigo-300">
+          <strong>הסבר:</strong> שעות פרונטליות = מגבלת מ״מ יומית. מכסת הריון = מקסימום שעות היעדרות עקב הריון. ימי הצהרה = מקסימום ימי הצהרת מחלה.
+        </p>
+      </div>
     </div>
   );
 }
