@@ -10,6 +10,8 @@ import { ThemeProvider } from '@/lib/ThemeContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import Login from './pages/Login';
+import { useDailyAbsenceReminder } from '@/hooks/useDailyAbsenceReminder';
+import ProfileSetupModal, { profileSetupNeeded } from '@/components/ProfileSetupModal';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -23,14 +25,19 @@ const LayoutWrapper = ({ children, currentPageName }) => {
 };
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError, isAuthenticated, navigateToLogin, user, updateUser } = useAuth();
+  useDailyAbsenceReminder(user);
 
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
       <div className="fixed inset-0 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-teal-100 border-t-teal-600 rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-green-100 border-t-blue-600 rounded-full animate-spin"></div>
       </div>
     );
+  }
+
+  if (!isAuthenticated) {
+    return <Login />;
   }
 
   if (authError) {
@@ -39,6 +46,10 @@ const AuthenticatedApp = () => {
     } else {
       return <Login onLogin={navigateToLogin} />;
     }
+  }
+
+  if (profileSetupNeeded(user)) {
+    return <ProfileSetupModal user={user} onComplete={(patch) => updateUser(patch)} />;
   }
 
   return (

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import FileSearch from './FileSearch';
 import FilePreview from './FilePreview';
 import FileVersionHistory from './FileVersionHistory';
@@ -70,15 +70,15 @@ export default function FileManager({ userEmail = null, category = null }) {
   const getFileIcon = (fileType) => {
     switch (fileType) {
       case 'image':
-        return <ImageIcon className="h-4 w-4 text-amber-500" />;
+        return <ImageIcon className="h-4 w-4 text-yellow-600" />;
       case 'pdf':
-        return <FileText className="h-4 w-4 text-red-500" />;
+        return <FileText className="h-4 w-4 text-yellow-500" />;
       case 'document':
         return <FileText className="h-4 w-4 text-blue-500" />;
       case 'spreadsheet':
         return <Sheet className="h-4 w-4 text-green-500" />;
       case 'video':
-        return <Video className="h-4 w-4 text-purple-500" />;
+        return <Video className="h-4 w-4 text-yellow-600" />;
       default:
         return <File className="h-4 w-4 text-slate-400" />;
     }

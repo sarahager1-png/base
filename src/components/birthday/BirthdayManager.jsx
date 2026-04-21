@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { Cake, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -54,14 +54,14 @@ export default function BirthdayManager() {
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-          <div className="p-2 bg-pink-100 rounded-lg">
-            <Cake className="h-5 w-5 text-pink-600" />
+          <div className="p-2 bg-yellow-100 rounded-lg">
+            <Cake className="h-5 w-5 text-yellow-700" />
           </div>
           ניהול תאריכי לידה
         </h3>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-3 py-2 bg-pink-600 text-white text-sm rounded-lg hover:bg-pink-700 transition-colors flex items-center gap-1"
+          className="px-3 py-2 bg-yellow-600 text-white text-sm rounded-lg hover:bg-yellow-700 transition-colors flex items-center gap-1"
         >
           <Plus className="h-4 w-4" />
           הוסף תאריך לידה
@@ -69,12 +69,12 @@ export default function BirthdayManager() {
       </div>
 
       {showForm && (
-        <div className="mb-6 p-4 bg-pink-50 rounded-lg border border-pink-200">
+        <div className="mb-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
           <div className="space-y-3">
             <select
               value={selectedUser}
               onChange={(e) => setSelectedUser(e.target.value)}
-              className="w-full p-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className="w-full p-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
             >
               <option value="">בחר עובד</option>
               {availableUsers.map(user => (
@@ -87,7 +87,7 @@ export default function BirthdayManager() {
               type="date"
               value={birthDate}
               onChange={(e) => setBirthDate(e.target.value)}
-              className="w-full p-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className="w-full p-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
             <div className="flex gap-2">
               <button
@@ -103,7 +103,7 @@ export default function BirthdayManager() {
               <button
                 onClick={() => createBirthday.mutate()}
                 disabled={!selectedUser || !birthDate || createBirthday.isPending}
-                className="flex-1 px-3 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 disabled:bg-slate-300"
+                className="flex-1 px-3 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:bg-slate-300"
               >
                 שמור
               </button>
@@ -125,7 +125,7 @@ export default function BirthdayManager() {
                 </div>
                 <button
                   onClick={() => deleteBirthday.mutate(birthday.id)}
-                  className="p-2 hover:bg-red-100 rounded-lg transition-colors text-red-600"
+                  className="p-2 hover:bg-yellow-100 rounded-lg transition-colors text-yellow-700"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>

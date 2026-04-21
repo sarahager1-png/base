@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import StatCard from '../StatCard';
 import ReportingModal from '../modals/ReportingModal';
 import AbsenceReportModal from '../modals/AbsenceReportModal';
@@ -12,9 +12,10 @@ import DailyJournal from '../journal/DailyJournal';
 import DailyMessageBoard from './DailyMessageBoard';
 import SendMessageModal from '../messages/SendMessageModal';
 import MessagesCenter from '../messages/MessagesCenter';
-import { 
+import {
   AlertTriangle, UserCheck, Clock, ShoppingCart, Shield,
-  CheckCircle, XCircle, Calendar, Printer, Map, Users, Plus, Wrench, Monitor, Timer, Sparkles, Heart
+  Calendar, Users, Plus, Wrench, Monitor, Timer, Sparkles,
+  Heart, Map, ChevronLeft, MessageSquare
 } from 'lucide-react';
 
 const TEACHER_BASE_SCHEDULE = {
@@ -25,6 +26,17 @@ const TEACHER_BASE_SCHEDULE = {
   4: { 1: 'חלון', 2: 'חלון', 3: 'הסטוריה - ח׳2', 4: 'הסטוריה - ח׳2', 5: 'אזרחות - ט׳1' },
   5: { 1: 'סיכום שבוע - ח׳2', 2: 'פרטני' },
 };
+
+const QUICK_ACTIONS = [
+  { id: 'absence',            label: 'העדרות',          Icon: Clock,        color: 'bg-amber-100 text-amber-700',     border: 'border-amber-200 hover:border-amber-400',  badge: 'חשוב' },
+  { id: 'substitute',         label: 'מילוי מקום',      Icon: Users,        color: 'bg-amber-100 text-amber-700',     border: 'border-amber-200 hover:border-amber-400' },
+  { id: 'overtime',           label: 'שעות נוספות',     Icon: Timer,        color: 'bg-amber-100 text-amber-700',     border: 'border-amber-200 hover:border-amber-400' },
+  { id: 'external',           label: 'פעילות חוץ',      Icon: Map,          color: 'bg-emerald-100 text-emerald-700', border: 'border-emerald-200 hover:border-emerald-400' },
+  { id: 'purchase',           label: 'רכש',              Icon: ShoppingCart, color: 'bg-blue-100 text-blue-700',       border: 'border-blue-200 hover:border-blue-400' },
+  { id: 'maintenance_general',label: 'תחזוקה כללית',    Icon: Wrench,       color: 'bg-slate-100 text-slate-600',     border: 'border-slate-200 hover:border-slate-400' },
+  { id: 'maintenance_pc',     label: 'תחזוקת מחשבים',  Icon: Monitor,      color: 'bg-indigo-100 text-indigo-700',   border: 'border-indigo-200 hover:border-indigo-400' },
+  { id: 'special_overtime',   label: 'שעות מיוחדות',    Icon: Sparkles,     color: 'bg-violet-100 text-violet-700',   border: 'border-violet-200 hover:border-violet-400' },
+];
 
 export default function VicePrincipalDashboard({ user, setView }) {
   const [showAddMeeting, setShowAddMeeting] = useState(false);
@@ -39,218 +51,122 @@ export default function VicePrincipalDashboard({ user, setView }) {
     queryKey: ['absences', 'pending'],
     queryFn: () => base44.entities.Absence.filter({ status: 'pending' }),
   });
-
   const { data: onboardingDocs = [] } = useQuery({
     queryKey: ['onboarding', 'pending'],
     queryFn: () => base44.entities.OnboardingDocument.filter({ status: 'pending' }),
   });
-
   const { data: purchaseRequests = [] } = useQuery({
     queryKey: ['purchases', 'pending'],
     queryFn: () => base44.entities.PurchaseRequest.filter({ status: 'pending' }),
   });
-
   const { data: substituteReports = [] } = useQuery({
     queryKey: ['substitutes', 'reported'],
     queryFn: () => base44.entities.SubstituteReport.filter({ status: 'reported' }),
   });
-
   const { data: myDuty } = useQuery({
     queryKey: ['duty', user.email, new Date().getDate()],
     queryFn: async () => {
-      const today = new Date().getDate();
-      const duties = await base44.entities.DutyAssignment.filter({ 
-        staff_email: user.email, 
-        day: today 
-      });
+      const duties = await base44.entities.DutyAssignment.filter({ staff_email: user.email, day: new Date().getDate() });
       return duties[0] || null;
     },
   });
 
-  const updateAbsence = useMutation({
-    mutationFn: ({ id, status }) => base44.entities.Absence.update(id, { status }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['absences'] });
-    },
-  });
-
-  const openFeature = (feature) => {
-    setActiveFeature(feature);
-    setModalOpen(true);
-  };
-
+  const openFeature = (id) => { setActiveFeature(id); setModalOpen(true); };
   const dayIdx = new Date().getDay();
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      <ReportingModal 
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        feature={activeFeature}
-        user={user}
-      />
-      <AbsenceReportModal 
-        isOpen={absenceModalOpen}
-        onClose={() => setAbsenceModalOpen(false)}
-        user={user}
-      />
-      <PrintRequestModal 
-        isOpen={printModalOpen}
-        onClose={() => setPrintModalOpen(false)}
-        user={user}
-      />
-      <SendMessageModal 
-        isOpen={messageModalOpen}
-        onClose={() => setMessageModalOpen(false)}
-        user={user}
-        recipientRole="staff"
-      />
+    <div className="space-y-6 animate-fade-in">
+      <ReportingModal isOpen={modalOpen} onClose={() => setModalOpen(false)} feature={activeFeature} user={user} />
+      <AbsenceReportModal isOpen={absenceModalOpen} onClose={() => setAbsenceModalOpen(false)} user={user} />
+      <PrintRequestModal isOpen={printModalOpen} onClose={() => setPrintModalOpen(false)} user={user} />
+      <SendMessageModal isOpen={messageModalOpen} onClose={() => setMessageModalOpen(false)} user={user} recipientRole="staff" />
 
       <DailyMessageBoard user={user} />
 
-      {/* Quick Actions - Top Priority */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-        <button onClick={() => setAbsenceModalOpen(true)} className="relative overflow-hidden flex flex-col items-center p-4 bg-gradient-to-br from-red-50 to-pink-50 rounded-xl shadow-sm border-2 border-red-200 hover:border-red-400 hover:shadow-md transition-all group text-center h-28 justify-center">
-          <div className="absolute top-1 right-1 bg-red-500 text-[9px] text-white font-bold px-2 py-0.5 rounded-full shadow">חשוב</div>
-          <div className="p-2.5 bg-red-100 rounded-full text-red-600 group-hover:scale-110 transition-transform mb-2">
-            <Clock className="h-6 w-6" />
+      {/* Duty alert */}
+      {myDuty && (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-amber-200 bg-amber-50 animate-slide-up">
+          <div className="h-8 w-8 rounded-lg bg-amber-500 flex items-center justify-center flex-shrink-0">
+            <Shield className="h-4 w-4 text-white" />
           </div>
-          <span className="text-xs font-bold text-slate-700 leading-tight">העדרות</span>
-        </button>
-      
-        <button onClick={() => openFeature('substitute')} className="flex flex-col items-center p-4 bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl shadow-sm border-2 border-purple-200 hover:border-purple-400 hover:shadow-md transition-all group text-center h-28 justify-center">
-          <div className="p-2.5 bg-purple-100 rounded-full text-purple-600 group-hover:scale-110 transition-transform mb-2">
-            <Users className="h-6 w-6" />
-          </div>
-          <span className="text-xs font-bold text-slate-700 leading-tight">מילוי מקום</span>
-        </button>
-
-        <button onClick={() => openFeature('overtime')} className="flex flex-col items-center p-4 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl shadow-sm border-2 border-yellow-200 hover:border-yellow-400 hover:shadow-md transition-all group text-center h-28 justify-center">
-          <div className="p-2.5 bg-yellow-100 rounded-full text-yellow-700 group-hover:scale-110 transition-transform mb-2">
-            <Timer className="h-6 w-6" />
-          </div>
-          <span className="text-xs font-bold text-slate-700 leading-tight">שעות נוספות</span>
-        </button>
-
-        <button onClick={() => openFeature('external')} className="flex flex-col items-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-sm border-2 border-green-200 hover:border-green-400 hover:shadow-md transition-all group text-center h-28 justify-center">
-          <div className="p-2.5 bg-green-100 rounded-full text-green-600 group-hover:scale-110 transition-transform mb-2">
-            <Map className="h-6 w-6" />
-          </div>
-          <span className="text-xs font-bold text-slate-700 leading-tight">פעילות חוץ</span>
-        </button>
-
-        <button onClick={() => openFeature('purchase')} className="flex flex-col items-center p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl shadow-sm border-2 border-amber-200 hover:border-amber-400 hover:shadow-md transition-all group text-center h-28 justify-center">
-          <div className="p-2.5 bg-amber-100 rounded-full text-amber-600 group-hover:scale-110 transition-transform mb-2">
-            <ShoppingCart className="h-6 w-6" />
-          </div>
-          <span className="text-xs font-bold text-slate-700 leading-tight">רכש</span>
-        </button>
-
-        <button onClick={() => openFeature('maintenance_general')} className="flex flex-col items-center p-4 bg-gradient-to-br from-slate-50 to-gray-50 rounded-xl shadow-sm border-2 border-slate-200 hover:border-slate-400 hover:shadow-md transition-all group text-center h-28 justify-center">
-          <div className="p-2.5 bg-slate-100 rounded-full text-slate-600 group-hover:scale-110 transition-transform mb-2">
-            <Wrench className="h-6 w-6" />
-          </div>
-          <span className="text-xs font-bold text-slate-700 leading-tight">תחזוקה כללית</span>
-        </button>
-
-        <button onClick={() => openFeature('maintenance_pc')} className="flex flex-col items-center p-4 bg-gradient-to-br from-cyan-50 to-teal-50 rounded-xl shadow-sm border-2 border-cyan-200 hover:border-cyan-400 hover:shadow-md transition-all group text-center h-28 justify-center">
-          <div className="p-2.5 bg-cyan-100 rounded-full text-cyan-600 group-hover:scale-110 transition-transform mb-2">
-            <Monitor className="h-6 w-6" />
-          </div>
-          <span className="text-xs font-bold text-slate-700 leading-tight">תחזוקת מחשבים</span>
-        </button>
-
-        <button onClick={() => openFeature('special_overtime')} className="flex flex-col items-center p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl shadow-sm border-2 border-indigo-200 hover:border-indigo-400 hover:shadow-md transition-all group text-center h-28 justify-center">
-          <div className="p-2.5 bg-indigo-100 rounded-full text-indigo-600 group-hover:scale-110 transition-transform mb-2">
-            <Sparkles className="h-6 w-6" />
-          </div>
-          <span className="text-xs font-bold text-slate-700 leading-tight">שעות מיוחדות</span>
-        </button>
-      </div>
-
-      {/* Header Banner */}
-      <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-3xl p-8 text-white shadow-lg border border-slate-600/20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]"></div>
-        <div className="relative z-10 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold mb-2 text-white">שלום, {user.full_name}</h2>
-            <p className="text-slate-300 text-sm flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              סגנית מנהלת
-            </p>
+            <p className="text-sm font-bold text-amber-900">תורנות היום שלי</p>
+            <p className="text-xs text-amber-700">{myDuty.duty_type} בשעה {myDuty.time}</p>
           </div>
-          <div className="h-16 w-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/20">
-            <Shield className="h-8 w-8 text-amber-400" />
+        </div>
+      )}
+
+      {/* Quick Actions */}
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+        <div className="flex items-center gap-3 px-5 py-3.5 border-b border-slate-100">
+          <div className="h-7 w-7 rounded-lg bg-slate-900 flex items-center justify-center flex-shrink-0">
+            <Sparkles className="h-3.5 w-3.5 text-white" />
           </div>
+          <h3 className="text-sm font-bold text-slate-800">פעולות מהירות</h3>
+        </div>
+        <div className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {QUICK_ACTIONS.map(({ id, label, Icon, color, border, badge }) => (
+            <button
+              key={id}
+              onClick={() => id === 'absence' ? setAbsenceModalOpen(true) : openFeature(id)}
+              className={`relative group flex flex-col items-center gap-2 p-4 rounded-xl border-2 bg-white ${border} hover:shadow-md transition-all duration-150`}
+            >
+              {badge && (
+                <span className="absolute top-2 right-2 text-[9px] font-black bg-red-500 text-white px-1.5 py-0.5 rounded-full">
+                  {badge}
+                </span>
+              )}
+              <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${color} group-hover:scale-110 transition-transform duration-150`}>
+                <Icon className="h-5 w-5" />
+              </div>
+              <span className="text-[12px] font-bold text-slate-700 leading-tight text-center">{label}</span>
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard 
-          title="היעדרויות לאישור" 
-          value={absences.length} 
-          icon={Clock} 
-          color="amber" 
-          subtext="ממתינות להחלטה" 
-        />
-        <StatCard 
-          title="טפסי קליטה" 
-          value={onboardingDocs.length} 
-          icon={UserCheck} 
-          color="purple" 
-          subtext="עובדים חדשים" 
-        />
-        <StatCard 
-          title="בקשות רכש" 
-          value={purchaseRequests.length} 
-          icon={ShoppingCart} 
-          color="blue" 
-          subtext="לאישור תקציבי" 
-        />
-        <StatCard 
-          title="מילוי מקום" 
-          value={substituteReports.length} 
-          icon={AlertTriangle} 
-          color="red" 
-          subtext="דוחות לאישור" 
-        />
+      {/* Stats row — staggered */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="animate-slide-up-1"><StatCard title="היעדרויות לאישור" value={absences.length} icon={Clock} color="amber" subtext="ממתינות להחלטה" /></div>
+        <div className="animate-slide-up-2"><StatCard title="טפסי קליטה" value={onboardingDocs.length} icon={UserCheck} color="purple" subtext="עובדים חדשים" /></div>
+        <div className="animate-slide-up-3"><StatCard title="בקשות רכש" value={purchaseRequests.length} icon={ShoppingCart} color="blue" subtext="לאישור תקציבי" /></div>
+        <div className="animate-slide-up-4"><StatCard title="מילוי מקום" value={substituteReports.length} icon={AlertTriangle} color="red" subtext="דוחות לאישור" /></div>
       </div>
 
-      {/* Daily Schedule */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow" style={{ order: 10 }}>
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-slate-800 flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-blue-600" />
-            מערכת שעות - {new Date().toLocaleDateString('he-IL', { weekday: 'long', day: '2-digit', month: '2-digit' })}
-          </h3>
-          <button 
+      {/* Schedule */}
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+          <div className="flex items-center gap-3">
+            <div className="h-7 w-7 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0">
+              <Calendar className="h-3.5 w-3.5 text-white" />
+            </div>
+            <h3 className="text-sm font-bold text-slate-800">
+              מערכת שעות — {new Date().toLocaleDateString('he-IL', { weekday: 'long', day: '2-digit', month: '2-digit' })}
+            </h3>
+          </div>
+          <button
             onClick={() => setView('schedule')}
-            className="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-1.5 rounded-lg transition-colors border border-blue-100"
+            className="text-[11px] font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-1.5 rounded-lg transition-colors border border-blue-100 flex items-center gap-1"
           >
-            לצפייה ביומן חודשי מלא
+            יומן חודשי <ChevronLeft className="h-3 w-3" />
           </button>
         </div>
-        
-        <div className="flex gap-4 overflow-x-auto pb-2">
+        <div className="p-4 flex gap-3 overflow-x-auto scrollbar-hide">
           {[1, 2, 3, 4, 5, 6, 7].map(hour => {
             const lesson = TEACHER_BASE_SCHEDULE[dayIdx]?.[hour];
-            
             return (
-              <div key={hour} className="min-w-[120px] flex-1">
-                <div className="text-center text-xs font-bold text-slate-400 mb-1">שעה {hour}</div>
-                <div className={`p-4 rounded-xl border text-center h-full flex flex-col justify-center items-center gap-1 shadow-sm transition-all hover:shadow-md ${lesson ? 'bg-white border-slate-200' : 'bg-slate-50 border-transparent'}`}>
+              <div key={hour} className="min-w-[100px] flex-1">
+                <p className="text-center text-[10px] font-bold text-slate-400 mb-1.5">שעה {hour}</p>
+                <div className={`p-3 rounded-xl border text-center h-[72px] flex flex-col justify-center items-center gap-1 transition-all ${lesson ? 'bg-white border-slate-200 hover:shadow-sm' : 'bg-slate-50 border-transparent'}`}>
                   {lesson ? (
                     <>
-                      <span className="font-bold text-slate-800 text-sm">{lesson.split('-')[0]?.trim()}</span>
+                      <span className="font-bold text-slate-800 text-xs leading-tight">{lesson.split('-')[0]?.trim()}</span>
                       {lesson.includes('-') && (
-                        <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
-                          {lesson.split('-')[1]?.trim()}
-                        </span>
+                        <span className="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full">{lesson.split('-')[1]?.trim()}</span>
                       )}
                     </>
                   ) : (
-                    <span className="text-slate-300">-</span>
+                    <span className="text-slate-300 text-xs">—</span>
                   )}
                 </div>
               </div>
@@ -259,83 +175,80 @@ export default function VicePrincipalDashboard({ user, setView }) {
         </div>
       </div>
 
-      {/* My Duty Alert */}
-      {myDuty && (
-        <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-100 rounded-full text-amber-600">
-              <Shield className="h-5 w-5" />
+      {/* Approvals + Meetings */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+          <div className="flex items-center gap-3 px-5 py-3.5 border-b border-slate-100">
+            <div className="h-7 w-7 rounded-lg bg-amber-500 flex items-center justify-center flex-shrink-0">
+              <Clock className="h-3.5 w-3.5 text-white" />
             </div>
-            <div>
-              <h4 className="font-bold text-amber-900">תורנות היום שלי</h4>
-              <p className="text-sm text-amber-800">{myDuty.duty_type} בשעה {myDuty.time}</p>
-            </div>
+            <h3 className="text-sm font-bold text-slate-800">היעדרויות לאישור</h3>
+            {absences.length > 0 && (
+              <span className="mr-auto text-[10px] font-black bg-amber-500 text-white px-1.5 py-0.5 rounded-full">
+                {absences.length}
+              </span>
+            )}
+          </div>
+          <div className="p-4">
+            <AbsenceApprovalPanel />
           </div>
         </div>
-      )}
 
-      {/* Today's Journal */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
-        <h3 className="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <div className="p-2 bg-blue-50 rounded-xl border border-blue-100">
-            <Calendar className="h-4 w-4 text-blue-600" />
-          </div>
-          יומן היום
-        </h3>
-        <DailyJournal date={new Date()} />
-      </div>
-
-
-
-      {/* Pending Approvals */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
-          <h3 className="text-base font-bold text-slate-800 mb-6 flex items-center gap-2">
-            <div className="p-2 bg-amber-50 rounded-xl border border-amber-100">
-              <Clock className="h-4 w-4 text-amber-600" />
+        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+          <div className="flex items-center gap-3 px-5 py-3.5 border-b border-slate-100">
+            <div className="h-7 w-7 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0">
+              <Users className="h-3.5 w-3.5 text-white" />
             </div>
-            היעדרויות לאישור
-          </h3>
-          <AbsenceApprovalPanel />
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-              <div className="p-2 bg-blue-50 rounded-xl border border-blue-100">
-                <Users className="h-4 w-4 text-blue-600" />
-              </div>
-              יומן פגישות
-            </h3>
+            <h3 className="text-sm font-bold text-slate-800">יומן פגישות</h3>
             <button
               onClick={() => setShowAddMeeting(true)}
-              className="px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1 shadow-sm"
+              className="mr-auto text-[11px] font-semibold bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1"
             >
-              <Plus className="h-4 w-4" />
-              פגישה חדשה
+              <Plus className="h-3 w-3" /> פגישה חדשה
             </button>
           </div>
-          <MeetingsList user={user} />
+          <div className="p-4">
+            <MeetingsList user={user} />
+          </div>
         </div>
       </div>
 
-      {/* Quick Send Message to Staff */}
+      {/* Journal */}
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+        <div className="flex items-center gap-3 px-5 py-3.5 border-b border-slate-100">
+          <div className="h-7 w-7 rounded-lg bg-emerald-600 flex items-center justify-center flex-shrink-0">
+            <Calendar className="h-3.5 w-3.5 text-white" />
+          </div>
+          <h3 className="text-sm font-bold text-slate-800">יומן היום</h3>
+        </div>
+        <div className="p-4">
+          <DailyJournal date={new Date()} />
+        </div>
+      </div>
+
+      {/* Send message CTA */}
       <button
         onClick={() => setMessageModalOpen(true)}
-        className="w-full p-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-2xl hover:shadow-lg transition-all font-bold text-center flex items-center justify-center gap-2"
+        className="w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl border-2 border-dashed border-slate-200 text-slate-500 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50 transition-all duration-150 font-semibold text-sm"
       >
-        <Heart className="h-5 w-5" />
+        <MessageSquare className="h-4 w-4" />
         שלח הערה מעצימה לצוות
       </button>
 
-      {/* Messages Center */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
-        <MessagesCenter user={user} />
+      {/* Messages */}
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+        <div className="flex items-center gap-3 px-5 py-3.5 border-b border-slate-100">
+          <div className="h-7 w-7 rounded-lg bg-violet-600 flex items-center justify-center flex-shrink-0">
+            <Heart className="h-3.5 w-3.5 text-white" />
+          </div>
+          <h3 className="text-sm font-bold text-slate-800">מרכז הודעות</h3>
+        </div>
+        <div className="p-4">
+          <MessagesCenter user={user} />
+        </div>
       </div>
 
-      {showAddMeeting && (
-        <AddMeeting user={user} onClose={() => setShowAddMeeting(false)} />
-      )}
+      {showAddMeeting && <AddMeeting user={user} onClose={() => setShowAddMeeting(false)} />}
     </div>
   );
 }

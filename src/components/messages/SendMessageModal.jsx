@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { X, Send, Heart, MessageCircle, Lightbulb, ThumbsUp } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -14,8 +14,8 @@ export default function SendMessageModal({ user, isOpen, onClose, recipientRole 
   const messageTypeIcons = {
     personal: {
       icon: Heart, label: 'הודעה אישית',
-      activeClass: 'bg-pink-50 border-pink-500',
-      iconClass: 'text-pink-600',
+      activeClass: 'bg-yellow-50 border-yellow-500',
+      iconClass: 'text-yellow-700',
     },
     feedback: {
       icon: ThumbsUp, label: 'משוב',
@@ -24,8 +24,8 @@ export default function SendMessageModal({ user, isOpen, onClose, recipientRole 
     },
     suggestion: {
       icon: Lightbulb, label: 'הצעה',
-      activeClass: 'bg-amber-50 border-amber-500',
-      iconClass: 'text-amber-600',
+      activeClass: 'bg-yellow-50 border-yellow-500',
+      iconClass: 'text-yellow-700',
     },
   };
 
@@ -37,18 +37,16 @@ export default function SendMessageModal({ user, isOpen, onClose, recipientRole 
   // Filter recipients based on role
   const getRecipients = () => {
     if (recipientRole === 'leadership') {
-      // Staff can message leadership
       return staffMembers.filter(m => ['admin', 'vice_principal', 'counselor'].includes(m.role));
     } else {
-      // Leadership can message staff
-      return staffMembers.filter(m => m.role === 'user');
+      return staffMembers.filter(m => !['admin', 'super_admin'].includes(m.role));
     }
   };
 
   const sendMessage = useMutation({
     mutationFn: async (messageData) => {
       if (Array.isArray(messageData)) {
-        return base44.entities.Message.bulkCreate(messageData);
+        return Promise.all(messageData.map(m => base44.entities.Message.create(m)));
       }
       return base44.entities.Message.create(messageData);
     },
@@ -104,7 +102,7 @@ export default function SendMessageModal({ user, isOpen, onClose, recipientRole 
   return (
     <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
-        <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-t-2xl p-6 text-white flex justify-between items-center">
+        <div className="bg-gradient-to-r from-blue-500 to-yellow-500 rounded-t-2xl p-6 text-white flex justify-between items-center">
           <h2 className="text-xl font-bold flex items-center gap-2">
             <MessageCircle className="h-5 w-5" />
             שלח הודעה
@@ -152,7 +150,7 @@ export default function SendMessageModal({ user, isOpen, onClose, recipientRole 
                 onClick={() => setSendToAll(true)}
                 className={`flex-1 px-3 py-2 rounded-lg font-medium transition-all ${
                   sendToAll
-                    ? 'bg-purple-600 text-white'
+                    ? 'bg-yellow-600 text-white'
                     : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
                 }`}
               >
@@ -165,7 +163,7 @@ export default function SendMessageModal({ user, isOpen, onClose, recipientRole 
                 onChange={(e) => setSelectedRecipient(e.target.value)}
                 className="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">-- בחר משתקל/ת --</option>
+                <option value="">-- בחרי איש/ת צוות --</option>
                 {recipients.map(member => (
                   <option key={member.id} value={member.email}>
                     {member.full_name}
@@ -174,9 +172,9 @@ export default function SendMessageModal({ user, isOpen, onClose, recipientRole 
               </select>
             )}
             {sendToAll && (
-              <div className="p-3 bg-purple-50 border border-purple-200 rounded-lg">
-                <p className="text-sm text-purple-800 font-medium">
-                  📢 ההודעה תשלח ל-{recipients.length} משתקלים/ות
+              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800 font-medium">
+                  📢 ההודעה תשלח ל-{recipients.length} אנשי צוות
                 </p>
               </div>
             )}
@@ -203,7 +201,7 @@ export default function SendMessageModal({ user, isOpen, onClose, recipientRole 
             <button
               onClick={handleSend}
               disabled={!content.trim() || (!sendToAll && !selectedRecipient) || sendMessage.isPending}
-              className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:shadow-lg transition-all disabled:opacity-50 font-medium flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-yellow-500 text-white rounded-lg hover:shadow-lg transition-all disabled:opacity-50 font-medium flex items-center justify-center gap-2"
             >
               <Send className="h-4 w-4" />
               שלח

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { Wrench, Monitor, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 
@@ -34,8 +34,8 @@ export default function MaintenancePage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-red-100 rounded-full">
-                <AlertTriangle className="h-6 w-6 text-red-600" />
+              <div className="p-3 bg-yellow-100 rounded-full">
+                <AlertTriangle className="h-6 w-6 text-yellow-700" />
               </div>
               <div>
                 <p className="text-sm text-slate-500">קריאות פתוחות</p>
@@ -58,8 +58,8 @@ export default function MaintenancePage() {
 
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-cyan-100 rounded-full">
-                <Monitor className="h-6 w-6 text-cyan-600" />
+              <div className="p-3 bg-blue-100 rounded-full">
+                <Monitor className="h-6 w-6 text-blue-600" />
               </div>
               <div>
                 <p className="text-sm text-slate-500">מחשבים</p>
@@ -99,7 +99,7 @@ export default function MaintenancePage() {
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-2">
                           {ticket.ticket_type === 'computer' ? (
-                            <Monitor className="h-4 w-4 text-cyan-500" />
+                            <Monitor className="h-4 w-4 text-blue-500" />
                           ) : (
                             <Wrench className="h-4 w-4 text-slate-500" />
                           )}
@@ -108,7 +108,7 @@ export default function MaintenancePage() {
                         <div className={`px-3 py-1 rounded-full text-xs font-bold ${
                           ticket.status === 'completed' ? 'bg-green-100 text-green-700' :
                           ticket.status === 'in_progress' ? 'bg-blue-100 text-blue-700' :
-                          'bg-amber-100 text-amber-700'
+                          'bg-yellow-100 text-yellow-700'
                         }`}>
                           {ticket.status === 'completed' ? 'טופל' :
                            ticket.status === 'in_progress' ? 'בטיפול' : 'פתוח'}
@@ -118,12 +118,12 @@ export default function MaintenancePage() {
                       <div className="flex items-center gap-3 text-xs text-slate-500">
                         <span>{ticket.reporter_name}</span>
                         {ticket.urgency === 'safety' && (
-                          <span className="bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-bold">
+                          <span className="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-bold">
                             בטיחות!
                           </span>
                         )}
                         {ticket.urgency === 'urgent' && (
-                          <span className="bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-bold">
+                          <span className="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-bold">
                             דחוף
                           </span>
                         )}
@@ -155,11 +155,11 @@ export default function MaintenancePage() {
                           <p className="text-xs text-slate-500 mt-1">{purchase.user_name}</p>
                         </div>
                         <div className={`px-3 py-1 rounded-full text-xs font-bold ${
-                          purchase.status === 'completed' ? 'bg-purple-100 text-purple-700' :
+                          purchase.status === 'completed' ? 'bg-yellow-100 text-yellow-700' :
                           purchase.status === 'ordered' ? 'bg-blue-100 text-blue-700' :
                           purchase.status === 'approved' ? 'bg-green-100 text-green-700' :
-                          purchase.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                          'bg-amber-100 text-amber-700'
+                          purchase.status === 'rejected' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-yellow-100 text-yellow-700'
                         }`}>
                           {purchase.status === 'completed' ? 'הושלם' :
                            purchase.status === 'ordered' ? 'הוזמן' :

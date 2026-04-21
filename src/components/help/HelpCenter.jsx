@@ -1,223 +1,271 @@
 import React, { useState, useMemo } from 'react';
 import {
   HelpCircle, ChevronDown, ChevronUp, Search, BookOpen,
-  Users, Shield, FileText, Bell, Calendar, Clock,
-  Printer, Wrench, ShoppingCart, MessageCircle, Star
+  Users, Shield, Bell, Calendar, Clock,
+  Printer, Wrench, MessageCircle, Star, ArrowLeft,
+  BarChart2, SlidersHorizontal, CheckSquare, FileText,
+  Home, UserCircle, Heart, FolderOpen, BarChart3
 } from 'lucide-react';
 
-// ─────────────────────────────────────────────
-//  FAQ Content
-// ─────────────────────────────────────────────
+// ─── FAQ data ──────────────────────────────────────────────────────────────────
+// roles: ['all'] | array of role strings | undefined = all
 const FAQ = [
-  // ── כלליות
   {
-    section: 'כלליות', icon: BookOpen, color: '#6366f1',
+    section: 'כלליות',
+    icon: BookOpen, color: '#2563eb',
+    view: null,
+    roles: ['all'],
     items: [
-      {
-        q: 'איך נכנסים למערכת?',
-        a: 'המערכת נפתחת דרך הדפדפן (Chrome / Firefox / Safari). הזינו את כתובת הגישה שקיבלתם מהמנהל/ת. אם אין לכם גישה – פנו למנהל/ת בית הספר.',
-      },
-      {
-        q: 'שכחתי סיסמה – מה עושים?',
-        a: 'לחצו על "שכחתי סיסמה" במסך הכניסה. יישלח אליכם קישוס לאיפוס לכתובת המייל שרשומה במערכת. אם אין לכם גישה למייל – צרו קשר עם המנהל/ת.',
-      },
-      {
-        q: 'האפליקציה לא נטענת – מה הבעיה?',
-        a: 'נסו לרענן את הדף (F5 או ⌘R). אם הבעיה נמשכת – נסו לנקות את מטמון הדפדפן (Ctrl+Shift+Delete), או פתחו בחלון פרטי (Incognito). ודאו שיש לכם חיבור לאינטרנט.',
-      },
-      {
-        q: 'איך מתקינים את האפליקציה על הטלפון?',
-        a: 'פתחו את האפליקציה בדפדפן Chrome בנייד. לחצו על התפריט (3 נקודות) ← "הוסף למסך הבית". האפליקציה תופיע כאייקון על שולחן העבודה וניתן להשתמש בה כמו אפליקציה רגילה.',
-      },
-      {
-        q: 'איך משנים את גודל הגופן?',
-        a: 'בראש המסך, ליד כפתור המצב הכהה, ישנם שלושה כפתורים עם האות "א" בגדלים שונים. לחצו על הגודל המתאים לכם. ההגדרה נשמרת לכניסות הבאות.',
-      },
-      {
-        q: 'מה ההבדל בין מצב בהיר למצב כהה?',
-        a: 'לחצו על אייקון הירח/שמש בפינה השמאלית העליונה של הפס הכהה. מצב כהה נוח יותר בסביבות עם תאורה חלשה ומפחית עייפות עיניים.',
-      },
-      {
-        q: 'איך עובד ה-Command Palette (⌘K)?',
-        a: 'לחצו על ⌘K (Mac) או Ctrl+K (Windows). יפתח חלון חיפוש מהיר שמאפשר לנווט לכל עמוד במערכת ללא עכבר. הקלידו חלק מהשם, השתמשו בחצים ← Enter לניווט.',
-      },
+      { q: 'איך נכנסים למערכת?', a: 'פתחו את smart-base-chabad.surge.sh בדפדפן. הזינו את המייל והסיסמה שקיבלתם. אם אין לכם גישה – פנו למנהל/ת.' },
+      { q: 'שכחתי סיסמה – מה עושים?', a: 'לחצו "שכחתי סיסמה" במסך הכניסה. יישלח קישור לאיפוס למייל הרשום. אם אין גישה למייל – פנו למנהל/ת.' },
+      { q: 'האפליקציה לא נטענת', a: 'רענן (F5). אם לא עוזר – נקו מטמון דפדפן (Ctrl+Shift+Delete) ונסו שוב. ודאו חיבור לאינטרנט.' },
+      { q: 'איך מתקינים על הטלפון?', a: 'פתחו ב-Chrome בנייד ← תפריט 3 נקודות ← "הוסף למסך הבית". הלחצן "התקן" מופיע גם בסרגל העליון של האפליקציה.' },
+      { q: 'איך משנים גודל גופן?', a: 'בסרגל העליון ישנם שלושה כפתורי "א" בגדלים שונים. לחצו על הגודל הנוח. ההגדרה נשמרת.' },
+      { q: 'מה ההבדל בין מצב בהיר לכהה?', a: 'לחצו על אייקון ירח/שמש בסרגל העליון. מצב כהה נוח לאור חלש ומפחית עייפות עיניים.' },
+      { q: 'מה זה חיפוש מהיר (⌘K)?', a: 'לחצו Ctrl+K (או ⌘K במק). יפתח חלון שמאפשר לנווט לכל עמוד בלי עכבר – הקלידו שם ← Enter.' },
+      { q: 'הפרופיל שלי – איך עורכים?', a: 'לחצו על שמכם בפינה הימנית העליונה ← "הפרופיל שלי". אפשר לשנות: שם, תפקיד, טלפון, מגדר.' },
     ],
   },
-
-  // ── דיווח ומעקב (מורה)
   {
-    section: 'דיווח ומעקב', icon: Clock, color: '#ef4444',
+    section: 'לוח בקרה',
+    icon: Home, color: '#0d9488',
+    view: 'dashboard',
+    roles: ['all'],
     items: [
-      {
-        q: 'איך מדווחים על היעדרות?',
-        a: 'בלוח הבקרה לחצו על הכפתור הגדול "העדרויות" (אדום). מלאו את הטופס: תאריכי ההיעדרות, הסיבה, פרטי ממלא מקום (אם ידוע) ואם נדרש אישור רפואי. לחצו "שלח". המנהל/ת יקבל התראה.',
-      },
-      {
-        q: 'שלחתי דיווח היעדרות – מתי יאושר?',
-        a: 'לאחר השליחה, הבקשה מופיעה בסטטוס "ממתין לאישור" (צהוב). המנהל/ת מטפל/ת בבקשות בדרך כלל תוך 24 שעות. תקבלו התראה ברגע שהסטטוס משתנה.',
-      },
-      {
-        q: 'איך רואים את כל ההיעדרויות שלי?',
-        a: 'בלוח הבקרה לחצו על "דוח היעדרויות" (כחול-סגול). תיפתח טבלה מלאה עם כל ההיסטוריה שלכם – תאריכים, סיבות, סטטוסים. לחצו "הדפס / PDF" כדי לייצא לנייר או PDF.',
-      },
-      {
-        q: 'ממתין "אישור רפואי" – מה עושים?',
-        a: 'הבקשה עברה לסטטוס "ממתין אישור רפואי" (סגול). צלמו את האישור הרפואי ועלו אותו לבקשה הרלוונטית בעמוד "היעדרויות ודיווח" ← לחיצה על הבקשה ← "העלה אישור".',
-      },
-      {
-        q: 'איך מדווחים על מילוי מקום שביצעתי?',
-        a: 'בלוח הבקרה לחצו על "מילוי מקום". מלאו את פרטי השיעור שמילאתם, הכיתה והתאריך. הדוח יישלח לאישור המנהל/ת.',
-      },
-      {
-        q: 'איך מדווחים על שעות נוספות?',
-        a: 'לחצו על "שעות נוספות" בלוח הבקרה. הזינו מספר שעות, תיאור הפעילות ותאריך. הבקשה תועבר לאישור.',
-      },
+      { q: 'מה רואים בלוח הבקרה?', a: 'לוח הבקרה מותאם לפי תפקידכם. מורים רואים: יומן, פעולות מהירות, לוח זמנים, תורנות. מנהל/ת רואה: כל ההיעדרויות, משימות פתוחות, דוח יום ועוד.' },
+      { q: 'כפתורי הפעולות המהירות', a: 'בלוח הבקרה של מורה/סגל: לחיצה על כפתור פותחת טופס מהיר. אין צורך לנווט לעמוד נפרד. למשל: "עדרויות", "שעות נוספות", "צילומים", "רכש", "תחזוקה".' },
+      { q: 'מהי הודעה יומית?', a: 'בכניסה עשויה לצוץ הודעה יומית (הכרזה, ציטוט, יום הולדת). ניתן לסגור אותה. המנהל/ת מגדיר/ה אותה ב"הגדרות מערכת".' },
+      { q: 'איפה רואים תורנות של היום?', a: 'בלוח הבקרה בתחתית. אם יש לכם תורנות – תופיע הודעה צהובה עם פרטים. אם לא – לא מוצגת.' },
     ],
   },
-
-  // ── לוח זמנים ויומן
   {
-    section: 'לוח זמנים ויומן', icon: Calendar, color: '#10b981',
+    section: 'היעדרויות ודיווח',
+    icon: Clock, color: '#eab308',
+    view: 'attendance',
+    roles: ['all'],
     items: [
-      {
-        q: 'איפה רואים את לוח הזמנים שלי?',
-        a: 'בתפריט הצדדי לחצו על "לוח זמנים". תראו את השיעורים השבועיים שלכם. לוח הזמנים מוגדר על ידי המנהל/ת ולא ניתן לעריכה ישירה על ידי המורה.',
-      },
-      {
-        q: 'איך רואים את יומן בית הספר?',
-        a: 'לחצו על "יומן בית הספר" בתפריט. תראו את כל האירועים, ימי החופש והפגישות של בית הספר. לוח היומן גלוי לכולם.',
-      },
-      {
-        q: 'איך מוסיפים אירוע ליומן?',
-        a: 'רק מנהל/ת ומשנה מנהל/ת יכולים להוסיף אירועים ליומן. אם ברצונכם להוסיף – פנו אליהם.',
-      },
-      {
-        q: 'איך יודעים מה קורה היום?',
-        a: 'בכניסה ללוח הבקרה מוצגת הודעה יומית (אם הוגדרה), וכן לוח פגישות היום. הסתכלו על הכרטיס "יומן בית הספר – היום" בפסגת הדשבורד.',
-      },
+      { q: 'איך מדווחים על היעדרות?', a: 'לחצו "העדרויות" (כפתור אדום בדשבורד) ← מלאו תאריך, סיבה ופרטים ← שלח. המנהל/ת יקבל התראה.' },
+      { q: 'מה הסטטוסים האפשריים?', a: 'ממתין לאישור (צהוב) ← מאושר (ירוק) / נדחה (אדום) / ממתין אישור רפואי (כתום). בסטטוס "ממתין אישור רפואי" – יש להגיש אישור.' },
+      { q: 'איך רואים את ההיסטוריה שלי?', a: 'בתפריט ← "היעדרויות ודיווח" ← לשונית "היעדרויות". רואים את כל הדיווחים עם סטטוסים ותאריכים.' },
+      { q: 'איך מדווחים על מילוי מקום?', a: 'בדשבורד ← "מילוי מקום" ← מלאו תאריך, שעות, כיתה ושם המורה הנעדר/ת ← שלח.' },
+      { q: 'איך מדווחים על שעות נוספות?', a: 'בדשבורד ← "שעות נוספות" ← הזינו תאריך, מספר שעות ופירוט. יש גם "שעות מיוחדות" לצומחים מחדש/תורנות.' },
+      { q: 'איך מדווחים פעילות חוץ?', a: 'בדשבורד ← "פעילות חוץ" ← ציינו יעד, שעת יציאה וחזרה.' },
     ],
   },
-
-  // ── בקשות ושירותים
   {
-    section: 'בקשות ושירותים', icon: Printer, color: '#8b5cf6',
+    section: 'אישור היעדרויות',
+    icon: Shield, color: '#0891b2',
+    view: 'attendance',
+    roles: ['admin', 'vice_principal', 'secretary'],
     items: [
-      {
-        q: 'איך מבקשים צילומים?',
-        a: 'בתפריט "מרכז צילומים" (או כפתור "הדפסה" בדשבורד). מלאו: מה להדפיס, כמה עותקים, לאיזו כיתה, ועד מתי נדרש. הבקשה תועבר לאחראי/ת הצילומים.',
-      },
-      {
-        q: 'הגשתי בקשת צילום – מתי תהיה מוכנה?',
-        a: 'לאחר אישור הבקשה, אחראי/ת הצילומים מטפל/ת לפי סדר קדימות. תקבלו התראה כשהבקשה הושלמה.',
-      },
-      {
-        q: 'איך מדווחים על תקלה בחדר / ציוד?',
-        a: 'לחצו על "תפעול ורכש" בתפריט ← "דיווח תקלה". ציינו: מה התקלה, איפה (חדר/ציוד), ורמת דחיפות. אב הבית יקבל התראה.',
-      },
-      {
-        q: 'איך מגישים בקשת רכש?',
-        a: 'בעמוד "תפעול ורכש" בחרו "בקשת רכש". ציינו: פריט, כמות, מחיר משוער ונימוק. הבקשה תועבר לאישור הנהלה.',
-      },
+      { q: 'איך מאשרים היעדרות?', a: 'בדשבורד הניהולי ← פאנל "היעדרויות ממתינות" ← לחצו "אשר" או "דחה". ניתן להוסיף הערה. המורה מקבל/ת התראה מיידית.' },
+      { q: 'איך מזינים היעדרות ידנית?', a: 'בעמוד "היעדרויות ודיווח" ← כפתור "הזנה ידנית" (כחול). בחרו מורה, תאריכים וסיבה. שמיד מופיע ברשימה.' },
+      { q: 'מה טאב "סטטיסטיקה"?', a: 'מציג טבלה: לכל עובד – מספר ימי היעדרות (מאושרים, ממתינים, נדחו) ממוינת מגבוהה לנמוכה.' },
+      { q: 'מה דוח אופקית?', a: 'טאב "דוח אופקית" מציג את כל ההיעדרויות לחודש שנבחר. סמנו כל היעדרות שדווחה במשרד החינוך. יצוא ל-CSV ו-Excel זמין.' },
+      { q: 'מה דוח שעות נוספות?', a: 'טאב "שעות נוספות" מציג טבלה לפי עובד: שעות רגילות, שעות מיוחדות וסה"כ. יצוא ל-Excel. כולל פירוט לכל דיווח.' },
     ],
   },
-
-  // ── הודעות והתראות
   {
-    section: 'הודעות והתראות', icon: Bell, color: '#f59e0b',
+    section: 'לוח זמנים ויומן',
+    icon: Calendar, color: '#10b981',
+    view: 'schedule',
+    roles: ['all'],
     items: [
-      {
-        q: 'לא מקבלים התראות – מה לעשות?',
-        a: 'לחצו על פעמון ההתראות בפינה הימנית העליונה. ודאו שהדפדפן נתן הרשאות התראה לאתר. אם לא – ב-Chrome: הגדרות ← פרטיות ← הרשאות אתרים ← התראות.',
-      },
-      {
-        q: 'איך שולחים הודעה להנהלה?',
-        a: 'בלוח הבקרה לחצו על "שלח הודעה להנהלה". כתבו את ההודעה ושלחו. ההנהלה תקבל התראה.',
-      },
-      {
-        q: 'איפה רואים הודעות שנשלחו אלי?',
-        a: 'לחצו על "מרכז הודעות" בתפריט הצדדי (אייקון פעמון). תוכלו לראות את כל ההודעות שהתקבלו.',
-      },
+      { q: 'איפה רואים את לוח הזמנים שלי?', a: 'בתפריט ← "לוח זמנים". מוצג תצוגה שבועית עם שיעורים לפי כיתה ומקצוע. בדשבורד מורה מוצגת תצוגה מקוצרת של היום.' },
+      { q: 'איך מעלים לוח זמנים?', a: 'מנהל/ת / רכז/ת ← עמוד "לוח זמנים" ← לשונית "העלאת מערכת" ← הורידו תבנית CSV ← מלאו ← העלו. ניתן גם ב-Excel.' },
+      { q: 'מה הפורמט הנדרש לייצוא?', a: 'עמודות נדרשות: email, day (0-6 או שם יום עברי), lesson (1-8), subject (מקצוע), class_name. הורידו תבנית מהעמוד.' },
+      { q: 'איפה רואים את יומן בית הספר?', a: 'בתפריט ← "יומן בית הספר". כולל אירועים, ימי חופש ופגישות. כולם יכולים לצפות, רק הנהלה יכולה לערוך.' },
+      { q: 'איך מוסיפים אירוע ליומן?', a: 'ב"ניהול יומן" (תפריט ← "ניהול יומן") ← הוסף אירוע. נגיש למנהל/ת ולסגן/ית בלבד.' },
     ],
   },
-
-  // ── למנהל/ת
   {
-    section: 'למנהל/ת', icon: Shield, color: '#0891b2',
+    section: 'מרכז צילומים',
+    icon: Printer, color: '#eab308',
+    view: 'printing',
+    roles: ['all'],
     items: [
-      {
-        q: 'איך מאשרים / דוחים היעדרות?',
-        a: 'בלוח הבקרה הניהולי, גללו ל"היעדרויות ממתינות". לחצו על הבקשה הרלוונטית ← "אשר" או "דחה". ניתן להוסיף הערה. המורה יקבל/ת התראה מיידית.',
-      },
-      {
-        q: 'איך מוסיפים עובד/ת חדש/ה למערכת?',
-        a: 'עברו ל"ניהול צוות" בתפריט. לחצו "הוסף עובד". מלאו: שם מלא, מייל, תפקיד וסוג מגדר (בן/בת). המערכת תשלח הזמנה לכניסה.',
-      },
-      {
-        q: 'איך מגדירים הודעה יומית?',
-        a: 'עברו ל"ניהול צוות" ← "הגדרות מוסד" ← לשונית "הודעות יומיות". לחצו "הוסף הודעה", בחרו סוג (חג / יום הולדת / ציטוט / הכרזה), הגדירו תאריך (חד-פעמי או שנתי חוזר), כתבו את ההודעה ושמרו. ההודעה תופיע לכל הצוות בתאריך שנקבע.',
-      },
-      {
-        q: 'איך מגדירים את סוג בית הספר (בנים/בנות/מעורב)?',
-        a: 'הגדרות מוסד ← לשונית "סוג בית הספר". בחרו: בית ספר בנות (פנייה בלשון נקבה), בנים (זכר) או מעורב. ניתן גם להגדיר לכל עובד/ת את המגדר האישי שלו/שלה דרך "ניהול צוות" ← לחיצה על העובד/ת.',
-      },
-      {
-        q: 'איך יוצרים דוח לתדפיס?',
-        a: 'בלוח הבקרה הניהולי לחצו "ייצוא דוח PDF". המסך יתאים את עצמו להדפסה ותוכלו לשמור כ-PDF. עבור מורה ספציפי/ת – בקשו ממנו/ממנה להפיק דוח אישי.',
-      },
-      {
-        q: 'איך רואים מה קרה היום במערכת?',
-        a: 'בלוח הבקרה הניהולי, גללו ל"פעילות אחרונה". תוכלו לראות פיד בזמן אמת של כל הפעולות: היעדרויות חדשות, בקשות רכש, תקלות תחזוקה – עם חותמת זמן לכל פעולה.',
-      },
-      {
-        q: 'איך שולחים הודעה לכל הצוות?',
-        a: 'בלוח הבקרה לחצו "שלח WhatsApp לצוות" לפתיחת WhatsApp Web עם הודעה מוכנה, או "הערה מעצימה לצוות" לשליחת הודעה דרך מערכת ההודעות הפנימית.',
-      },
+      { q: 'איך שולחים בקשת צילום?', a: 'בתפריט ← "מרכז צילומים" ← "בקשת צילום חדשה" ← העלו PDF, ציינו מקצוע, כיתה, כמות עותקים ועמודים בקובץ. הוסיפו הערות אם צריך ← שלח לאישור.' },
+      { q: 'מה הסטטוסים בבקשת צילום?', a: 'ממתין → מאושר (הנהלה אישרה) → בהדפסה (המזכירה מדפיסה) → הושלם. ניתן לבטל בקשה בסטטוס "ממתין" בלחיצה על X.' },
+      { q: 'אפשר לדחות את המועד?', a: 'בטופס הבקשה יש שדה "נדרש עד תאריך". מלאו את המועד הרצוי ← המזכירה תדע לתעדף.' },
+      { q: 'אפשר לבקש דו-צדדי / A3 / צבעוני?', a: 'כן! בטופס הבקשה בחרו: גודל נייר (A4/A3/מיוחד), מצב צבע (שחור-לבן / צבעוני) ותיבת "דו-צדדי".' },
+      { q: 'כמנהל/ת – איך מאשרים בקשות?', a: 'בעמוד "מרכז צילומים" ← בקשות ממתינות ← לחצו "אשר". ניתן לראות את הקובץ לפני אישור.' },
+      { q: 'כמזכירה – איך מסמנים הדפסה הושלמה?', a: 'בחרו בקשות עם checkbox ← "סמן הושלם" (או "סמן בהדפסה"). לחצן "הדפס" מדפיס ישירות. יש גם כפתור WhatsApp להודעה אוטומטית.' },
+      { q: 'איך מייצאים דוח הדפסות ל-Excel?', a: 'בראש עמוד "מרכז צילומים" ← כפתור ירוק "יצוא Excel". מכיל את כל הבקשות עם כל הפרטים.' },
+      { q: 'מה הגרף "מעקב צילומים לפי מורה"?', a: 'בתחתית העמוד (למנהל/ת ומזכירה) יש טבלה מתרחבת לפי מורה ← לחצו על שם מורה לפירוט לפי כיתה ומקצוע.' },
     ],
   },
-
-  // ── אבחון תקלות
   {
-    section: 'אבחון תקלות', icon: Wrench, color: '#64748b',
+    section: 'תפעול ורכש',
+    icon: Wrench, color: '#64748b',
+    view: 'maintenance',
+    roles: ['all'],
     items: [
-      {
-        q: 'הדף נטען אבל ריק – מה קורה?',
-        a: 'ייתכן שאין לכם הרשאה לתצוגה זו, או שיש בעיית תקשורת עם השרת. נסו לרענן (F5). אם הבעיה חוזרת – צרו קשר עם מנהל/ת המערכת.',
-      },
-      {
-        q: 'לחצתי שמור אבל השינויים לא נשמרו?',
-        a: 'ודאו שהופיעה הודעת הצלחה (ירוקה) בפינה. אם לא הופיעה – בדקו שיש חיבור לאינטרנט ונסו שוב. אם השגיאה נמשכת – צלמו מסך ופנו לתמיכה.',
-      },
-      {
-        q: 'המערכת איטית – מה לעשות?',
-        a: '1. סגרו לשוניות מיותרות בדפדפן. 2. נסו Chrome במקום Safari. 3. נסו לנקות מטמון (Ctrl+Shift+Delete). 4. ודאו שהאינטרנט תקין.',
-      },
+      { q: 'איך מדווחים תקלה?', a: 'בתפריט ← "תפעול ורכש" ← "תקלה חדשה". ציינו: תיאור, חדר / ציוד, רמת דחיפות. אב הבית יקבל התראה.' },
+      { q: 'איך מגישים בקשת רכש?', a: 'בדשבורד ← "רכש" (כפתור כתום) ← פרטי הפריט, כמות ומחיר משוער ← שלח. הבקשה תועבר לאישור הנהלה.' },
+      { q: 'אפשר לצרף תמונה לתקלה?', a: 'כן! בטופס הדיווח יש אפשרות לצלם / לצרף תמונה של התקלה.' },
+      { q: 'מתי הבקשה תטופל?', a: 'לאחר שהבקשה מאושרת על ידי הנהלה, אב הבית מקבל הקצאה ומסמן "בטיפול" / "טופל". תקבלו התראה.' },
+    ],
+  },
+  {
+    section: 'משימות ואישורים',
+    icon: CheckSquare, color: '#ca8a04',
+    view: 'tasks',
+    roles: ['all'],
+    items: [
+      { q: 'מה ניתן לאשר בעמוד "משימות"?', a: 'כל הבקשות הממתינות לאישורכם: חתימות, אישורי חופשה, בקשות מיוחדות. הסטטוסים: ממתין / אושר / נדחה.' },
+      { q: 'איך יוצרים משימה חדשה?', a: 'בעמוד "משימות" ← "+ משימה חדשה". ניתן להקצות למשתמש אחר, להוסיף תאריך יעד ותיאור.' },
+      { q: 'איך מסמנים משימה כהושלמה?', a: 'לחצו על ✓ לצד המשימה. הסטטוס ישתנה ל"הושלמה" ובעל/ת המשימה יקבל/ת התראה.' },
+    ],
+  },
+  {
+    section: 'הודעות והתראות',
+    icon: Bell, color: '#f59e0b',
+    view: 'notifications',
+    roles: ['all'],
+    items: [
+      { q: 'איפה רואים התראות?', a: 'לחצו על פעמון בסרגל העליון. גם בתפריט ← "התראות" יש רשימה מלאה. Badge אדום מציין כמות שלא נקראו.' },
+      { q: 'לא מקבלים התראות – מה לעשות?', a: 'Chrome: לחצו על מנעול בשורת הכתובת ← "התראות" ← "אפשר". לאחר מכן ב"הגדרות" ← "התראות" ← "אפשר דחיפה לנייד".' },
+      { q: 'איך שולחים הודעה להנהלה?', a: 'בלוח הבקרה ← כפתור ורוד "שלח הודעה למנהלת". כתבו את ההודעה ושלחו. ההנהלה מקבלת התראה.' },
+      { q: 'איפה ההודעות שנשלחו אלי?', a: 'בתפריט ← "התראות". כל ההודעות מופיעות שם לפי סדר זמן, עם סינון לפי סוג.' },
+    ],
+  },
+  {
+    section: 'ניהול צוות',
+    icon: Users, color: '#f97316',
+    view: 'hr',
+    roles: ['admin', 'vice_principal', 'secretary'],
+    items: [
+      { q: 'איך מוסיפים עובד/ת חדש/ה?', a: 'בתפריט ← "ניהול צוות" ← "+ הוסף עובד". מלאו: שם מלא, מייל, תפקיד ומגדר. המערכת תשלח הזמנה.' },
+      { q: 'איך עורכים פרטי עובד/ת?', a: 'בניהול צוות ← לחצו על שם העובד/ת ← ערכו שדות ← שמרו. שינוי תפקיד משפיע על הגישה של העובד/ת.' },
+      { q: 'איך מגדירים הודעה יומית?', a: 'ניהול צוות ← "הגדרות מוסד" ← "הודעות יומיות" ← הוסף. בחרו: סוג, תאריך (חד-פעמי / שנתי חוזר), כתבו טקסט ← שמרו.' },
+      { q: 'איך שולחים WhatsApp לכל הצוות?', a: 'בדשבורד ניהול ← כפתור "שלח WhatsApp לצוות" ← נפתח WhatsApp Web עם הודעה מוכנה. ניתן לערוך לפני שליחה.' },
+    ],
+  },
+  {
+    section: 'קליטת מחליפים',
+    icon: FileText, color: '#14b8a6',
+    view: 'onboarding',
+    roles: ['admin', 'vice_principal', 'substitute'],
+    items: [
+      { q: 'מה עמוד "טפסי קליטה"?', a: 'מאפשר למחליפים / עובדים חדשים למלא טפסי קליטה דיגיטלית: פרטים אישיים, חשבון בנק, הצהרות ועוד.' },
+      { q: 'מחליפ/ה – איך ממלאים טפסי קליטה?', a: 'בתפריט ← "טפסי קליטה". מלאו את הטפסים ← שלח. הנהלה תקבל הודעה שהטפסים הוגשו.' },
+    ],
+  },
+  {
+    section: 'ניהול תורנויות',
+    icon: Clock, color: '#eab308',
+    view: 'duty-management',
+    roles: ['admin', 'vice_principal', 'coordinator'],
+    items: [
+      { q: 'איך מגדירים תורנויות לצוות?', a: 'בתפריט ← "ניהול תורנויות" ← הוסף תורנות. בחרו: עובד, יום, שעה וסוג תורנות. מורה יקבל/ת התראה.' },
+      { q: 'איך מורה רואה את התורנות שלו/ה?', a: 'בלוח הבקרה ← כרטיס "תורנות היום". תיפתח הודעה צהובה עם פרטים. ניתן גם לראות ב"ניהול תורנויות".' },
+    ],
+  },
+  {
+    section: 'ניהול חדרים',
+    icon: Home, color: '#84cc16',
+    view: 'room-management',
+    roles: ['all'],
+    items: [
+      { q: 'איך רואים פנויות חדרים?', a: 'בתפריט ← "ניהול חדרים". נראים כל החדרים עם סטטוס (תפוס / פנוי). לחצו על חדר לפרטים נוספים.' },
+      { q: 'איך מבקשים חדר?', a: 'לחצו על חדר פנוי ← "בקש חדר" ← ציינו שעה ותיאור ← שלח לאישור.' },
+    ],
+  },
+  {
+    section: 'דוחות ויצוא',
+    icon: BarChart3, color: '#2563eb',
+    view: 'reports',
+    roles: ['admin', 'vice_principal', 'coordinator', 'secretary'],
+    items: [
+      { q: 'מה כלול בעמוד "דוחות"?', a: '5 לשוניות: היעדרויות, רכש, הדפסות, תורנויות, תחזוקה. כל לשונית מציגה טבלה מלאה עם יצוא Excel. בראש: 4 KPIs עם מספרים עדכניים.' },
+      { q: 'איך מייצאים לExcel?', a: 'בכל לשונית יש כפתור "יצוא Excel" ← לחצו ← הקובץ מורד מיד. הוא כולל את כל השורות (עד 100 בתצוגה, הכול בExcel).' },
+      { q: 'מה דוח ריכוז שעות נוספות?', a: 'בעמוד "היעדרויות ודיווח" ← טאב "שעות נוספות". מציג: שעות רגילות, מיוחדות וסה"כ לכל עובד עם יצוא Excel.' },
+    ],
+  },
+  {
+    section: 'אנליטיקס',
+    icon: BarChart2, color: '#06b6d4',
+    view: 'analytics',
+    roles: ['admin', 'vice_principal'],
+    items: [
+      { q: 'מה ניתן לראות באנליטיקס?', a: 'גרפים ותובנות על: היעדרויות לפי חודש, עובדים עם הכי הרבה היעדרויות, עלות שעות נוספות, מגמות לאורך זמן.' },
+      { q: 'האם הנתונים בזמן אמת?', a: 'כן – הנתונים מתעדכנים ברגע שנוצרת פעולה חדשה במערכת (היעדרות מאושרת, בקשה ממתינה וכו\').' },
+    ],
+  },
+  {
+    section: 'הגדרות מערכת',
+    icon: SlidersHorizontal, color: '#64748b',
+    view: 'settings',
+    roles: ['admin', 'vice_principal'],
+    items: [
+      { q: 'מה אפשר להגדיר בהגדרות?', a: '4 לשוניות: פיצ\'רים (הפעלה/כיבוי תכונות), WhatsApp (חיבור Green API), בית הספר (שם ולוגו), התראות (הרשאת push לנייד).' },
+      { q: 'איך מפעילים / מכבים תכונה?', a: '"הגדרות מערכת" ← "פיצ\'רים" ← החליפו את המתג. למשל: WhatsApp, לוח זמנים, דוחות, קהילה. השינוי נכנס לתוקף מיד.' },
+      { q: 'איך מחברים WhatsApp?', a: '"הגדרות מערכת" ← "WhatsApp" ← הזינו Instance ID ו-API Token מחשבון Green API שלכם. לחצו "שמור" ← "בדוק חיבור".' },
+      { q: 'Green API – איך מקבלים חשבון?', a: 'גשו ל-green-api.com ← הירשמו ← צרו instance ← קחו את המזהה (ID) והטוקן (Token) ← הזינו בהגדרות.' },
+    ],
+  },
+  {
+    section: 'קהילה והווי',
+    icon: Heart, color: '#eab308',
+    view: 'community',
+    roles: ['all'],
+    items: [
+      { q: 'מה ניתן לשתף בקהילה?', a: 'הודעות, תמונות, הכרזות וחגיגות. זהו מרחב פנימי לצוות בית הספר.' },
+      { q: 'האם כולם יכולים לפרסם?', a: 'כן – כל חברי הצוות יכולים לפרסם. ניתן להגיב ולהגיב על פוסטים.' },
+    ],
+  },
+  {
+    section: 'ניהול קבצים',
+    icon: FolderOpen, color: '#3b82f6',
+    view: 'file-management',
+    roles: ['all'],
+    items: [
+      { q: 'איך מעלים קובץ?', a: 'בתפריט ← "ניהול קבצים" ← "+ העלה קובץ". בחרו קובץ מהמחשב, ציינו שם ותיאור.' },
+      { q: 'מי יכול לראות קבצים שהעליתי?', a: 'בהעלאה ניתן לסמן "ציבורי" (כולם) או להשאיר פרטי (רק אתם). מנהל/ת רואה הכל.' },
+    ],
+  },
+  {
+    section: 'אבחון תקלות',
+    icon: Wrench, color: '#475569',
+    view: null,
+    roles: ['all'],
+    items: [
+      { q: 'הדף נטען ריק', a: 'ייתכן שאין לכם הרשאה, או שגיאת תקשורת. רענן (F5). אם חוזר – פנו למנהל/ת.' },
+      { q: 'לחצתי שמור אבל לא נשמר', a: 'בדקו שהופיעה הודעת הצלחה ירוקה. אם לא – ודאו חיבור לאינטרנט ונסו שוב. צלמו מסך ופנו לתמיכה.' },
+      { q: 'המערכת איטית', a: '1. סגרו לשוניות מיותרות. 2. נסו Chrome במקום Safari. 3. נקו מטמון (Ctrl+Shift+Delete). 4. ודאו שהאינטרנט תקין.' },
+      { q: 'לא רואה תפריט מסוים', a: 'ייתכן שהתכונה כבויה. מנהל/ת יכולה להפעיל ב"הגדרות מערכת" ← "פיצ\'רים". ייתכן גם שאין לכם הרשאה לאותה תכונה.' },
     ],
   },
 ];
 
-// ─────────────────────────────────────────────
-//  Components
-// ─────────────────────────────────────────────
+const ROLE_LABEL = {
+  admin: 'מנהל/ת',
+  vice_principal: 'סגן/ית מנהל',
+  secretary: 'מזכירה',
+  teacher: 'מורה',
+  coordinator: 'רכז/ת',
+  counselor: 'יועצ/ת',
+  assistant: 'סייע/ת',
+  substitute: 'מחליפ/ה',
+  maintenance: 'אב בית',
+  user: 'עובד/ת',
+};
+
 function FAQItem({ q, a, isOpen, onToggle }) {
   return (
     <div className={`rounded-xl border transition-all duration-200 overflow-hidden
-      ${isOpen ? 'border-indigo-200 dark:border-indigo-700 shadow-sm' : 'border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600'}`}>
-      <button
-        className="w-full flex items-start justify-between gap-4 p-4 text-right"
-        onClick={onToggle}
-      >
-        <span className={`font-semibold text-sm leading-relaxed ${isOpen ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-800 dark:text-slate-100'}`}>
+      ${isOpen ? 'border-blue-200 shadow-sm' : 'border-slate-100 hover:border-slate-200'}`}>
+      <button className="w-full flex items-start justify-between gap-4 p-4 text-right" onClick={onToggle}>
+        <span className={`font-semibold text-sm leading-relaxed ${isOpen ? 'text-blue-700' : 'text-slate-800'}`}>
           {q}
         </span>
         <div className={`flex-shrink-0 mt-0.5 p-0.5 rounded-full transition-colors
-          ${isOpen ? 'bg-indigo-100 dark:bg-indigo-900' : 'bg-slate-100 dark:bg-slate-700'}`}>
-          {isOpen
-            ? <ChevronUp className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-            : <ChevronDown className="h-4 w-4 text-slate-400" />}
+          ${isOpen ? 'bg-blue-100' : 'bg-slate-100'}`}>
+          {isOpen ? <ChevronUp className="h-4 w-4 text-blue-600" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
         </div>
       </button>
       {isOpen && (
-        <div className="px-4 pb-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 pt-3">
+        <div className="px-4 pb-4 text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
           {a}
         </div>
       )}
@@ -225,15 +273,22 @@ function FAQItem({ q, a, isOpen, onToggle }) {
   );
 }
 
-export default function HelpCenter({ userRole }) {
+export default function HelpCenter({ userRole, onNavigate }) {
   const [query, setQuery] = useState('');
   const [openId, setOpenId] = useState(null);
   const [activeSection, setActiveSection] = useState('all');
+  const [roleFilter, setRoleFilter] = useState(true); // show role-relevant only
 
-  // Filter
+  const visibleSections = useMemo(() => {
+    if (!roleFilter || !userRole) return FAQ;
+    return FAQ.filter(s =>
+      s.roles.includes('all') || s.roles.includes(userRole)
+    );
+  }, [userRole, roleFilter]);
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return FAQ.map(section => ({
+    return visibleSections.map(section => ({
       ...section,
       items: section.items.filter(item =>
         !q || item.q.includes(q) || item.a.includes(q)
@@ -242,73 +297,80 @@ export default function HelpCenter({ userRole }) {
       if (activeSection !== 'all' && s.section !== activeSection) return false;
       return s.items.length > 0;
     });
-  }, [query, activeSection]);
+  }, [query, activeSection, visibleSections]);
 
   const totalResults = filtered.reduce((sum, s) => sum + s.items.length, 0);
 
   return (
-    <div className="space-y-6 animate-fade-in" dir="rtl">
+    <div className="space-y-5" dir="rtl">
 
-      {/* Hero */}
-      <div className="relative rounded-2xl overflow-hidden p-8 text-white"
-           style={{ background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 60%, #6366f1 100%)' }}>
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-8 -left-8 h-40 w-40 rounded-full bg-white/10" />
-          <div className="absolute -bottom-6 -right-6 h-28 w-28 rounded-full bg-white/10" />
-        </div>
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
-              <HelpCircle className="h-7 w-7 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-black">מרכז עזרה</h1>
-              <p className="text-white/70 text-sm">שאלות ותשובות – SMART BASE</p>
-            </div>
-          </div>
-
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
-            <input
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              placeholder="חפשו שאלה..."
-              className="w-full bg-white/15 backdrop-blur-sm border border-white/20 rounded-xl pr-10 pl-4 py-3 text-white placeholder-white/50 outline-none focus:bg-white/20 focus:border-white/40 transition-all text-sm"
-            />
-          </div>
-          {query && (
-            <p className="text-white/60 text-xs mt-2">
-              {totalResults === 0 ? 'לא נמצאו תוצאות' : `נמצאו ${totalResults} תשובות`}
-            </p>
-          )}
-        </div>
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+          <div className="p-2 rounded-xl bg-blue-100"><HelpCircle className="h-5 w-5 text-blue-600" /></div>
+          מרכז עזרה
+        </h1>
+        <p className="text-sm text-slate-400 mt-1 mr-11">SMART BASE · {ROLE_LABEL[userRole] || 'משתמש/ת'}</p>
       </div>
 
-      {/* Section Filter */}
-      <div className="flex gap-2 flex-wrap">
+      {/* Search */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+        <div className="relative">
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <input
+            value={query}
+            onChange={e => { setQuery(e.target.value); setActiveSection('all'); }}
+            placeholder="חפשו שאלה..."
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl pr-10 pl-4 py-2.5 text-slate-800 placeholder-slate-400 outline-none focus:border-blue-400 focus:bg-white transition-all text-sm"
+          />
+        </div>
+        {query && (
+          <p className="text-slate-400 text-xs mt-2 pr-1">
+            {totalResults === 0 ? 'לא נמצאו תוצאות' : `נמצאו ${totalResults} תשובות`}
+          </p>
+        )}
+      </div>
+
+      {/* Role filter toggle */}
+      {userRole && (
+        <div className="flex items-center gap-3 bg-white rounded-xl border border-slate-200 px-4 py-3">
+          <label className="flex items-center gap-2 cursor-pointer flex-1">
+            <div className="relative">
+              <input type="checkbox" className="sr-only peer" checked={roleFilter} onChange={e => setRoleFilter(e.target.checked)} />
+              <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:bg-blue-600 peer-checked:after:translate-x-4 rtl:peer-checked:after:-translate-x-4 after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all" />
+            </div>
+            <span className="text-sm font-semibold text-slate-700">הצג רק עזרה רלוונטית לתפקידי ({ROLE_LABEL[userRole]})</span>
+          </label>
+          <span className="text-xs text-slate-400 bg-slate-100 rounded-full px-2 py-0.5">
+            {visibleSections.length} נושאים
+          </span>
+        </div>
+      )}
+
+      {/* Section pills */}
+      <div className="flex gap-1.5 flex-wrap">
         <button
           onClick={() => setActiveSection('all')}
           className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border
-            ${activeSection === 'all' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:border-indigo-300'}`}
+            ${activeSection === 'all' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-200 hover:border-blue-300'}`}
         >
           הכל
         </button>
-        {FAQ.map(s => (
+        {visibleSections.map(s => (
           <button
             key={s.section}
             onClick={() => setActiveSection(activeSection === s.section ? 'all' : s.section)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border
-              ${activeSection === s.section ? 'text-white border-transparent' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:border-indigo-300'}`}
+            className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border
+              ${activeSection === s.section ? 'text-white border-transparent' : 'bg-white text-slate-600 border-slate-200 hover:border-blue-300'}`}
             style={activeSection === s.section ? { background: s.color } : {}}
           >
-            <s.icon className="h-3.5 w-3.5" />
+            <s.icon className="h-3 w-3" />
             {s.section}
           </button>
         ))}
       </div>
 
-      {/* FAQ Sections */}
+      {/* Results */}
       {filtered.length === 0 ? (
         <div className="text-center py-16 text-slate-400">
           <HelpCircle className="h-12 w-12 mx-auto mb-3 opacity-40" />
@@ -317,28 +379,32 @@ export default function HelpCenter({ userRole }) {
         </div>
       ) : (
         filtered.map(section => (
-          <div key={section.section} className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-            {/* Section Header */}
-            <div className="flex items-center gap-3 p-5 border-b border-slate-100 dark:border-slate-700">
-              <div className="p-2.5 rounded-xl"
-                   style={{ background: `${section.color}18`, border: `1px solid ${section.color}30` }}>
+          <div key={section.section} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="flex items-center gap-3 p-4 md:p-5 border-b border-slate-100">
+              <div className="p-2.5 rounded-xl" style={{ background: `${section.color}18`, border: `1px solid ${section.color}30` }}>
                 <section.icon className="h-5 w-5" style={{ color: section.color }} />
               </div>
-              <h2 className="font-bold text-slate-800 dark:text-white">{section.section}</h2>
-              <span className="mr-auto text-xs text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">
-                {section.items.length} שאלות
-              </span>
+              <div className="flex-1 min-w-0">
+                <h2 className="font-bold text-slate-800">{section.section}</h2>
+                <p className="text-xs text-slate-400">{section.items.length} שאלות</p>
+              </div>
+              {onNavigate && section.view && (
+                <button
+                  onClick={() => onNavigate(section.view)}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors text-white flex-shrink-0"
+                  style={{ background: section.color }}
+                >
+                  עבור לתכונה
+                  <ArrowLeft className="h-3 w-3" />
+                </button>
+              )}
             </div>
-
-            {/* Items */}
             <div className="p-4 space-y-2">
               {section.items.map((item, i) => {
                 const id = `${section.section}-${i}`;
                 return (
                   <FAQItem
-                    key={id}
-                    q={item.q}
-                    a={item.a}
+                    key={id} q={item.q} a={item.a}
                     isOpen={openId === id}
                     onToggle={() => setOpenId(openId === id ? null : id)}
                   />
@@ -349,12 +415,13 @@ export default function HelpCenter({ userRole }) {
         ))
       )}
 
-      {/* Contact Footer */}
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 text-center text-white">
-        <Star className="h-8 w-8 mx-auto mb-3 text-yellow-400" />
-        <h3 className="font-bold text-lg mb-1">לא מצאתם תשובה?</h3>
-        <p className="text-slate-400 text-sm mb-4">פנו למנהל/ת המערכת שיוכלו לעזור לכם ישירות.</p>
-        <p className="text-xs text-slate-500">SMART BASE · מערכת ניהול חכמה</p>
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 text-center">
+        <div className="p-3 rounded-xl bg-yellow-100 w-fit mx-auto mb-3">
+          <Star className="h-5 w-5 text-yellow-600" />
+        </div>
+        <h3 className="font-bold text-slate-800 mb-1">לא מצאתם תשובה?</h3>
+        <p className="text-slate-500 text-sm">פנו למנהל/ת המערכת שיוכלו לעזור ישירות.</p>
+        <p className="text-xs text-slate-300 mt-3">SMART BASE · מערכת ניהול חכמה</p>
       </div>
     </div>
   );

@@ -18,7 +18,7 @@ export default function FilePreview({ file }) {
         return (
           <div className="w-full h-64 bg-slate-100 rounded-lg flex items-center justify-center border border-slate-200">
             <div className="text-center">
-              <FileText className="h-12 w-12 text-red-500 mx-auto mb-2" />
+              <FileText className="h-12 w-12 text-yellow-500 mx-auto mb-2" />
               <p className="text-sm text-slate-600">קובץ PDF - לחץ להורדה</p>
             </div>
           </div>

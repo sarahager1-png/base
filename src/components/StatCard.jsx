@@ -2,99 +2,131 @@ import React from 'react';
 import { useCountUp } from '@/hooks/useCountUp';
 
 const COLOR_MAP = {
-  red:    { from: '#ef4444', to: '#dc2626', light: '#fef2f2', text: '#b91c1c', glow: '#ef444440' },
-  amber:  { from: '#f59e0b', to: '#d97706', light: '#fffbeb', text: '#b45309', glow: '#f59e0b40' },
-  green:  { from: '#10b981', to: '#059669', light: '#ecfdf5', text: '#047857', glow: '#10b98140' },
-  blue:   { from: '#3b82f6', to: '#2563eb', light: '#eff6ff', text: '#1d4ed8', glow: '#3b82f640' },
-  purple: { from: '#8b5cf6', to: '#7c3aed', light: '#f5f3ff', text: '#6d28d9', glow: '#8b5cf640' },
-  cyan:   { from: '#06b6d4', to: '#0891b2', light: '#ecfeff', text: '#0e7490', glow: '#06b6d440' },
-  orange: { from: '#f97316', to: '#ea580c', light: '#fff7ed', text: '#c2410c', glow: '#f9731640' },
+  blue:   {
+    accentBar: 'bg-blue-500',
+    iconBg:    'bg-blue-600',
+    iconText:  'text-white',
+    numText:   'text-blue-600',
+    hoverGlow: 'hover:shadow-blue-100',
+    hoverBorder: 'hover:border-blue-200',
+  },
+  green:  {
+    accentBar: 'bg-emerald-500',
+    iconBg:    'bg-emerald-600',
+    iconText:  'text-white',
+    numText:   'text-emerald-600',
+    hoverGlow: 'hover:shadow-emerald-100',
+    hoverBorder: 'hover:border-emerald-200',
+  },
+  yellow: {
+    accentBar: 'bg-amber-400',
+    iconBg:    'bg-amber-500',
+    iconText:  'text-white',
+    numText:   'text-amber-600',
+    hoverGlow: 'hover:shadow-amber-100',
+    hoverBorder: 'hover:border-amber-200',
+  },
+  red:    {
+    accentBar: 'bg-red-500',
+    iconBg:    'bg-red-500',
+    iconText:  'text-white',
+    numText:   'text-red-600',
+    hoverGlow: 'hover:shadow-red-100',
+    hoverBorder: 'hover:border-red-200',
+  },
+  amber:  {
+    accentBar: 'bg-amber-400',
+    iconBg:    'bg-amber-500',
+    iconText:  'text-white',
+    numText:   'text-amber-600',
+    hoverGlow: 'hover:shadow-amber-100',
+    hoverBorder: 'hover:border-amber-200',
+  },
+  orange: {
+    accentBar: 'bg-orange-500',
+    iconBg:    'bg-orange-500',
+    iconText:  'text-white',
+    numText:   'text-orange-600',
+    hoverGlow: 'hover:shadow-orange-100',
+    hoverBorder: 'hover:border-orange-200',
+  },
+  purple: {
+    accentBar: 'bg-violet-500',
+    iconBg:    'bg-violet-600',
+    iconText:  'text-white',
+    numText:   'text-violet-600',
+    hoverGlow: 'hover:shadow-violet-100',
+    hoverBorder: 'hover:border-violet-200',
+  },
+  cyan:   {
+    accentBar: 'bg-cyan-500',
+    iconBg:    'bg-cyan-600',
+    iconText:  'text-white',
+    numText:   'text-cyan-600',
+    hoverGlow: 'hover:shadow-cyan-100',
+    hoverBorder: 'hover:border-cyan-200',
+  },
+  indigo: {
+    accentBar: 'bg-indigo-500',
+    iconBg:    'bg-indigo-600',
+    iconText:  'text-white',
+    numText:   'text-indigo-600',
+    hoverGlow: 'hover:shadow-indigo-100',
+    hoverBorder: 'hover:border-indigo-200',
+  },
 };
 
-export default function StatCard({ title, value, icon: Icon, color, subtext, trend }) {
+export default function StatCard({ title, value, icon: Icon, color, subtext, trend, onClick }) {
   const c = COLOR_MAP[color] || COLOR_MAP.blue;
   const animated = useCountUp(typeof value === 'number' ? value : 0);
   const display = typeof value === 'number' ? animated : value;
 
   return (
     <div
-      className="relative rounded-2xl p-6 overflow-hidden group cursor-default
-                 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
-      style={{
-        background: `linear-gradient(145deg, ${c.light} 0%, #ffffff 55%, ${c.light}80 100%)`,
-        boxShadow: `0 2px 8px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)`,
-        border: `1px solid ${c.from}20`,
-      }}
+      onClick={onClick}
+      className={`
+        group relative bg-white rounded-2xl border border-slate-200 p-5 overflow-hidden
+        transition-all duration-200
+        hover:-translate-y-1 hover:shadow-xl ${c.hoverGlow} ${c.hoverBorder}
+        ${onClick ? 'cursor-pointer' : 'cursor-default'}
+      `}
     >
-      {/* Thick top accent bar */}
-      <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl"
-           style={{ background: `linear-gradient(90deg, ${c.from}, ${c.to})` }} />
+      {/* Top accent bar */}
+      <div className={`absolute inset-x-0 top-0 h-[3px] ${c.accentBar} opacity-0 group-hover:opacity-100 transition-opacity duration-200`} />
 
-      {/* Large primary glow blob */}
-      <div className="absolute -top-10 -left-10 h-40 w-40 rounded-full opacity-25 blur-3xl
-                      transition-opacity duration-300 group-hover:opacity-45"
-           style={{ background: `radial-gradient(circle, ${c.from}, transparent)` }} />
-
-      {/* Secondary glow bottom-right */}
-      <div className="absolute -bottom-8 -right-6 h-28 w-28 rounded-full opacity-15 blur-2xl
-                      transition-opacity duration-300 group-hover:opacity-30"
-           style={{ background: `radial-gradient(circle, ${c.to}, transparent)` }} />
-
-      <div className="relative flex items-start justify-between">
-        <div className="flex-1">
-          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
-            {title}
-          </p>
-          {/* Gradient number */}
-          <h3
-            className="text-4xl font-black mb-1 leading-none tabular-nums"
-            style={{
-              background: `linear-gradient(135deg, ${c.from}, ${c.to})`,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
-          >
-            {display}
-          </h3>
-          {subtext && (
-            <p className="text-xs text-slate-400 mt-2 font-medium">{subtext}</p>
-          )}
+      {/* Icon + trend */}
+      <div className="flex items-start justify-between mb-4">
+        <div className={`
+          p-2.5 rounded-xl ${c.iconBg}
+          shadow-sm group-hover:scale-110 group-hover:shadow-md transition-all duration-200
+        `}>
+          <Icon className={`h-5 w-5 ${c.iconText}`} />
         </div>
-
-        {/* Icon with outer ring glow */}
-        <div className="flex-shrink-0 relative">
-          {/* Glow ring behind icon */}
-          <div
-            className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md"
-            style={{ background: `linear-gradient(135deg, ${c.from}, ${c.to})`, transform: 'scale(1.3)' }}
-          />
-          <div
-            className="relative p-3.5 rounded-2xl shadow-lg transition-transform duration-300 group-hover:scale-110"
-            style={{
-              background: `linear-gradient(135deg, ${c.from}, ${c.to})`,
-              boxShadow: `0 8px 25px ${c.glow}`,
-            }}
-          >
-            <Icon className="h-6 w-6 text-white" />
-          </div>
-        </div>
-      </div>
-
-      {trend !== undefined && (
-        <div className="relative mt-4 pt-3 border-t flex items-center gap-1"
-             style={{ borderColor: `${c.from}20` }}>
-          <span
-            className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-              trend >= 0
-                ? 'bg-emerald-50 text-emerald-600'
-                : 'bg-red-50 text-red-500'
-            }`}
-          >
+        {trend !== undefined && (
+          <span className={`text-[11px] font-bold px-2 py-1 rounded-lg ${
+            trend >= 0
+              ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+              : 'bg-red-50 text-red-500 border border-red-100'
+          }`}>
             {trend >= 0 ? '↑' : '↓'} {Math.abs(trend)}%
           </span>
-          <span className="text-xs text-slate-400">מהשבוע שעבר</span>
-        </div>
+        )}
+      </div>
+
+      {/* Number */}
+      <p className={`text-4xl font-black tabular-nums leading-none mb-1.5 tracking-tight ${c.numText}`}>
+        {display}
+      </p>
+
+      {/* Label */}
+      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest leading-tight">
+        {title}
+      </p>
+
+      {subtext && (
+        <p className="text-[11px] text-slate-400 mt-2.5 pt-2.5 border-t border-slate-100">
+          {subtext}
+        </p>
       )}
     </div>
   );

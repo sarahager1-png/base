@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { useAuth } from '@/lib/AuthContext';
 import { Shield, Plus, Calendar, MapPin, Clock, X, Trash2, Edit2, Save, CheckCircle, XCircle, Bell } from 'lucide-react';
 
@@ -131,14 +131,14 @@ export default function DutyManagementPage() {
 
       {/* Teacher: Pending Duty Approvals */}
       {myPendingDuties.length > 0 && (
-        <div className="bg-amber-50 border border-amber-300 rounded-2xl p-5">
-          <h3 className="font-bold text-amber-900 flex items-center gap-2 mb-3">
-            <Bell className="h-5 w-5 text-amber-600" />
+        <div className="bg-yellow-50 border border-yellow-300 rounded-2xl p-5">
+          <h3 className="font-bold text-yellow-900 flex items-center gap-2 mb-3">
+            <Bell className="h-5 w-5 text-yellow-700" />
             תורנויות הממתינות לאישורך ({myPendingDuties.length})
           </h3>
           <div className="space-y-2">
             {myPendingDuties.map(duty => (
-              <div key={duty.id} className="flex items-center justify-between p-3 bg-white rounded-xl border border-amber-200">
+              <div key={duty.id} className="flex items-center justify-between p-3 bg-white rounded-xl border border-yellow-200">
                 <div>
                   <p className="font-semibold text-slate-800">{duty.duty_type}</p>
                   <p className="text-sm text-slate-500">{duty.day}/{selectedMonth + 1}/{selectedYear} • {duty.time}</p>
@@ -153,7 +153,7 @@ export default function DutyManagementPage() {
                   </button>
                   <button
                     onClick={() => updateAssignmentStatus.mutate({ id: duty.id, status: 'declined' })}
-                    className="px-3 py-1.5 bg-red-100 text-red-700 border border-red-300 rounded-lg text-sm font-bold hover:bg-red-200 flex items-center gap-1"
+                    className="px-3 py-1.5 bg-yellow-100 text-yellow-700 border border-yellow-300 rounded-lg text-sm font-bold hover:bg-yellow-200 flex items-center gap-1"
                   >
                     <XCircle className="h-4 w-4" />
                     דחייה
@@ -330,7 +330,7 @@ export default function DutyManagementPage() {
                   </button>
                   <button
                     onClick={() => deleteSetting.mutate(setting.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                    className="p-2 text-yellow-700 hover:bg-yellow-50 rounded-lg"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -408,8 +408,8 @@ export default function DutyManagementPage() {
                               <div className="flex items-center justify-center gap-1">
                                 <span className={`text-xs font-medium px-2 py-1 rounded ${
                                   assignment.status === 'confirmed' ? 'bg-green-100 text-green-700' :
-                                  assignment.status === 'declined' ? 'bg-red-100 text-red-700 line-through' :
-                                  'bg-amber-100 text-amber-700'
+                                  assignment.status === 'declined' ? 'bg-yellow-100 text-yellow-700 line-through' :
+                                  'bg-yellow-100 text-yellow-700'
                                 }`}>
                                   {assignment.staff_name}
                                   {assignment.status === 'confirmed' && ' ✓'}
@@ -418,7 +418,7 @@ export default function DutyManagementPage() {
                                 {isManager && (
                                 <button
                                   onClick={() => deleteAssignment.mutate(assignment.id)}
-                                  className="text-red-500 hover:text-red-700"
+                                  className="text-yellow-500 hover:text-yellow-700"
                                 >
                                   <X className="h-3 w-3" />
                                 </button>

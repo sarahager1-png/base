@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
-import { X, Upload, AlertCircle, Calendar, Clock, PenLine } from 'lucide-react';
+import { base44 } from '@/api/firebaseClient';
+import { X, Upload, AlertCircle, Calendar, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import DigitalSignature from '@/components/ui/DigitalSignature';
+import { useApprovalSettings } from '@/hooks/useApprovalSettings';
 
 export default function AbsenceReportModal({ isOpen, onClose, user }) {
+  const { require_absence_approval } = useApprovalSettings();
   const [absenceReason, setAbsenceReason] = useState('sick_child');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -14,9 +15,6 @@ export default function AbsenceReportModal({ isOpen, onClose, user }) {
   const [uploading, setUploading] = useState(false);
   const [substituteEmail, setSubstituteEmail] = useState('');
   const [substituteName, setSubstituteName] = useState('');
-  const [signature, setSignature] = useState(null);
-  const [showSignature, setShowSignature] = useState(false);
-
   const queryClient = useQueryClient();
 
   const { data: choiceDaysUsed = 0 } = useQuery({
@@ -61,7 +59,6 @@ export default function AbsenceReportModal({ isOpen, onClose, user }) {
     setCertificateFile(null);
     setSubstituteEmail('');
     setSubstituteName('');
-    setSignature(null);
   };
 
   const addLessonHour = () => {
@@ -79,7 +76,7 @@ export default function AbsenceReportModal({ isOpen, onClose, user }) {
   };
 
   const handleSubmit = async () => {
-    const requiresCertificate = ['sick_child', 'other'].includes(absenceReason);
+    const requiresCertificate = ['illness', 'sick_child', 'other'].includes(absenceReason);
     
     // Check limits
     if (absenceReason === 'choice_day' && choiceDaysUsed >= 2) {
@@ -110,8 +107,7 @@ export default function AbsenceReportModal({ isOpen, onClose, user }) {
       medical_certificate_required: requiresCertificate,
       medical_certificate_url: certificateUrl,
       substitute_teacher_name: substituteName,
-      signature_data: signature,
-      status: requiresCertificate && !certificateUrl ? 'awaiting_certificate' : 'pending',
+      status: requiresCertificate && !certificateUrl ? 'awaiting_certificate' : require_absence_approval ? 'pending' : 'approved',
       choice_days_used: absenceReason === 'choice_day' ? 1 : 0,
       declaration_days_used: absenceReason === 'declaration_days' ? 2 : 0,
     };
@@ -120,6 +116,7 @@ export default function AbsenceReportModal({ isOpen, onClose, user }) {
   };
 
   const reasonLabels = {
+    illness: 'מחלה (נדרש אישור)',
     sick_child: 'מחלת ילד (נדרש אישור)',
     other: 'אחר (נדרש אישור)',
     choice_day: `יום בחירה (נוצלו ${choiceDaysUsed}/2)`,
@@ -130,19 +127,12 @@ export default function AbsenceReportModal({ isOpen, onClose, user }) {
 
   return (
     <>
-    {showSignature && (
-      <DigitalSignature
-        onSave={(data) => setSignature(data)}
-        onClose={() => setShowSignature(false)}
-        title="חתימת המורה על דיווח היעדרות"
-      />
-    )}
     <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-gradient-to-r from-red-600 to-pink-600 p-6 text-white flex justify-between items-center">
+        <div className="sticky top-0 bg-gradient-to-r from-yellow-600 to-yellow-600 p-6 text-white flex justify-between items-center">
           <div>
             <h2 className="text-2xl font-bold">דיווח היעדרות</h2>
-            <p className="text-red-100 text-sm">מלאי את כל הפרטים הנדרשים</p>
+            <p className="text-yellow-100 text-sm">מלאי את כל הפרטים הנדרשים</p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg transition-colors">
             <X className="h-6 w-6" />
@@ -214,15 +204,15 @@ export default function AbsenceReportModal({ isOpen, onClose, user }) {
                         />
                         <span className="font-bold text-slate-700">כל היום</span>
                       </div>
-                      <button onClick={() => removeLessonHour(index)} className="text-red-500 hover:bg-red-50 rounded p-1.5">
+                      <button onClick={() => removeLessonHour(index)} className="text-yellow-500 hover:bg-yellow-50 rounded p-1.5">
                         <X className="h-4 w-4" />
                       </button>
                     </div>
                   ) : (
                     <>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full">שעה {index + 1}</span>
-                        <button onClick={() => removeLessonHour(index)} className="text-red-500 hover:bg-red-50 rounded p-1">
+                        <span className="text-xs font-bold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full">שעה {index + 1}</span>
+                        <button onClick={() => removeLessonHour(index)} className="text-yellow-500 hover:bg-yellow-50 rounded p-1">
                           <X className="h-3.5 w-3.5" />
                         </button>
                       </div>
@@ -263,7 +253,7 @@ export default function AbsenceReportModal({ isOpen, onClose, user }) {
                           placeholder="ממלאת מקום לשעה זו (שם)"
                           value={hour.substitute_teacher_name || ''}
                           onChange={(e) => updateLessonHour(index, 'substitute_teacher_name', e.target.value)}
-                          className="p-2 border border-purple-200 rounded text-sm bg-purple-50 placeholder-purple-400"
+                          className="p-2 border border-yellow-200 rounded text-sm bg-yellow-50 placeholder-yellow-400"
                         />
                         <input
                           type="text"
@@ -281,8 +271,8 @@ export default function AbsenceReportModal({ isOpen, onClose, user }) {
           </div>
 
           {/* Substitute Teacher */}
-          <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
-            <h4 className="font-bold text-purple-900 mb-3">ממלאת מקום</h4>
+          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+            <h4 className="font-bold text-yellow-900 mb-3">ממלאת מקום</h4>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">שם ממלאת המקום</label>
               <input
@@ -290,19 +280,19 @@ export default function AbsenceReportModal({ isOpen, onClose, user }) {
                 value={substituteName}
                 onChange={(e) => setSubstituteName(e.target.value)}
                 placeholder="לדוגמה: רחל לוי"
-                className="w-full p-2 border border-purple-300 rounded-lg bg-white"
+                className="w-full p-2 border border-yellow-300 rounded-lg bg-white"
               />
             </div>
           </div>
 
           {/* Medical Certificate Upload */}
           {['sick_child', 'other', 'declaration_days'].includes(absenceReason) && (
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
               <div className="flex items-start gap-3 mb-3">
-                <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
+                <AlertCircle className="h-5 w-5 text-yellow-700 mt-0.5" />
                 <div>
-                  <h4 className="font-bold text-amber-900">נדרש אישור/מסמך</h4>
-                  <p className="text-sm text-amber-700">
+                  <h4 className="font-bold text-yellow-900">נדרש אישור/מסמך</h4>
+                  <p className="text-sm text-yellow-700">
                     {absenceReason === 'declaration_days' 
                       ? 'יש לצרף מסמך תומך להצהרה'
                       : 'יש לצרף אישור רפואי. אם לא יצורף, תתקבל התראה יומית ב-8 בבוקר'}
@@ -313,36 +303,13 @@ export default function AbsenceReportModal({ isOpen, onClose, user }) {
                 type="file"
                 accept=".pdf,.jpg,.jpeg,.png"
                 onChange={(e) => setCertificateFile(e.target.files[0])}
-                className="w-full p-3 border-2 border-dashed border-amber-300 rounded-lg bg-white hover:border-amber-400 transition-colors"
+                className="w-full p-3 border-2 border-dashed border-yellow-300 rounded-lg bg-white hover:border-yellow-400 transition-colors"
               />
               {certificateFile && (
                 <p className="text-sm text-green-600 mt-2 font-medium">✓ {certificateFile.name}</p>
               )}
             </div>
           )}
-
-          {/* Digital Signature */}
-          <div className="border border-slate-200 rounded-xl p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="font-bold text-slate-700 flex items-center gap-2">
-                <PenLine className="h-4 w-4 text-purple-600" />
-                חתימה דיגיטלית
-              </h4>
-              <Button onClick={() => setShowSignature(true)} variant="outline" size="sm" className="text-purple-600 border-purple-300 hover:bg-purple-50">
-                {signature ? 'שנה חתימה' : 'חתום כאן'}
-              </Button>
-            </div>
-            {signature ? (
-              <div className="relative">
-                <img src={signature} alt="חתימה" className="max-h-20 border border-slate-200 rounded-lg bg-white p-1" />
-                <button onClick={() => setSignature(null)} className="absolute top-1 left-1 p-1 bg-red-100 text-red-600 rounded-full hover:bg-red-200">
-                  <X className="h-3 w-3" />
-                </button>
-              </div>
-            ) : (
-              <p className="text-sm text-slate-400 italic">לא נוספה חתימה</p>
-            )}
-          </div>
 
           {/* Submit */}
           <div className="flex gap-3 pt-4 border-t border-slate-200">
@@ -352,7 +319,7 @@ export default function AbsenceReportModal({ isOpen, onClose, user }) {
             <Button
               onClick={handleSubmit}
               disabled={!startDate || !endDate || lessonHours.length === 0 || uploading}
-              className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+              className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white"
             >
               {uploading ? 'מעלה קובץ...' : 'שלח דיווח'}
             </Button>

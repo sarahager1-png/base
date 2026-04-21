@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { Settings, Save, Users, Bell, UserCog, BookOpen, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import DailyAnnouncementsManager from './DailyAnnouncementsManager';
@@ -51,7 +51,7 @@ function TeamGenderPanel() {
   return (
     <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 rounded-lg" style={{ background: 'linear-gradient(135deg, #ec4899, #db2777)' }}>
+        <div className="p-2 rounded-lg" style={{ background: 'linear-gradient(135deg, #eab308, #ca8a04)' }}>
           <UserCog className="h-5 w-5 text-white" />
         </div>
         <div>
@@ -65,7 +65,7 @@ function TeamGenderPanel() {
           <div key={u.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600">
             <div className="flex items-center gap-3">
               <div className="h-8 w-8 rounded-lg flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
-                   style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
+                   style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)' }}>
                 {u.avatar || u.full_name?.charAt(0)}
               </div>
               <div>
@@ -78,8 +78,8 @@ function TeamGenderPanel() {
                 onClick={() => updateGender.mutate({ id: u.id, gender: 'female' })}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   u.gender === 'female'
-                    ? 'bg-pink-500 text-white shadow-sm'
-                    : 'bg-white dark:bg-slate-600 text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-slate-500 hover:border-pink-300'
+                    ? 'bg-yellow-500 text-white shadow-sm'
+                    : 'bg-white dark:bg-slate-600 text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-slate-500 hover:border-yellow-300'
                 }`}
               >
                 👩 נקבה
@@ -88,8 +88,8 @@ function TeamGenderPanel() {
                 onClick={() => updateGender.mutate({ id: u.id, gender: 'male' })}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   u.gender === 'male'
-                    ? 'bg-indigo-500 text-white shadow-sm'
-                    : 'bg-white dark:bg-slate-600 text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-slate-500 hover:border-indigo-300'
+                    ? 'bg-blue-500 text-white shadow-sm'
+                    : 'bg-white dark:bg-slate-600 text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-slate-500 hover:border-blue-300'
                 }`}
               >
                 👨 זכר
@@ -138,7 +138,7 @@ export default function InstitutionSettingsPanel() {
     return (
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 rounded-lg" style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
+          <div className="p-2 rounded-lg" style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)' }}>
             <Settings className="h-5 w-5 text-white" />
           </div>
           <h3 className="text-lg font-bold text-slate-800 dark:text-white">הגדרות מוסד</h3>
@@ -148,12 +148,12 @@ export default function InstitutionSettingsPanel() {
           placeholder="שם המוסד"
           value={settings?.institution_name || ''}
           onChange={(e) => setSettings({ ...settings || {}, institution_name: e.target.value })}
-          className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-700 dark:text-white"
+          className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 dark:text-white"
         />
         <button
           onClick={() => saveMut.mutate({ institution_name: settings?.institution_name || 'המוסד שלי' })}
           className="w-full px-4 py-2 text-white rounded-lg font-semibold"
-          style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}
+          style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)' }}
         >
           אתחל הגדרות
         </button>
@@ -178,7 +178,7 @@ export default function InstitutionSettingsPanel() {
             key={t.id}
             onClick={() => setActiveTab(t.id)}
             className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-lg transition-all
-              ${activeTab === t.id ? 'bg-white dark:bg-slate-800 text-indigo-600 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}
+              ${activeTab === t.id ? 'bg-white dark:bg-slate-800 text-blue-600 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}
           >
             <t.icon className="h-3.5 w-3.5" />
             {t.label}
@@ -191,7 +191,7 @@ export default function InstitutionSettingsPanel() {
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg" style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
+              <div className="p-2 rounded-lg" style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)' }}>
                 <Settings className="h-5 w-5 text-white" />
               </div>
               <div>
@@ -201,7 +201,7 @@ export default function InstitutionSettingsPanel() {
             </div>
             <button onClick={handleSave} disabled={saveMut.isPending}
                     className="flex items-center gap-2 px-4 py-2 text-white text-sm font-semibold rounded-xl disabled:opacity-50"
-                    style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
+                    style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)' }}>
               <Save className="h-4 w-4" />
               שמור
             </button>
@@ -216,7 +216,7 @@ export default function InstitutionSettingsPanel() {
                 <div
                   onClick={() => handleToggle(f.id)}
                   className={`relative w-10 h-5 rounded-full transition-all cursor-pointer flex-shrink-0
-                    ${(settings?.[f.id] ?? true) ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-600'}`}
+                    ${(settings?.[f.id] ?? true) ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-600'}`}
                 >
                   <div className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-all
                     ${(settings?.[f.id] ?? true) ? 'right-0.5' : 'left-0.5'}`} />
@@ -231,7 +231,7 @@ export default function InstitutionSettingsPanel() {
       {activeTab === 'gender' && (
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 rounded-lg" style={{ background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)' }}>
+            <div className="p-2 rounded-lg" style={{ background: 'linear-gradient(135deg, #eab308, #ca8a04)' }}>
               <Users className="h-5 w-5 text-white" />
             </div>
             <div>
@@ -247,18 +247,18 @@ export default function InstitutionSettingsPanel() {
                 onClick={() => setSchoolGender(opt.value)}
                 className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-right
                   ${schoolGender === opt.value
-                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                     : 'border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500'}`}
               >
                 <span className="text-3xl flex-shrink-0">{opt.emoji}</span>
                 <div className="flex-1">
-                  <p className={`font-bold text-sm ${schoolGender === opt.value ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-800 dark:text-white'}`}>
+                  <p className={`font-bold text-sm ${schoolGender === opt.value ? 'text-blue-700 dark:text-blue-300' : 'text-slate-800 dark:text-white'}`}>
                     {opt.label}
                   </p>
                   <p className="text-xs text-slate-400 mt-0.5">{opt.desc}</p>
                 </div>
                 {schoolGender === opt.value && (
-                  <div className="h-5 w-5 rounded-full bg-indigo-600 flex items-center justify-center flex-shrink-0">
+                  <div className="h-5 w-5 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
                     <div className="h-2 w-2 rounded-full bg-white" />
                   </div>
                 )}
@@ -334,7 +334,7 @@ function StaffHoursPanel() {
   return (
     <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 rounded-lg" style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
+        <div className="p-2 rounded-lg" style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)' }}>
           <BookOpen className="h-5 w-5 text-white" />
         </div>
         <div>
@@ -365,7 +365,7 @@ function StaffHoursPanel() {
                   <td className="py-3 pr-0">
                     <div className="flex items-center gap-2">
                       <div className="h-7 w-7 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-                           style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
+                           style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)' }}>
                         {u.full_name?.charAt(0)}
                       </div>
                       <div>
@@ -379,7 +379,7 @@ function StaffHoursPanel() {
                       type="number" min="0" max="40"
                       value={e.frontline_hours ?? u.frontline_hours ?? 24}
                       onChange={(e2) => handleChange(u.id, 'frontline_hours', e2.target.value)}
-                      className="w-16 text-center p-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white text-xs focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-16 text-center p-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white text-xs focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </td>
                   <td className="py-3 px-3">
@@ -387,7 +387,7 @@ function StaffHoursPanel() {
                       type="number" min="0" max="80"
                       value={e.pregnancy_hours_quota ?? u.pregnancy_hours_quota ?? 40}
                       onChange={(e2) => handleChange(u.id, 'pregnancy_hours_quota', e2.target.value)}
-                      className="w-16 text-center p-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white text-xs focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-16 text-center p-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white text-xs focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </td>
                   <td className="py-3 px-3">
@@ -395,7 +395,7 @@ function StaffHoursPanel() {
                       type="number" min="0" max="10"
                       value={e.declaration_days_quota ?? u.declaration_days_quota ?? 2}
                       onChange={(e2) => handleChange(u.id, 'declaration_days_quota', e2.target.value)}
-                      className="w-16 text-center p-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white text-xs focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-16 text-center p-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white text-xs focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </td>
                   <td className="py-3 pl-0">
@@ -404,7 +404,7 @@ function StaffHoursPanel() {
                         onClick={() => handleSave(u)}
                         disabled={updateHours.isPending}
                         className="flex items-center gap-1 px-3 py-1.5 text-white text-xs font-bold rounded-lg disabled:opacity-50"
-                        style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}
+                        style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)' }}
                       >
                         <Save className="h-3 w-3" />שמור
                       </button>
@@ -420,8 +420,8 @@ function StaffHoursPanel() {
         )}
       </div>
 
-      <div className="mt-4 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl">
-        <p className="text-xs text-indigo-700 dark:text-indigo-300">
+      <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+        <p className="text-xs text-blue-700 dark:text-blue-300">
           <strong>הסבר:</strong> שעות פרונטליות = מגבלת מ״מ יומית. מכסת הריון = מקסימום שעות היעדרות עקב הריון. ימי הצהרה = מקסימום ימי הצהרת מחלה.
         </p>
       </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { useAuth } from '@/lib/AuthContext';
 import FileManager from '../components/files/FileManager';
 import FileUploadWidget from '../components/files/FileUploadWidget';
@@ -15,7 +15,7 @@ export default function FileManagementPage() {
   return (
     <div className="space-y-6 md:space-y-8 animate-fade-in" dir="rtl">
       {/* Header */}
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-4 md:p-8 border border-blue-100">
+      <div className="bg-gradient-to-br from-blue-50 to-blue-50 rounded-2xl p-4 md:p-8 border border-blue-100">
         <div className="flex items-center gap-3 mb-2">
           <Files className="h-7 w-7 md:h-8 md:w-8 text-blue-600" />
           <h1 className="text-2xl md:text-3xl font-bold text-blue-900">ניהול קבצים</h1>

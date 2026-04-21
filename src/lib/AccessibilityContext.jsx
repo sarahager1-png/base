@@ -50,8 +50,11 @@ export function AccessibilityProvider({ children }) {
 
   const g = (female, male = female) => schoolGender === 'male' ? male : female;
 
-  const gTitle = (role) => {
-    const map = schoolGender === 'male' ? ROLE_TITLES.male : ROLE_TITLES.female;
+  // gTitle(role) — uses school gender
+  // gTitle(role, userGender) — uses specific user's gender
+  const gTitle = (role, userGender) => {
+    const gender = userGender || schoolGender;
+    const map = gender === 'male' ? ROLE_TITLES.male : ROLE_TITLES.female;
     return map[role] || role;
   };
 

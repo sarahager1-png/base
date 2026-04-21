@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { useQuery } from '@tanstack/react-query';
-import { Shield, Menu, Sparkles, Moon, Sun, Search } from 'lucide-react';
+import { Shield, Menu, Sparkles, Moon, Sun, Search, Eye, Users, BookOpen, MessageCircle, Wrench, RefreshCw, HeartHandshake, User, ClipboardList, GraduationCap } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import NotificationBell from '../components/notifications/NotificationBell';
 import CommandPalette from '../components/CommandPalette';
@@ -39,6 +39,10 @@ import FileManagementPage from './FileManagement';
 import InsightsDashboard from '../components/analytics/InsightsDashboard';
 import Profile from './Profile';
 import DevAdmin from './DevAdmin';
+import SchoolAdmin from './SchoolAdmin';
+import Reports from './Reports';
+import SettingsPage from './Settings';
+import MobileNav from '../components/MobileNav';
 
 const GREGORIAN_DATE = new Date().toLocaleDateString('he-IL');
 const _hd = getHebrewDate(new Date());
@@ -54,7 +58,7 @@ function DashboardInner() {
   const [demoMode, setDemoMode] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [viewAsRole, setViewAsRole] = useState(null);
-  const [schoolName, setSchoolName] = useState('בית ספר "בינה"');
+  const [schoolName, setSchoolName] = useState(() => localStorage.getItem('school_name') || 'בית הספר');
   const [schoolLogo, setSchoolLogo] = useState(null);
   const [isEditingSchool, setIsEditingSchool] = useState(false);
   const [installPrompt, setInstallPrompt] = useState(null);
@@ -124,24 +128,17 @@ function DashboardInner() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center"
-           style={{ background: 'linear-gradient(135deg, #0d2b28 0%, #0f4540 50%, #0d2b28 100%)' }}>
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="relative mx-auto mb-6 h-16 w-16">
-            <div className="absolute inset-0 rounded-2xl opacity-30 blur-xl"
-                 style={{ background: 'linear-gradient(135deg, #0d9488, #22c55e)' }} />
-            <div className="relative h-16 w-16 rounded-2xl flex items-center justify-center overflow-hidden"
-                 style={{ background: 'linear-gradient(135deg, #0d9488 0%, #22c55e 100%)' }}>
-              <div className="absolute inset-0 opacity-30"
-                   style={{ background: 'radial-gradient(circle at 30% 30%, #fff, transparent 60%)' }} />
-              <Sparkles className="h-8 w-8 text-white animate-pulse relative z-10" />
-            </div>
+          <div className="relative mx-auto mb-8 h-16 w-16">
+            <img src="/logo-smartbase.jpeg" alt="Smart Base"
+                 className="h-16 w-16 rounded-2xl object-cover object-top shadow-sm animate-float" />
           </div>
-          <div className="h-1 w-32 mx-auto rounded-full overflow-hidden bg-white/10">
-          <div className="h-full rounded-full animate-loading-bar"
-               style={{ background: 'linear-gradient(90deg, #0d9488, #22c55e)' }} />
+          <p className="text-slate-800 font-bold text-lg mb-1">Smart Base</p>
+          <p className="text-slate-400 text-sm mb-6">טוען את המערכת...</p>
+          <div className="h-0.5 w-40 mx-auto rounded-full bg-slate-100 overflow-hidden">
+            <div className="h-full w-1/2 rounded-full bg-blue-500 animate-loading-bar" />
           </div>
-          <p className="text-slate-400 mt-4 text-sm">טוען את המערכת...</p>
         </div>
       </div>
     );
@@ -157,71 +154,60 @@ function DashboardInner() {
       />
       {user && <DailyAnnouncementModal user={user} />}
       {/* ══════════════ HEADER ══════════════ */}
-      <header className="sticky top-0 z-40" dir="rtl"
-              style={{ background: 'linear-gradient(160deg, #1e1b4b 0%, #312e81 30%, #4c1d95 65%, #3730a3 100%)', boxShadow: '0 1px 0 rgba(255,255,255,0.07), 0 8px 40px rgba(49,46,129,0.6)' }}>
+      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80" dir="rtl">
+        <div className="max-w-full px-5 lg:px-8 h-[60px] flex items-center justify-between gap-4">
 
-        {/* Subtle top shimmer */}
-        <div className="absolute top-0 left-0 right-0 h-px pointer-events-none"
-             style={{ background: 'linear-gradient(90deg, transparent, rgba(196,181,253,0.6) 40%, rgba(255,255,255,0.8) 50%, rgba(196,181,253,0.6) 60%, transparent)' }} />
-
-        {/* Main bar */}
-        <div className="relative max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 h-[60px] flex items-center justify-between gap-2">
-
-          {/* ── RIGHT: Logo + school name ── */}
+          {/* ── RIGHT: hamburger + logo + school name ── */}
           <div className="flex items-center gap-3 min-w-0">
-            {/* Mobile hamburger */}
             <button onClick={() => setSidebarOpen(true)}
-                    className="lg:hidden p-2 rounded-xl text-white/50 hover:text-white hover:bg-white/10 transition-all flex-shrink-0">
+                    className="lg:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors flex-shrink-0">
               <Menu className="h-5 w-5" />
             </button>
 
-            {/* Home button */}
-            <button onClick={() => setCurrentView('dashboard')}
-                    className="flex items-center gap-2.5 group flex-shrink-0">
-              <span className="hidden sm:block text-white font-bold text-sm tracking-wide opacity-90 group-hover:opacity-100 transition-opacity">SMART BASE</span>
+            <button onClick={() => setCurrentView('dashboard')} className="flex items-center gap-2.5 flex-shrink-0">
+              <img src="/logo-smartbase.jpeg" alt="Smart Base"
+                   className="w-9 h-9 rounded-xl object-cover object-top shadow-sm" />
+              <span className="hidden sm:block text-slate-800 font-bold text-base">SMART BASE</span>
             </button>
 
-            {/* Divider */}
-            <div className="hidden md:block h-6 w-px flex-shrink-0" style={{ background: 'linear-gradient(180deg, transparent, rgba(255,255,255,0.15), transparent)' }} />
+            <div className="hidden md:block h-7 w-px bg-slate-200 flex-shrink-0" />
 
-            {/* School name */}
             <div className="hidden md:block min-w-0">
               {isEditingSchool ? (
                 <input type="text" value={schoolName}
                   onChange={(e) => setSchoolName(e.target.value)}
-                  onBlur={() => setIsEditingSchool(false)} autoFocus
-                  className="text-sm font-bold text-white bg-transparent border-b border-violet-400 outline-none w-44" />
+                  onBlur={() => { setIsEditingSchool(false); localStorage.setItem('school_name', schoolName); }}
+                  autoFocus
+                  className="text-sm font-semibold text-slate-800 bg-transparent border-b-2 border-blue-500 outline-none w-48" />
               ) : (
                 <p onClick={() => setIsEditingSchool(true)}
-                   className="text-sm font-bold text-white/95 hover:text-violet-200 cursor-pointer truncate transition-colors leading-none">
+                   className="text-sm font-semibold text-slate-700 hover:text-blue-600 cursor-pointer truncate transition-colors">
                   {schoolName}
                 </p>
               )}
-              <p className="text-[10px] text-violet-300/70 mt-0.5 leading-none">{HEBREW_DATE} · {GREGORIAN_DATE}</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">{HEBREW_DATE} · {GREGORIAN_DATE}</p>
             </div>
           </div>
 
           {/* ── LEFT: Controls ── */}
-          <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0">
 
-            {/* Search pill */}
+            {/* Search */}
             <button onClick={() => setCommandOpen(true)}
-                    className="hidden sm:flex items-center gap-1.5 h-8 px-3 rounded-full text-white/45 hover:text-white transition-all text-xs"
-                    style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}>
-              <Search className="h-3 w-3" />
-              <span className="hidden lg:inline">חיפוש</span>
-              <kbd className="hidden lg:inline text-[9px] font-mono opacity-50 bg-white/10 px-1 rounded">⌘K</kbd>
+                    className="hidden sm:flex items-center gap-2 h-9 px-3 rounded-lg text-slate-500 hover:bg-slate-100 transition-all text-sm border border-slate-200">
+              <Search className="h-4 w-4" />
+              <span className="hidden lg:inline text-slate-400 text-xs">חיפוש</span>
+              <kbd className="hidden lg:inline text-[10px] text-slate-300 bg-slate-100 px-1.5 rounded font-mono">⌘K</kbd>
             </button>
 
             {/* Font size */}
-            <div className="hidden sm:flex items-center rounded-full overflow-hidden"
-                 style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <div className="hidden md:flex items-center gap-0.5 p-0.5 rounded-lg bg-slate-100">
               {Object.entries(sizes).map(([key, val]) => (
                 <button key={key} onClick={() => setFontSize(key)} title={val.tip}
-                        className={`w-7 h-7 font-bold transition-all ${fontSize === key ? 'text-white' : 'text-white/35 hover:text-white/70'}`}
-                        style={fontSize === key ? { background: 'rgba(139,92,246,0.7)' } : {}}
-                        dangerouslySetInnerHTML={undefined}>
-                  <span style={{ fontSize: key === 'normal' ? '10px' : key === 'large' ? '12px' : '14px' }}>א</span>
+                        className={`w-8 h-8 rounded-md font-bold transition-all ${
+                          fontSize === key ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                        }`}>
+                  <span style={{ fontSize: key === 'normal' ? '11px' : key === 'large' ? '13px' : '15px' }}>א</span>
                 </button>
               ))}
             </div>
@@ -229,64 +215,88 @@ function DashboardInner() {
             {/* Install PWA */}
             {!isInstalled && installPrompt && (
               <button onClick={handleInstall}
-                      className="hidden sm:flex items-center gap-1.5 h-8 px-3 rounded-full text-white font-bold text-xs transition-all hover:opacity-90"
-                      style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', boxShadow: '0 2px 12px rgba(109,40,217,0.5)' }}>
-                <span>⬇</span>
-                <span>התקן אפליקציה</span>
+                      className="flex items-center gap-1.5 h-9 px-4 rounded-lg bg-blue-600 text-white font-semibold text-sm hover:bg-blue-700 transition-colors shadow-sm">
+                <span className="hidden sm:inline">התקן אפליקציה</span>
+                <span className="sm:hidden">⬇</span>
               </button>
             )}
 
             {/* Dark mode */}
             <button onClick={toggleDark} title={dark ? 'מצב בהיר' : 'מצב כהה'}
-                    className="h-8 w-8 rounded-full flex items-center justify-center transition-all text-white/40 hover:text-white"
-                    style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}>
-              {dark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+                    className="h-9 w-9 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors border border-slate-200">
+              {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
 
             {/* Notifications */}
             <NotificationBell userEmail={user.email} />
 
-            {/* User avatar */}
+            {/* User avatar + name */}
             <button onClick={() => setCurrentView('profile')} title="הפרופיל שלי"
-                    className="flex items-center gap-2 group pr-1">
-              <div className="hidden sm:block text-right leading-tight">
-                <p className="text-white/90 text-xs font-semibold group-hover:text-violet-200 transition-colors leading-none">{user.full_name}</p>
-                <p className="text-violet-300/50 text-[10px] mt-0.5 leading-none">{user.title || gTitle(user.role)}</p>
+                    className="flex items-center gap-2 pl-1 group">
+              <div className="hidden sm:block text-right">
+                <p className="text-slate-700 text-xs font-semibold leading-tight">{user.full_name}</p>
+                <p className="text-slate-400 text-[10px] leading-tight">{user.title || gTitle(user.role, user.gender)}</p>
               </div>
-              <div className="h-8 w-8 rounded-xl flex items-center justify-center text-sm font-bold text-white flex-shrink-0 ring-1 ring-violet-400/40"
-                   style={{ background: 'linear-gradient(135deg, #7c3aed, #4338ca)', boxShadow: '0 0 12px rgba(124,58,237,0.4)' }}>
-                {user.avatar || user.full_name?.charAt(0)}
+              <div className="h-9 w-9 rounded-xl flex items-center justify-center text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors flex-shrink-0">
+                {user.full_name?.charAt(0)}
               </div>
             </button>
           </div>
         </div>
 
-        {/* ── Role switcher (admin only) ── */}
-        {user.role === 'admin' && (
-          <div className="relative" style={{ background: 'rgba(0,0,0,0.25)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-            <div className="max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 py-1.5 flex items-center gap-1 overflow-x-auto scrollbar-hide">
-              <span className="text-[9px] text-white/20 ml-1 flex-shrink-0 uppercase tracking-wider">תצוגה</span>
+        {/* ── Role switcher (admin / super_admin only) ── */}
+        {['admin', 'super_admin'].includes(user.role) && (
+          <div className="border-t border-slate-200/60 bg-gradient-to-l from-slate-50 via-white to-slate-50">
+            <div className="px-4 lg:px-8 py-2.5 flex items-center gap-2 overflow-x-auto scrollbar-hide">
+              {/* Label */}
+              <div className="flex items-center gap-1.5 flex-shrink-0 ml-1">
+                <div className="h-5 w-5 rounded-md bg-indigo-600 flex items-center justify-center flex-shrink-0">
+                  <Eye className="h-3 w-3 text-white" />
+                </div>
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">תצוגה כ:</span>
+              </div>
+              <div className="h-5 w-px bg-slate-200 flex-shrink-0" />
               {[
-                { role: null,            label: 'מנהלת',   emoji: '👩‍💼' },
-                { role: 'vice_principal',label: 'סגנית',   emoji: '📋' },
-                { role: 'secretary',     label: 'מזכירה',  emoji: '💼' },
-                { role: 'teacher',       label: 'מורה',    emoji: '📚' },
-                { role: 'counselor',     label: 'יועצת',   emoji: '💛' },
-                { role: 'maintenance',   label: 'אב בית',  emoji: '🔧' },
-                { role: 'substitute',    label: 'מ.מ.',    emoji: '🔄' },
-                { role: 'assistant',     label: 'סייעת',   emoji: '🤝' },
-                { role: 'user',          label: 'עובד',    emoji: '👤' },
-              ].map(item => (
-                <button key={item.role ?? 'admin'}
-                        onClick={() => setViewAsRole(item.role)}
-                        className="flex items-center gap-1 px-2.5 py-1 text-[10px] rounded-full whitespace-nowrap transition-all font-semibold flex-shrink-0"
-                        style={viewAsRole === item.role
-                          ? { background: 'linear-gradient(135deg, #7c3aed, #4f46e5)', color: '#fff', boxShadow: '0 2px 8px rgba(124,58,237,0.5)' }
-                          : { color: 'rgba(255,255,255,0.35)' }}>
-                  <span>{item.emoji}</span>
-                  {item.label}
-                </button>
-              ))}
+                { role: null,             roleKey: 'admin',          Icon: GraduationCap,   color: 'indigo'  },
+                { role: 'vice_principal', roleKey: 'vice_principal', Icon: ClipboardList,   color: 'violet'  },
+                { role: 'secretary',      roleKey: 'secretary',      Icon: Users,           color: 'blue'    },
+                { role: 'teacher',        roleKey: 'teacher',        Icon: BookOpen,        color: 'emerald' },
+                { role: 'counselor',      roleKey: 'counselor',      Icon: MessageCircle,   color: 'amber'   },
+                { role: 'maintenance',    roleKey: 'maintenance',    Icon: Wrench,          color: 'orange'  },
+                { role: 'substitute',     roleKey: 'substitute',     Icon: RefreshCw,       color: 'teal'    },
+                { role: 'assistant',      roleKey: 'assistant',      Icon: HeartHandshake,  color: 'pink'    },
+                { role: 'user',           roleKey: 'user',           Icon: User,            color: 'slate'   },
+              ].map(item => {
+                const label = gTitle(item.roleKey);
+                const active = viewAsRole === item.role;
+                const colorMap = {
+                  indigo:  { bg: 'bg-indigo-600',  ring: 'ring-indigo-200',  pill: 'bg-indigo-50 text-indigo-700 border-indigo-200',  activePill: 'bg-indigo-600 text-white border-indigo-600 shadow-indigo-200'  },
+                  violet:  { bg: 'bg-violet-600',  ring: 'ring-violet-200',  pill: 'bg-violet-50 text-violet-700 border-violet-200',  activePill: 'bg-violet-600 text-white border-violet-600 shadow-violet-200'  },
+                  blue:    { bg: 'bg-blue-600',    ring: 'ring-blue-200',    pill: 'bg-blue-50 text-blue-700 border-blue-200',          activePill: 'bg-blue-600 text-white border-blue-600 shadow-blue-200'        },
+                  emerald: { bg: 'bg-emerald-600', ring: 'ring-emerald-200', pill: 'bg-emerald-50 text-emerald-700 border-emerald-200', activePill: 'bg-emerald-600 text-white border-emerald-600 shadow-emerald-200'},
+                  amber:   { bg: 'bg-amber-500',   ring: 'ring-amber-200',   pill: 'bg-amber-50 text-amber-700 border-amber-200',       activePill: 'bg-amber-500 text-white border-amber-500 shadow-amber-200'     },
+                  orange:  { bg: 'bg-orange-500',  ring: 'ring-orange-200',  pill: 'bg-orange-50 text-orange-700 border-orange-200',    activePill: 'bg-orange-500 text-white border-orange-500 shadow-orange-200'  },
+                  teal:    { bg: 'bg-teal-600',    ring: 'ring-teal-200',    pill: 'bg-teal-50 text-teal-700 border-teal-200',          activePill: 'bg-teal-600 text-white border-teal-600 shadow-teal-200'        },
+                  pink:    { bg: 'bg-pink-500',    ring: 'ring-pink-200',    pill: 'bg-pink-50 text-pink-700 border-pink-200',          activePill: 'bg-pink-500 text-white border-pink-500 shadow-pink-200'        },
+                  slate:   { bg: 'bg-slate-600',   ring: 'ring-slate-200',   pill: 'bg-slate-100 text-slate-600 border-slate-200',      activePill: 'bg-slate-700 text-white border-slate-700 shadow-slate-200'     },
+                };
+                const c = colorMap[item.color];
+                return (
+                  <button
+                    key={item.role ?? 'admin'}
+                    onClick={() => setViewAsRole(item.role)}
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border whitespace-nowrap transition-all duration-150 flex-shrink-0 ${
+                      active
+                        ? `${c.activePill} shadow-md shadow-${item.color}-100 -translate-y-px`
+                        : `${c.pill} hover:shadow-sm hover:-translate-y-px`
+                    }`}
+                  >
+                    <item.Icon className="h-3 w-3 flex-shrink-0" />
+                    {label}
+                    {active && <span className="inline-block h-1.5 w-1.5 rounded-full bg-white/70 flex-shrink-0" />}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -294,13 +304,13 @@ function DashboardInner() {
 
       {/* Offline banner */}
       {!isOnline && (
-        <div className="bg-amber-500 text-white text-sm font-medium px-4 py-2 flex items-center justify-center gap-2 animate-fade-in">
+        <div className="bg-yellow-500 text-white text-sm font-medium px-4 py-2 flex items-center justify-center gap-2 animate-fade-in">
           <span className="h-2 w-2 rounded-full bg-white animate-pulse flex-shrink-0" />
           אין חיבור לאינטרנט — המערכת עובדת במצב לא מקוון
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto flex items-start pt-6 gap-6 px-4 sm:px-6 lg:px-8">
+      <div className="flex items-start min-h-[calc(100vh-68px)]">
         <Sidebar 
           user={user} 
           activeView={currentView} 
@@ -311,10 +321,10 @@ function DashboardInner() {
           onUserGenderChange={(g) => setUser(u => ({ ...u, gender: g }))}
         />
 
-        <main className="flex-1 pb-10 min-w-0">
+        <main className="flex-1 pb-24 lg:pb-10 min-w-0 p-5 lg:p-7">
           {currentView === 'dashboard' && (
             <>
-              {((user.role === 'admin' && !viewAsRole)) && (
+              {((['admin', 'super_admin'].includes(user.role)) && !viewAsRole) && (
                 <AdminDashboard />
               )}
               
@@ -385,15 +395,20 @@ function DashboardInner() {
           {currentView === 'onboarding' && <Onboarding />}
           {currentView === 'analytics' && <InsightsDashboard />}
           {currentView === 'file-management' && <FileManagementPage />}
-          {currentView === 'help' && <HelpCenter userRole={user.role} />}
+          {currentView === 'reports' && <Reports />}
+          {currentView === 'settings' && <SettingsPage />}
+          {currentView === 'help' && <HelpCenter userRole={user.role} onNavigate={setCurrentView} />}
           {currentView === 'profile' && <Profile />}
           {currentView === 'dev-admin' && <DevAdmin />}
+          {currentView === 'school-admin' && <SchoolAdmin />}
         </main>
       </div>
 
       {sidebarOpen && (
         <div className="fixed inset-0 bg-slate-900/20 z-40 lg:hidden backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
       )}
+
+      <MobileNav activeView={currentView} setView={setCurrentView} userEmail={user.email} />
     </div>
   );
 }

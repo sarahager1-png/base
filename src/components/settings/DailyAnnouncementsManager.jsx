@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { Plus, Trash2, Bell, Calendar, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -77,7 +77,7 @@ export default function DailyAnnouncementsManager() {
         <button
           onClick={() => setShowForm(v => !v)}
           className="flex items-center gap-2 px-3 py-2 text-sm font-semibold rounded-xl text-white transition-all hover:shadow-md"
-          style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}
+          style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)' }}
         >
           <Plus className="h-4 w-4" />
           הוסף הודעה
@@ -97,8 +97,8 @@ export default function DailyAnnouncementsManager() {
                 onClick={() => setForm(f => ({ ...f, type: t.value }))}
                 className={`px-3 py-2 rounded-xl text-xs font-semibold text-right transition-all border
                   ${form.type === t.value
-                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-md'
-                    : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:border-indigo-300'}`}
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-md'
+                    : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:border-blue-300'}`}
               >
                 {t.label}
               </button>
@@ -117,14 +117,14 @@ export default function DailyAnnouncementsManager() {
                   placeholder="03-14 (חודש-יום)"
                   value={form.date_key}
                   onChange={e => setForm(f => ({ ...f, date_key: e.target.value }))}
-                  className="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-400"
+                  className="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-blue-400"
                 />
               ) : (
                 <input
                   type="date"
                   value={form.date_key}
                   onChange={e => setForm(f => ({ ...f, date_key: e.target.value }))}
-                  className="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-400"
+                  className="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-blue-400"
                 />
               )}
             </div>
@@ -134,7 +134,7 @@ export default function DailyAnnouncementsManager() {
                 id="recurring"
                 checked={form.recurring}
                 onChange={e => setForm(f => ({ ...f, recurring: e.target.checked, date_key: '' }))}
-                className="w-4 h-4 rounded text-indigo-600"
+                className="w-4 h-4 rounded text-blue-600"
               />
               <label htmlFor="recurring" className="text-xs text-slate-600 dark:text-slate-300 flex items-center gap-1">
                 <RefreshCw className="h-3.5 w-3.5" /> חוזר כל שנה
@@ -149,14 +149,14 @@ export default function DailyAnnouncementsManager() {
               placeholder="אימוג'י (אופציונלי)"
               value={form.emoji}
               onChange={e => setForm(f => ({ ...f, emoji: e.target.value }))}
-              className="w-20 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-400 text-center"
+              className="w-20 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-blue-400 text-center"
             />
             <input
               type="text"
               placeholder="כותרת (אופציונלי)"
               value={form.title}
               onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-              className="flex-1 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-400"
+              className="flex-1 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
 
@@ -166,13 +166,13 @@ export default function DailyAnnouncementsManager() {
             value={form.message}
             onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
             rows={3}
-            className="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
+            className="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-blue-400 resize-none"
           />
 
           <div className="flex gap-2">
             <button onClick={handleSave} disabled={createMut.isPending}
                     className="flex-1 py-2.5 text-sm font-bold text-white rounded-xl transition-all disabled:opacity-50"
-                    style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
+                    style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)' }}>
               שמור הודעה
             </button>
             <button onClick={() => setShowForm(false)}
@@ -202,7 +202,7 @@ export default function DailyAnnouncementsManager() {
                     {formatDateKey(a.date_key)}
                   </span>
                   {a.recurring && (
-                    <span className="text-[10px] text-indigo-500 flex items-center gap-0.5">
+                    <span className="text-[10px] text-blue-500 flex items-center gap-0.5">
                       <RefreshCw className="h-2.5 w-2.5" /> שנתי
                     </span>
                   )}
@@ -212,7 +212,7 @@ export default function DailyAnnouncementsManager() {
                 <p className="text-xs text-slate-500 truncate">{a.message}</p>
               </div>
               <button onClick={() => deleteMut.mutate(a.id)}
-                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all">
+                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-all">
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>

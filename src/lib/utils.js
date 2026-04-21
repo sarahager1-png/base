@@ -20,6 +20,6 @@ export function timeAgo(dateStr) {
  */
 export function getStatusBadgeClass(status) {
   if (status === 'approved') return { badgeClass: 'bg-green-100 text-green-700', label: 'מאושר' };
-  if (status === 'rejected') return { badgeClass: 'bg-red-100 text-red-700', label: 'נדחה' };
-  return { badgeClass: 'bg-amber-100 text-amber-700', label: 'ממתין' };
+  if (status === 'rejected') return { badgeClass: 'bg-yellow-100 text-yellow-700', label: 'נדחה' };
+  return { badgeClass: 'bg-yellow-100 text-yellow-700', label: 'ממתין' };
 }

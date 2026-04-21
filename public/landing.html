@@ -4,275 +4,681 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Smart Base — מערכת ניהול חכמה לבית הספר</title>
+  <meta name="description" content="Smart Base — כל מה שצוות בית הספר צריך במקום אחד. ניהול היעדרויות, משימות, יומן, תורנויות ועוד — PWA בעברית מלאה."/>
   <link rel="icon" href="/icon.jpeg" />
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth}
-    body{font-family:'Heebo',sans-serif;background:#080618;color:#fff;overflow-x:hidden}
-    nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 40px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,6,24,.75);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06)}
-    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;font-weight:800;font-size:18px}
-    .nav-logo img{height:34px;border-radius:10px}
-    .nav-links{display:flex;gap:28px;list-style:none}
-    .nav-links a{color:rgba(255,255,255,.55);text-decoration:none;font-size:14px;font-weight:600;transition:color .2s}
-    .nav-links a:hover{color:#fff}
-    .nav-cta{padding:9px 22px;border-radius:99px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;font-weight:700;font-size:14px;text-decoration:none;box-shadow:0 4px 20px rgba(109,40,217,.5);transition:opacity .2s,transform .2s}
-    .nav-cta:hover{opacity:.9;transform:translateY(-1px)}
-    .hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;overflow:hidden}
-    .blob{position:absolute;border-radius:50%;filter:blur(100px);pointer-events:none;animation:drift 9s ease-in-out infinite alternate}
-    .blob-1{width:600px;height:600px;background:#4f46e540;top:-100px;right:-100px}
-    .blob-2{width:500px;height:500px;background:#7c3aed30;bottom:-80px;left:-80px;animation-duration:11s;animation-delay:-3s}
-    .blob-3{width:350px;height:350px;background:#ec489920;top:45%;left:25%;animation-duration:13s;animation-delay:-6s}
-    @keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(30px,-20px) scale(1.05)}}
-    .hero::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}
-    .badge{display:inline-flex;align-items:center;gap:8px;padding:6px 18px;border-radius:99px;background:rgba(79,70,229,.15);border:1px solid rgba(79,70,229,.4);color:#a5b4fc;font-size:13px;font-weight:700;margin-bottom:28px;position:relative;z-index:1}
-    .dot{width:7px;height:7px;border-radius:50%;background:#4f46e5;box-shadow:0 0 8px #4f46e5;animation:pulse 2s infinite}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-    h1{font-size:clamp(36px,7vw,78px);font-weight:900;line-height:1.1;margin-bottom:24px;position:relative;z-index:1}
-    .grad{background:linear-gradient(90deg,#c4b5fd 0%,#a78bfa 35%,#818cf8 65%,#67e8f9 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .hero-sub{font-size:clamp(15px,2.5vw,19px);color:rgba(255,255,255,.52);max-width:560px;line-height:1.75;margin-bottom:44px;position:relative;z-index:1}
-    .btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:64px;position:relative;z-index:1}
-    .btn-p{display:inline-flex;align-items:center;gap:8px;padding:14px 30px;border-radius:14px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;font-weight:800;font-size:15px;text-decoration:none;box-shadow:0 8px 40px rgba(109,40,217,.6);transition:transform .2s,box-shadow .2s}
-    .btn-p:hover{transform:translateY(-2px);box-shadow:0 12px 50px rgba(109,40,217,.7)}
-    .btn-s{display:inline-flex;align-items:center;gap:8px;padding:14px 30px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.8);font-weight:700;font-size:15px;text-decoration:none;backdrop-filter:blur(10px);transition:background .2s,transform .2s}
-    .btn-s:hover{background:rgba(255,255,255,.1);transform:translateY(-2px)}
-    .mockup-wrap{position:relative;z-index:1;width:100%;max-width:900px}
-    .mockup-frame{background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.11);border-radius:24px;overflow:hidden;box-shadow:0 40px 120px rgba(0,0,0,.65)}
-    .mbar{height:38px;background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;padding:0 16px;gap:7px}
-    .mdot{width:10px;height:10px;border-radius:50%}
-    .mcontent{display:grid;grid-template-columns:190px 1fr;height:370px}
-    .mside{background:rgba(25,22,65,.85);border-left:1px solid rgba(255,255,255,.05);padding:14px 10px;display:flex;flex-direction:column;gap:3px}
-    .mitem{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;font-size:11.5px;color:rgba(255,255,255,.45)}
-    .mitem.on{background:linear-gradient(135deg,rgba(79,70,229,.3),rgba(124,58,237,.2));color:#fff;border:1px solid rgba(79,70,229,.3)}
-    .mica{width:22px;height:22px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
-    .mmain{padding:18px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
-    .mstats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-    .mstat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:11px}
-    .msl{font-size:9.5px;color:rgba(255,255,255,.4);margin-bottom:3px}
-    .msv{font-size:20px;font-weight:900}
-    .mrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1}
-    .mcard{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:11px;padding:13px}
-    .mct{font-size:10.5px;font-weight:700;color:rgba(255,255,255,.55);margin-bottom:9px}
-    .mbr{display:flex;align-items:center;gap:7px;margin-bottom:5px}
-    .mbl{font-size:9.5px;color:rgba(255,255,255,.4);width:18px}
-    .mbb{flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
-    .mbf{height:100%;border-radius:99px;background:linear-gradient(90deg,#4f46e5,#7c3aed)}
-    .mnote{background:rgba(79,70,229,.13);border:1px solid rgba(79,70,229,.22);border-radius:7px;padding:7px 9px;font-size:10.5px;color:rgba(255,255,255,.65);margin-bottom:5px}
-    .mnote.g{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.2)}
-    .mnote.y{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.2)}
-    .strip{display:flex;justify-content:center;flex-wrap:wrap;background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);padding:52px 24px}
-    .sitem{flex:1;min-width:150px;text-align:center;padding:0 28px;border-left:1px solid rgba(255,255,255,.06)}
-    .sitem:last-child{border-left:none}
-    .snum{font-size:46px;font-weight:900;background:linear-gradient(135deg,#c4b5fd,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
-    .slbl{color:rgba(255,255,255,.4);font-size:13px;margin-top:6px}
-    .sec{padding:96px 24px;max-width:1100px;margin:0 auto}
-    .sec-lbl{display:inline-block;padding:4px 14px;border-radius:99px;background:rgba(79,70,229,.15);border:1px solid rgba(79,70,229,.35);color:#a5b4fc;font-size:11.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px}
-    .sec-h{font-size:clamp(26px,4vw,42px);font-weight:900;line-height:1.2;margin-bottom:14px}
-    .sec-sub{color:rgba(255,255,255,.48);font-size:16px;line-height:1.75;max-width:540px;margin-bottom:52px}
-    .fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px}
-    .fcard{background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:26px;transition:transform .3s,border-color .3s,box-shadow .3s}
-    .fcard:hover{transform:translateY(-4px);border-color:rgba(79,70,229,.4);box-shadow:0 20px 60px rgba(0,0,0,.3)}
-    .ficon{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:21px;margin-bottom:16px}
-    .ftit{font-size:16px;font-weight:800;margin-bottom:7px}
-    .fdesc{color:rgba(255,255,255,.48);font-size:13.5px;line-height:1.7}
-    .sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:20px;counter-reset:step}
-    .scard{position:relative;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:28px 22px;counter-increment:step}
-    .scard::before{content:counter(step);position:absolute;top:22px;left:22px;width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#fff}
-    .semi{font-size:30px;margin-bottom:14px;display:block}
-    .stit{font-size:15px;font-weight:800;margin-bottom:7px}
-    .sdesc{color:rgba(255,255,255,.48);font-size:13px;line-height:1.7}
-    .rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
-    .rcard{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:15px;padding:18px 14px;text-align:center;transition:transform .2s,border-color .2s}
-    .rcard:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.15)}
-    .remi{font-size:26px;display:block;margin-bottom:9px}
-    .rnam{font-size:13.5px;font-weight:800;margin-bottom:3px}
-    .rdesc{font-size:11px;color:rgba(255,255,255,.38);line-height:1.5}
-    .cta{padding:80px 24px 120px;text-align:center;position:relative;overflow:hidden}
-    .cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(79,70,229,.3),transparent 70%);pointer-events:none}
-    .cta-box{position:relative;z-index:1;background:linear-gradient(160deg,rgba(79,70,229,.14),rgba(124,58,237,.07));border:1px solid rgba(79,70,229,.28);border-radius:28px;padding:60px 36px;max-width:680px;margin:0 auto}
-    .cta-h{font-size:clamp(26px,4vw,40px);font-weight:900;margin-bottom:14px}
-    .cta-sub{color:rgba(255,255,255,.52);font-size:16px;margin-bottom:34px;line-height:1.65}
-    footer{border-top:1px solid rgba(255,255,255,.06);padding:28px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;color:rgba(255,255,255,.28);font-size:13px}
-    footer a{color:rgba(255,255,255,.38);text-decoration:none}
-    footer a:hover{color:rgba(255,255,255,.7)}
-    @media(max-width:768px){nav{padding:12px 20px}.nav-links{display:none}.mcontent{grid-template-columns:1fr}.mside{display:none}.sitem{border-left:none;border-bottom:1px solid rgba(255,255,255,.06);padding:22px}.sitem:last-child{border-bottom:none}footer{justify-content:center;text-align:center}}
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Heebo', sans-serif; background: #fff; color: #0a0a0a; overflow-x: hidden; }
+
+    /* ─── NAV ─────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: 60px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px;
+      background: rgba(255,255,255,0.82); backdrop-filter: blur(20px);
+      border-bottom: 1px solid #e5e5e5;
+      transition: all 0.3s;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo img { height: 34px; width: 34px; border-radius: 9px; object-fit: cover; object-position: top; }
+    .nav-logo span { font-weight: 800; font-size: 16px; color: #0a0a0a; letter-spacing: -0.02em; }
+    .nav-links { display: flex; gap: 4px; list-style: none; }
+    .nav-links a {
+      padding: 6px 14px; border-radius: 8px;
+      color: #525252; text-decoration: none; font-size: 14px; font-weight: 600;
+      transition: all 0.15s;
+    }
+    .nav-links a:hover { background: #f5f5f5; color: #0a0a0a; }
+    .nav-cta {
+      padding: 8px 20px; border-radius: 10px;
+      background: #0a0a0a; color: #fff;
+      font-weight: 700; font-size: 14px; text-decoration: none;
+      transition: all 0.15s;
+    }
+    .nav-cta:hover { background: #1a1a1a; transform: translateY(-1px); }
+
+    /* ─── HERO ────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 120px 24px 80px;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 50% at 50% -10%, rgba(99,102,241,0.08), transparent),
+        radial-gradient(ellipse 50% 40% at 80% 60%, rgba(168,85,247,0.06), transparent),
+        radial-gradient(ellipse 40% 40% at 20% 70%, rgba(20,184,166,0.05), transparent);
+    }
+    .hero-grid {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(0,0,0,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.025) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 100%);
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 5px 14px; border-radius: 99px;
+      background: #f0fdf4; border: 1px solid #bbf7d0;
+      color: #15803d; font-size: 12px; font-weight: 700;
+      letter-spacing: 0.02em; text-transform: uppercase;
+      margin-bottom: 28px; position: relative; z-index: 1;
+    }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{ opacity:1; transform: scale(1); } 50%{ opacity:0.5; transform: scale(0.8); } }
+    h1 {
+      font-size: clamp(40px, 7vw, 80px); font-weight: 900;
+      line-height: 1.08; letter-spacing: -0.04em;
+      color: #0a0a0a; margin-bottom: 24px;
+      position: relative; z-index: 1;
+    }
+    .grad {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-sub {
+      font-size: clamp(16px, 2.5vw, 20px); color: #525252;
+      max-width: 560px; line-height: 1.7; margin-bottom: 44px;
+      font-weight: 400; position: relative; z-index: 1;
+    }
+    .hero-btns {
+      display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+      margin-bottom: 72px; position: relative; z-index: 1;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px; border-radius: 12px;
+      background: #0a0a0a; color: #fff;
+      font-weight: 700; font-size: 15px; text-decoration: none;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+      transition: all 0.2s;
+    }
+    .btn-primary:hover { background: #1a1a1a; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px; border-radius: 12px;
+      background: #fff; border: 1.5px solid #e5e5e5; color: #0a0a0a;
+      font-weight: 600; font-size: 15px; text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: #d4d4d4; background: #fafafa; transform: translateY(-2px); }
+
+    /* ─── APP MOCKUP ──────────────────────────────────── */
+    .mockup-wrap { position: relative; z-index: 1; width: 100%; max-width: 960px; }
+    .mockup-frame {
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      border-radius: 20px; overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,0.04),
+        0 8px 24px rgba(0,0,0,0.06),
+        0 40px 80px rgba(0,0,0,0.1);
+    }
+    .mbar {
+      height: 40px; background: #fafafa;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex; align-items: center; padding: 0 16px; gap: 7px;
+    }
+    .mdot { width: 10px; height: 10px; border-radius: 50%; }
+    .murl {
+      flex: 1; height: 22px; background: #f0f0f0; border-radius: 6px;
+      max-width: 280px; margin: 0 auto;
+    }
+    .mapp { display: grid; grid-template-columns: 200px 1fr; height: 380px; }
+    /* sidebar */
+    .mside {
+      background: linear-gradient(180deg, #f8faff 0%, #fff 100%);
+      border-left: 1px solid #f0f0f0;
+      padding: 12px 8px; display: flex; flex-direction: column; gap: 2px;
+    }
+    .mside-logo {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px; margin-bottom: 8px; border-bottom: 1px solid #f0f0f0;
+    }
+    .mside-logo img { width: 24px; height: 24px; border-radius: 7px; object-fit: cover; object-position: top; }
+    .mside-logo span { font-size: 12px; font-weight: 800; color: #0a0a0a; }
+    .mitem {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 10px; border-radius: 8px;
+      font-size: 11.5px; color: #737373; font-weight: 500;
+    }
+    .mitem.active { background: #eef2ff; color: #4f46e5; font-weight: 700; }
+    .micon {
+      width: 20px; height: 20px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center; font-size: 10px;
+      flex-shrink: 0;
+    }
+    /* main */
+    .mmain { padding: 16px; overflow: hidden; display: flex; flex-direction: column; gap: 12px; background: #fafafa; }
+    .mheader { font-size: 13px; font-weight: 800; color: #0a0a0a; margin-bottom: 2px; }
+    .mstats { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+    .mstat {
+      background: #fff; border: 1px solid #f0f0f0; border-radius: 10px;
+      padding: 10px; text-align: center;
+    }
+    .mslabel { font-size: 9px; color: #a3a3a3; font-weight: 500; margin-bottom: 4px; }
+    .msvalue { font-size: 20px; font-weight: 900; line-height: 1; }
+    .mrow { display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px; flex: 1; }
+    .mcard { background: #fff; border: 1px solid #f0f0f0; border-radius: 10px; padding: 12px; }
+    .mcard-title { font-size: 10px; font-weight: 700; color: #737373; margin-bottom: 8px; }
+    .mbar-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+    .mbar-lbl { font-size: 9px; color: #a3a3a3; width: 14px; }
+    .mbar-track { flex: 1; height: 5px; background: #f0f0f0; border-radius: 99px; overflow: hidden; }
+    .mbar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg,#4f46e5,#7c3aed); }
+    .mnote {
+      border-radius: 6px; padding: 6px 8px; font-size: 9.5px;
+      margin-bottom: 5px; font-weight: 500;
+    }
+    .mnote-b { background: #eef2ff; color: #4338ca; border: 1px solid #c7d2fe; }
+    .mnote-g { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .mnote-y { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+
+    /* ─── STATS STRIP ─────────────────────────────────── */
+    .strip {
+      display: flex; justify-content: center; flex-wrap: wrap;
+      border-top: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0;
+      padding: 52px 24px;
+    }
+    .sitem {
+      flex: 1; min-width: 140px; text-align: center;
+      padding: 0 32px; border-left: 1px solid #f0f0f0;
+    }
+    .sitem:last-child { border-left: none; }
+    .snum {
+      font-size: 44px; font-weight: 900; letter-spacing: -0.04em;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      line-height: 1;
+    }
+    .slbl { color: #737373; font-size: 14px; margin-top: 6px; font-weight: 500; }
+
+    /* ─── SECTIONS ────────────────────────────────────── */
+    .sec { padding: 96px 24px; max-width: 1120px; margin: 0 auto; }
+    .sec-label {
+      display: inline-block; padding: 4px 12px; border-radius: 99px;
+      background: #f5f3ff; border: 1px solid #ddd6fe;
+      color: #6d28d9; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px;
+    }
+    .sec-h {
+      font-size: clamp(28px, 4.5vw, 46px); font-weight: 900;
+      letter-spacing: -0.03em; line-height: 1.1; color: #0a0a0a;
+      margin-bottom: 16px;
+    }
+    .sec-sub {
+      color: #525252; font-size: 18px; line-height: 1.7;
+      max-width: 520px; margin-bottom: 56px;
+    }
+
+    /* ─── FEATURES GRID ───────────────────────────────── */
+    .fgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .fcard {
+      background: #fff; border: 1px solid #e5e5e5; border-radius: 20px;
+      padding: 28px; transition: all 0.25s;
+    }
+    .fcard:hover { border-color: #d4d4d4; box-shadow: 0 8px 32px rgba(0,0,0,0.08); transform: translateY(-3px); }
+    .ficon {
+      width: 48px; height: 48px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 18px;
+    }
+    .ftit { font-size: 16px; font-weight: 800; color: #0a0a0a; margin-bottom: 8px; letter-spacing: -0.01em; }
+    .fdesc { font-size: 14px; color: #737373; line-height: 1.65; }
+
+    /* ─── HOW IT WORKS ────────────────────────────────── */
+    .how-bg { background: #fafafa; border-top: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0; }
+    .steps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0; }
+    .step {
+      padding: 32px 28px; border-left: 1px solid #f0f0f0;
+      position: relative;
+    }
+    .step:last-child { border-left: none; }
+    .step-num {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: #0a0a0a; color: #fff;
+      font-weight: 900; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 18px;
+    }
+    .step-icon { font-size: 28px; margin-bottom: 14px; }
+    .step-title { font-size: 15px; font-weight: 800; color: #0a0a0a; margin-bottom: 8px; }
+    .step-desc { font-size: 13.5px; color: #737373; line-height: 1.65; }
+
+    /* ─── ROLES ───────────────────────────────────────── */
+    .roles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+    .role-card {
+      background: #fff; border: 1px solid #e5e5e5; border-radius: 16px;
+      padding: 20px 16px; text-align: center; transition: all 0.2s;
+    }
+    .role-card:hover { border-color: #c7d2fe; transform: translateY(-2px); box-shadow: 0 4px 16px rgba(79,70,229,0.08); }
+    .role-emoji { font-size: 32px; margin-bottom: 10px; display: block; }
+    .role-name { font-size: 14px; font-weight: 800; color: #0a0a0a; margin-bottom: 5px; }
+    .role-desc { font-size: 11.5px; color: #a3a3a3; line-height: 1.5; }
+    .role-badge {
+      display: inline-block; margin-top: 8px;
+      padding: 2px 8px; border-radius: 99px;
+      font-size: 10px; font-weight: 700;
+    }
+
+    /* ─── CTA ─────────────────────────────────────────── */
+    .cta-section { padding: 80px 24px 120px; }
+    .cta-box {
+      max-width: 700px; margin: 0 auto;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1e1b4b 100%);
+      border-radius: 28px; padding: 64px 48px; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-glow {
+      position: absolute; top: -80px; right: -80px;
+      width: 300px; height: 300px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(99,102,241,0.3), transparent 70%);
+      pointer-events: none;
+    }
+    .cta-glow2 {
+      position: absolute; bottom: -60px; left: -60px;
+      width: 240px; height: 240px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(168,85,247,0.25), transparent 70%);
+      pointer-events: none;
+    }
+    .cta-h { font-size: clamp(26px, 4vw, 40px); font-weight: 900; letter-spacing: -0.03em; color: #fff; margin-bottom: 14px; position: relative; z-index: 1; }
+    .cta-sub { color: rgba(255,255,255,0.55); font-size: 16px; margin-bottom: 36px; line-height: 1.65; position: relative; z-index: 1; }
+    .btn-white {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px; border-radius: 12px;
+      background: #fff; color: #0a0a0a;
+      font-weight: 800; font-size: 15px; text-decoration: none;
+      transition: all 0.2s; position: relative; z-index: 1;
+    }
+    .btn-white:hover { background: #f5f5f5; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+
+    /* ─── FOOTER ──────────────────────────────────────── */
+    footer {
+      border-top: 1px solid #f0f0f0; padding: 28px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+      color: #a3a3a3; font-size: 13px;
+    }
+    .footer-logo { display: flex; align-items: center; gap: 8px; }
+    .footer-logo img { width: 24px; height: 24px; border-radius: 6px; object-fit: cover; object-position: top; }
+    .footer-logo span { font-weight: 700; color: #525252; font-size: 14px; }
+    footer a { color: #737373; text-decoration: none; transition: color 0.15s; }
+    footer a:hover { color: #0a0a0a; }
+
+    /* ─── RESPONSIVE ──────────────────────────────────── */
+    @media(max-width: 768px){
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .mapp { grid-template-columns: 1fr; }
+      .mside { display: none; }
+      .mstats { grid-template-columns: repeat(2,1fr); }
+      .mrow { grid-template-columns: 1fr; }
+      .sitem { border-left: none; padding: 24px 16px; border-bottom: 1px solid #f0f0f0; }
+      .sitem:last-child { border-bottom: none; }
+      .step { border-left: none; border-bottom: 1px solid #f0f0f0; }
+      .step:last-child { border-bottom: none; }
+      .cta-box { padding: 40px 24px; }
+      footer { justify-content: center; text-align: center; }
+    }
+
+    /* ─── SCROLL ANIMATIONS ───────────────────────────── */
+    .fade-up {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
   </style>
 </head>
 <body>
 
+<!-- NAV -->
 <nav>
   <a href="#" class="nav-logo">
-    <img src="/logo-full.jpeg" alt="Smart Base" style="height:38px;border-radius:8px" />
+    <img src="/logo-smartbase.jpeg" alt="Smart Base"/>
+    <span>Smart Base</span>
   </a>
   <ul class="nav-links">
     <li><a href="#features">תכונות</a></li>
     <li><a href="#how">איך זה עובד</a></li>
     <li><a href="#roles">תפקידים</a></li>
-    <li><a href="#access">כניסה</a></li>
   </ul>
   <a href="/index.html" class="nav-cta">כניסה למערכת ←</a>
 </nav>
 
-<div class="hero">
-  <div class="blob blob-1"></div>
-  <div class="blob blob-2"></div>
-  <div class="blob blob-3"></div>
-  <div class="badge"><span class="dot"></span>מערכת ניהול חכמה לבית הספר · רשת חינוך חב"ד</div>
-  <h1>כל מה שצוות בית הספר<br/><span class="grad">צריך — במקום אחד</span></h1>
-  <p class="hero-sub">מניהול היעדרויות ועד תורנויות, מחתימה דיגיטלית ועד יומן חגים — Smart Base מחברת את כל הצוות, מכל מכשיר, בלחיצה אחת.</p>
-  <div class="btns">
-    <a href="/index.html" class="btn-p">🚀 כניסה למערכת</a>
-    <a href="#features" class="btn-s">גלו את התכונות ↓</a>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+
+  <div class="badge fade-up">
+    <span class="badge-dot"></span>
+    רשת חינוך חב"ד · מערכת פעילה
   </div>
-  <div class="mockup-wrap">
+
+  <h1 class="fade-up">כל מה שצוות<br/>בית הספר צריך —<br/><span class="grad">במקום אחד</span></h1>
+
+  <p class="hero-sub fade-up">
+    מניהול היעדרויות ועד תורנויות, מחתימה דיגיטלית ועד יומן חגים —
+    Smart Base מחברת את כל הצוות, מכל מכשיר, בלחיצה אחת.
+  </p>
+
+  <div class="hero-btns fade-up">
+    <a href="/index.html" class="btn-primary">
+      <span>כניסה למערכת</span>
+      <span>←</span>
+    </a>
+    <a href="#features" class="btn-secondary">
+      <span>גלו את התכונות</span>
+      <span>↓</span>
+    </a>
+  </div>
+
+  <!-- APP MOCKUP -->
+  <div class="mockup-wrap fade-up">
     <div class="mockup-frame">
       <div class="mbar">
         <div class="mdot" style="background:#ff5f57"></div>
         <div class="mdot" style="background:#febc2e"></div>
         <div class="mdot" style="background:#28c840"></div>
-        <div style="flex:1;height:16px;background:rgba(255,255,255,.05);border-radius:6px;margin-right:12px"></div>
+        <div class="murl"></div>
       </div>
-      <div class="mcontent">
+      <div class="mapp">
+        <!-- sidebar mock -->
         <div class="mside">
-          <div style="display:flex;align-items:center;gap:7px;padding:7px;margin-bottom:6px">
-            <img src="/icon.jpeg" style="width:26px;height:26px;border-radius:7px"/>
-            <span style="font-size:11.5px;font-weight:800;color:rgba(255,255,255,.8)">Smart Base</span>
+          <div class="mside-logo">
+            <img src="/logo-smartbase.jpeg" alt=""/>
+            <span>Smart Base</span>
           </div>
-          <div class="mitem on"><div class="mica" style="background:linear-gradient(135deg,#0d9488,#22c55e)">🏠</div>לוח בקרה</div>
-          <div class="mitem"><div class="mica" style="background:rgba(255,255,255,.06)">📅</div>יומן</div>
-          <div class="mitem"><div class="mica" style="background:rgba(255,255,255,.06)">⏰</div>היעדרויות</div>
-          <div class="mitem"><div class="mica" style="background:rgba(255,255,255,.06)">✅</div>משימות</div>
-          <div class="mitem"><div class="mica" style="background:rgba(255,255,255,.06)">👥</div>ניהול צוות</div>
-          <div class="mitem"><div class="mica" style="background:rgba(255,255,255,.06)">🛡</div>תורנויות</div>
-          <div class="mitem"><div class="mica" style="background:rgba(255,255,255,.06)">🖨</div>צילומים</div>
+          <div class="mitem active">
+            <div class="micon" style="background:#eef2ff;">🏠</div>לוח בקרה
+          </div>
+          <div class="mitem">
+            <div class="micon" style="background:#f5f5f5;">📅</div>יומן
+          </div>
+          <div class="mitem">
+            <div class="micon" style="background:#f5f5f5;">⏰</div>היעדרויות
+          </div>
+          <div class="mitem">
+            <div class="micon" style="background:#f5f5f5;">✅</div>משימות
+          </div>
+          <div class="mitem">
+            <div class="micon" style="background:#f5f5f5;">👥</div>ניהול צוות
+          </div>
+          <div class="mitem">
+            <div class="micon" style="background:#f5f5f5;">🛡</div>תורנויות
+          </div>
+          <div class="mitem">
+            <div class="micon" style="background:#f5f5f5;">🖨</div>צילומים
+          </div>
+          <div class="mitem">
+            <div class="micon" style="background:#f5f5f5;">🔧</div>תפעול
+          </div>
         </div>
+        <!-- main mock -->
         <div class="mmain">
+          <div class="mheader">לוח בקרה — בית ספר אהלי יוסף</div>
           <div class="mstats">
-            <div class="mstat"><div class="msl">צוות פעיל</div><div class="msv" style="color:#818cf8">42</div></div>
-            <div class="mstat"><div class="msl">היעדרויות</div><div class="msv" style="color:#f87171">3</div></div>
-            <div class="mstat"><div class="msl">משימות</div><div class="msv" style="color:#fbbf24">7</div></div>
-            <div class="mstat"><div class="msl">ימי חופש</div><div class="msv" style="color:#34d399">12</div></div>
+            <div class="mstat">
+              <div class="mslabel">צוות פעיל</div>
+              <div class="msvalue" style="color:#4f46e5">42</div>
+            </div>
+            <div class="mstat">
+              <div class="mslabel">היעדרויות</div>
+              <div class="msvalue" style="color:#ef4444">3</div>
+            </div>
+            <div class="mstat">
+              <div class="mslabel">משימות פתוחות</div>
+              <div class="msvalue" style="color:#f59e0b">7</div>
+            </div>
+            <div class="mstat">
+              <div class="mslabel">ימי חופש קרובים</div>
+              <div class="msvalue" style="color:#10b981">12</div>
+            </div>
           </div>
           <div class="mrow">
             <div class="mcard">
-              <div class="mct">📊 נוכחות השבוע</div>
-              <div class="mbr"><div class="mbl">א'</div><div class="mbb"><div class="mbf" style="width:95%"></div></div></div>
-              <div class="mbr"><div class="mbl">ב'</div><div class="mbb"><div class="mbf" style="width:88%"></div></div></div>
-              <div class="mbr"><div class="mbl">ג'</div><div class="mbb"><div class="mbf" style="width:92%"></div></div></div>
-              <div class="mbr"><div class="mbl">ד'</div><div class="mbb"><div class="mbf" style="width:100%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div></div>
+              <div class="mcard-title">נוכחות השבוע</div>
+              <div class="mbar-row">
+                <div class="mbar-lbl">א׳</div>
+                <div class="mbar-track"><div class="mbar-fill" style="width:95%"></div></div>
+                <div style="font-size:9px;color:#a3a3a3;width:22px;text-align:left">95%</div>
+              </div>
+              <div class="mbar-row">
+                <div class="mbar-lbl">ב׳</div>
+                <div class="mbar-track"><div class="mbar-fill" style="width:88%"></div></div>
+                <div style="font-size:9px;color:#a3a3a3;width:22px;text-align:left">88%</div>
+              </div>
+              <div class="mbar-row">
+                <div class="mbar-lbl">ג׳</div>
+                <div class="mbar-track"><div class="mbar-fill" style="width:93%"></div></div>
+                <div style="font-size:9px;color:#a3a3a3;width:22px;text-align:left">93%</div>
+              </div>
+              <div class="mbar-row">
+                <div class="mbar-lbl">ד׳</div>
+                <div class="mbar-track"><div class="mbar-fill" style="width:100%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div>
+                <div style="font-size:9px;color:#a3a3a3;width:22px;text-align:left">100%</div>
+              </div>
             </div>
             <div class="mcard">
-              <div class="mct">📢 הודעות היום</div>
-              <div class="mnote">ישיבת צוות יום ג' בשעה 14:00</div>
-              <div class="mnote g">חג פורים — חופשה מיוחדת 🎭</div>
-              <div class="mnote y">תזכורת: הגשת דוחות עד יום ו'</div>
+              <div class="mcard-title">הודעות היום</div>
+              <div class="mnote mnote-b">ישיבת צוות ג׳ בשעה 14:00</div>
+              <div class="mnote mnote-g">חג פורים — חופשה מיוחדת 🎭</div>
+              <div class="mnote mnote-y">תזכורת: הגשת דוחות עד ו׳</div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+</section>
 
+<!-- STATS STRIP -->
 <div class="strip">
-  <div class="sitem"><div class="snum">16+</div><div class="slbl">מודולים מובנים</div></div>
-  <div class="sitem"><div class="snum">100%</div><div class="slbl">ענן ומובייל</div></div>
-  <div class="sitem"><div class="snum">PWA</div><div class="slbl">כאפליקציה אמיתית</div></div>
-  <div class="sitem"><div class="snum">RTL</div><div class="slbl">עברית מלאה</div></div>
+  <div class="sitem fade-up">
+    <div class="snum">16+</div>
+    <div class="slbl">מודולים מובנים</div>
+  </div>
+  <div class="sitem fade-up">
+    <div class="snum">100%</div>
+    <div class="slbl">ענן ומובייל</div>
+  </div>
+  <div class="sitem fade-up">
+    <div class="snum">PWA</div>
+    <div class="slbl">כאפליקציה אמיתית</div>
+  </div>
+  <div class="sitem fade-up">
+    <div class="snum">RTL</div>
+    <div class="slbl">עברית מלאה</div>
+  </div>
 </div>
 
-<div class="sec" id="features">
-  <div class="sec-lbl">תכונות</div>
-  <h2 class="sec-h">כל כלי הניהול שצריכים —<br/><span class="grad">בממשק אחד חכם</span></h2>
-  <p class="sec-sub">Smart Base מחליפה עשרות גיליונות אקסל, קבוצות וואטסאפ ומיילים. הכל במקום אחד, מסודר ונגיש.</p>
+<!-- FEATURES -->
+<section class="sec" id="features">
+  <div class="sec-label fade-up">תכונות</div>
+  <h2 class="sec-h fade-up">כל כלי הניהול שצריכים —<br/><span class="grad">בממשק אחד חכם</span></h2>
+  <p class="sec-sub fade-up">Smart Base מחליפה עשרות גיליונות Excel, קבוצות וואצאפ ומיילים. הכל מסודר, נגיש ומאובטח.</p>
   <div class="fgrid">
-    <div class="fcard"><div class="ficon" style="background:linear-gradient(135deg,#4f46e520,#7c3aed30)">📅</div><div class="ftit">יומן בית הספר</div><div class="fdesc">לוח שנה עם חגי ישראל, אירועים וחופשות. טעינת חגי משרד החינוך בלחיצה אחת.</div></div>
-    <div class="fcard"><div class="ficon" style="background:linear-gradient(135deg,#ef444420,#f9731630)">⏰</div><div class="ftit">ניהול היעדרויות</div><div class="fdesc">דיווח עם חתימה דיגיטלית, אישורים רפואיים ומעקב ימי בחירה והצהרה.</div></div>
-    <div class="fcard"><div class="ficon" style="background:linear-gradient(135deg,#8b5cf620,#a855f730)">✅</div><div class="ftit">משימות ואישורים</div><div class="fdesc">מעקב משימות עם תאריכי יעד, הקצאה לעובדים ואישורים דיגיטליים.</div></div>
-    <div class="fcard"><div class="ficon" style="background:linear-gradient(135deg,#10b98120,#34d39930)">👥</div><div class="ftit">ניהול צוות (HR)</div><div class="fdesc">הזמנת עובדים, ניהול תפקידים והרשאות וטפסי קליטה דיגיטליים.</div></div>
-    <div class="fcard"><div class="ficon" style="background:linear-gradient(135deg,#3b82f620,#6366f130)">🛡</div><div class="ftit">ניהול תורנויות</div><div class="fdesc">חלוקת תורנויות, אישור/דחייה ע"י העובד ומעקב מנהלים בזמן אמת.</div></div>
-    <div class="fcard"><div class="ficon" style="background:linear-gradient(135deg,#f59e0b20,#f9731630)">🖨</div><div class="ftit">מרכז צילומים</div><div class="fdesc">הגשת בקשות הדפסה עם כמות, מועד נדרש וניהול תור ייעודי.</div></div>
-    <div class="fcard"><div class="ficon" style="background:linear-gradient(135deg,#06b6d420,#0d948830)">🔧</div><div class="ftit">תפעול ורכש</div><div class="fdesc">קריאות תקלה, בקשות רכש ומעקב סטטוס לאב הבית.</div></div>
-    <div class="fcard"><div class="ficon" style="background:linear-gradient(135deg,#ec489920,#f4366330)">✍️</div><div class="ftit">חתימה דיגיטלית</div><div class="fdesc">חתימה באצבע או בעכבר בתוך הטופס — שמירה אוטומטית לכל דיווח.</div></div>
-    <div class="fcard"><div class="ficon" style="background:linear-gradient(135deg,#a855f720,#6366f130)">📊</div><div class="ftit">אנליטיקס ותובנות</div><div class="fdesc">דוחות נוכחות, גרפי היעדרויות ומגמות לקבלת החלטות מבוססת נתונים.</div></div>
-  </div>
-</div>
-
-<div style="background:rgba(255,255,255,.015);border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05)">
-<div class="sec" id="how" style="padding:80px 24px">
-  <div class="sec-lbl">איך זה עובד</div>
-  <h2 class="sec-h">מוכנים תוך דקות</h2>
-  <p class="sec-sub">אין צורך בהתקנה, אין שרתים, אין IT. Smart Base פועלת בענן ומוכנה לשימוש מיד.</p>
-  <div class="sgrid">
-    <div class="scard"><span class="semi">🏫</span><div class="stit">הגדרת בית הספר</div><div class="sdesc">המפתחת פותחת instance ייחודי לבית הספר עם נתונים מבודדים לחלוטין.</div></div>
-    <div class="scard"><span class="semi">📧</span><div class="stit">הזמנת הצוות</div><div class="sdesc">המנהלת מזמינה כל עובד עם תפקיד מוגדר. הם מקבלים מייל ונכנסים בלחיצה.</div></div>
-    <div class="scard"><span class="semi">📱</span><div class="stit">התקנה כאפליקציה</div><div class="sdesc">לחיצה אחת להתקנה על הנייד — הכפתור מופיע אוטומטית. בלי App Store.</div></div>
-    <div class="scard"><span class="semi">🚀</span><div class="stit">מתחילים לעבוד</div><div class="sdesc">כל אחד רואה את החלק שלו. הנתונים בזמן אמת, מכל מכשיר, בכל מקום.</div></div>
-  </div>
-</div>
-</div>
-
-<div class="sec" id="roles">
-  <div class="sec-lbl">תפקידים</div>
-  <h2 class="sec-h">חווייה מותאמת לכל תפקיד</h2>
-  <p class="sec-sub">כל עובד רואה בדיוק את מה שהוא צריך — לא יותר ולא פחות.</p>
-  <div class="rgrid">
-    <div class="rcard"><span class="remi">👩‍💼</span><div class="rnam">מנהלת</div><div class="rdesc">גישה מלאה + אנליטיקס + פאנל מפתח</div></div>
-    <div class="rcard"><span class="remi">👩‍🏫</span><div class="rnam">סגנית מנהלת</div><div class="rdesc">HR, יומן, תורנויות, אישורים</div></div>
-    <div class="rcard"><span class="remi">📋</span><div class="rnam">מזכירה</div><div class="rdesc">HR, צילומים, תפעול</div></div>
-    <div class="rcard"><span class="remi">🍎</span><div class="rnam">מורה</div><div class="rdesc">לוח זמנים, היעדרויות, משימות</div></div>
-    <div class="rcard"><span class="remi">🧭</span><div class="rnam">רכזת</div><div class="rdesc">תורנויות, לוח זמנים</div></div>
-    <div class="rcard"><span class="remi">💬</span><div class="rnam">יועצת</div><div class="rdesc">לוח זמנים, קהילה</div></div>
-    <div class="rcard"><span class="remi">🤝</span><div class="rnam">סייעת</div><div class="rdesc">לוח זמנים, היעדרויות</div></div>
-    <div class="rcard"><span class="remi">🔧</span><div class="rnam">אב בית</div><div class="rdesc">תפעול ורכש בלבד</div></div>
-  </div>
-</div>
-
-<!-- ═══ ACCESS ═══ -->
-<div class="sec" id="access" style="padding:70px 24px">
-  <div class="sec-lbl">כניסה למערכת</div>
-  <h2 class="sec-h">איך מתחילים?</h2>
-  <p class="sec-sub">Smart Base מבוססת על base44 — גישה מאובטחת ומנוהלת לפי תפקידים.</p>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;max-width:800px">
-    <div style="background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:26px">
-      <div style="font-size:28px;margin-bottom:12px">📧</div>
-      <div style="font-size:15px;font-weight:800;margin-bottom:8px">קבלת הזמנה</div>
-      <div style="color:rgba(255,255,255,.5);font-size:13.5px;line-height:1.75">המנהלת שולחת הזמנה לכל עובד/ת באימייל. לוחצים על הקישור ונכנסים ישירות.</div>
+    <div class="fcard fade-up">
+      <div class="ficon" style="background:#eef2ff;">📅</div>
+      <div class="ftit">יומן בית הספר</div>
+      <div class="fdesc">לוח שנה עם חגי ישראל, אירועים וחופשות. טעינת חגי משרד החינוך בלחיצה אחת.</div>
     </div>
-    <div style="background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:26px">
-      <div style="font-size:28px;margin-bottom:12px">📱</div>
-      <div style="font-size:15px;font-weight:800;margin-bottom:8px">התקנה כאפליקציה</div>
-      <div style="color:rgba(255,255,255,.5);font-size:13.5px;line-height:1.75">לאחר הכניסה — לחצו "הוסף למסך הבית" להתקנה כ-PWA. ללא App Store.</div>
+    <div class="fcard fade-up">
+      <div class="ficon" style="background:#fef2f2;">⏰</div>
+      <div class="ftit">ניהול היעדרויות</div>
+      <div class="fdesc">דיווח עם חתימה דיגיטלית, אישורים רפואיים ומעקב ימי בחירה והצהרה.</div>
     </div>
-    <div style="background:linear-gradient(160deg,rgba(79,70,229,.08),rgba(79,70,229,.02));border:1px solid rgba(79,70,229,.22);border-radius:20px;padding:26px">
-      <div style="font-size:28px;margin-bottom:12px">👩‍💼</div>
-      <div style="font-size:15px;font-weight:800;margin-bottom:8px;color:#a5b4fc">מנהלת / מפתחת</div>
-      <div style="color:rgba(255,255,255,.5);font-size:13.5px;line-height:1.75;margin-bottom:14px">גישה לפאנל base44 להגדרת בית הספר, הזמנת צוות וניהול הרשאות.</div>
-      <a href="/index.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;font-size:12px;font-weight:700;text-decoration:none">🚀 כניסה למערכת</a>
+    <div class="fcard fade-up">
+      <div class="ficon" style="background:#f5f3ff;">✅</div>
+      <div class="ftit">משימות ואישורים</div>
+      <div class="fdesc">מעקב משימות עם תאריכי יעד, הקצאה לעובדים ואישורים דיגיטליים.</div>
+    </div>
+    <div class="fcard fade-up">
+      <div class="ficon" style="background:#f0fdf4;">👥</div>
+      <div class="ftit">ניהול צוות (HR)</div>
+      <div class="fdesc">הזמנת עובדים, ניהול תפקידים והרשאות וטפסי קליטה דיגיטליים.</div>
+    </div>
+    <div class="fcard fade-up">
+      <div class="ficon" style="background:#eff6ff;">🛡</div>
+      <div class="ftit">ניהול תורנויות</div>
+      <div class="fdesc">חלוקת תורנויות, אישור/דחייה ע"י העובד ומעקב מנהלים בזמן אמת.</div>
+    </div>
+    <div class="fcard fade-up">
+      <div class="ficon" style="background:#fffbeb;">🖨</div>
+      <div class="ftit">מרכז צילומים</div>
+      <div class="fdesc">הגשת בקשות הדפסה עם כמות, מועד נדרש וניהול תור ייעודי.</div>
+    </div>
+    <div class="fcard fade-up">
+      <div class="ficon" style="background:#f0fdfa;">🔧</div>
+      <div class="ftit">תפעול ורכש</div>
+      <div class="fdesc">קריאות תקלה, בקשות רכש ומעקב סטטוס לאב הבית.</div>
+    </div>
+    <div class="fcard fade-up">
+      <div class="ficon" style="background:#fdf4ff;">✍️</div>
+      <div class="ftit">חתימה דיגיטלית</div>
+      <div class="fdesc">חתימה באצבע או בעכבר בתוך הטופס — שמירה אוטומטית לכל דיווח.</div>
+    </div>
+    <div class="fcard fade-up">
+      <div class="ficon" style="background:#f0f9ff;">📊</div>
+      <div class="ftit">אנליטיקס ותובנות</div>
+      <div class="fdesc">דוחות נוכחות, גרפי היעדרויות ומגמות לקבלת החלטות מבוססת נתונים.</div>
     </div>
   </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<div class="how-bg">
+  <section class="sec" id="how" style="padding:80px 24px">
+    <div class="sec-label fade-up">איך זה עובד</div>
+    <h2 class="sec-h fade-up">מוכנים תוך דקות</h2>
+    <p class="sec-sub fade-up">אין צורך בהתקנה, אין שרתים, אין IT. Smart Base פועלת בענן ומוכנה לשימוש מיד.</p>
+    <div class="steps-grid fade-up">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-icon">🏫</div>
+        <div class="step-title">הגדרת בית הספר</div>
+        <div class="step-desc">המפתחת פותחת instance ייחודי עם נתונים מבודדים לחלוטין לכל מוסד.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-icon">📧</div>
+        <div class="step-title">הזמנת הצוות</div>
+        <div class="step-desc">המנהלת מזמינה כל עובד עם תפקיד מוגדר. מקבלים מייל ונכנסים בלחיצה.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-icon">📱</div>
+        <div class="step-title">התקנה כאפליקציה</div>
+        <div class="step-desc">לחיצה אחת "הוסף למסך הבית" — מותקנת כ-PWA. בלי App Store.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-icon">🚀</div>
+        <div class="step-title">מתחילים לעבוד</div>
+        <div class="step-desc">כל אחד רואה רק את החלק שלו. נתונים בזמן אמת, מכל מכשיר.</div>
+      </div>
+    </div>
+  </section>
 </div>
 
-<div class="cta">
-  <div class="cta-glow"></div>
-  <div class="cta-box">
-    <div class="sec-lbl" style="margin-bottom:18px">התחילו היום</div>
-    <div class="cta-h">מוכנים לשדרג את<br/><span class="grad">ניהול בית הספר?</span></div>
+<!-- ROLES -->
+<section class="sec" id="roles">
+  <div class="sec-label fade-up">תפקידים</div>
+  <h2 class="sec-h fade-up">חווייה מותאמת לכל תפקיד</h2>
+  <p class="sec-sub fade-up">כל עובד/ת רואה בדיוק את מה שהם צריכים — לא יותר ולא פחות.</p>
+  <div class="roles-grid fade-up">
+    <div class="role-card">
+      <span class="role-emoji">👩‍💼</span>
+      <div class="role-name">מנהלת</div>
+      <div class="role-desc">גישה מלאה, אנליטיקס ופאנל ניהול</div>
+      <span class="role-badge" style="background:#f0fdf4;color:#15803d;">גישה מלאה</span>
+    </div>
+    <div class="role-card">
+      <span class="role-emoji">👩‍🏫</span>
+      <div class="role-name">סגנית מנהלת</div>
+      <div class="role-desc">HR, יומן, תורנויות, אישורים</div>
+      <span class="role-badge" style="background:#eef2ff;color:#4338ca;">ניהול</span>
+    </div>
+    <div class="role-card">
+      <span class="role-emoji">📋</span>
+      <div class="role-name">מזכירה</div>
+      <div class="role-desc">HR, צילומים, תפעול</div>
+      <span class="role-badge" style="background:#fffbeb;color:#92400e;">מנהלה</span>
+    </div>
+    <div class="role-card">
+      <span class="role-emoji">🍎</span>
+      <div class="role-name">מורה</div>
+      <div class="role-desc">לוח זמנים, היעדרויות, משימות</div>
+      <span class="role-badge" style="background:#f0fdfa;color:#065f46;">הוראה</span>
+    </div>
+    <div class="role-card">
+      <span class="role-emoji">🧭</span>
+      <div class="role-name">רכזת</div>
+      <div class="role-desc">תורנויות, לוח זמנים</div>
+      <span class="role-badge" style="background:#fdf4ff;color:#7e22ce;">רכז</span>
+    </div>
+    <div class="role-card">
+      <span class="role-emoji">💬</span>
+      <div class="role-name">יועצת</div>
+      <div class="role-desc">לוח זמנים, קהילה</div>
+      <span class="role-badge" style="background:#eff6ff;color:#1d4ed8;">ייעוץ</span>
+    </div>
+    <div class="role-card">
+      <span class="role-emoji">🤝</span>
+      <div class="role-name">סייעת</div>
+      <div class="role-desc">לוח זמנים, היעדרויות</div>
+      <span class="role-badge" style="background:#fef2f2;color:#991b1b;">סיוע</span>
+    </div>
+    <div class="role-card">
+      <span class="role-emoji">🔧</span>
+      <div class="role-name">אב בית</div>
+      <div class="role-desc">תפעול ורכש בלבד</div>
+      <span class="role-badge" style="background:#f5f5f5;color:#525252;">תפעול</span>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-box fade-up">
+    <div class="cta-glow"></div>
+    <div class="cta-glow2"></div>
+    <div class="cta-h">מוכנים לשדרג את<br/>ניהול בית הספר?</div>
     <p class="cta-sub">הצטרפו לבתי הספר שכבר עובדים חכם יותר עם Smart Base — ללא עלות התקנה, ללא תשתית.</p>
-    <div class="btns" style="margin-bottom:0">
-      <a href="/index.html" class="btn-p">🚀 כניסה למערכת</a>
-    </div>
+    <a href="/index.html" class="btn-white">
+      <span>כניסה למערכת</span>
+      <span>←</span>
+    </a>
   </div>
-</div>
+</section>
 
+<!-- FOOTER -->
 <footer>
-  <div style="display:flex;align-items:center;gap:9px">
-    <img src="/icon.jpeg" style="width:26px;height:26px;border-radius:7px"/>
-    Smart Base
+  <div class="footer-logo">
+    <img src="/logo-smartbase.jpeg" alt=""/>
+    <span>Smart Base</span>
   </div>
-  <div>מערכת ניהול חכמה לבית הספר · © 2026</div>
+  <div>מערכת ניהול חכמה לבית הספר · © 2026 רשת חינוך חב"ד</div>
   <a href="/index.html">כניסה למערכת →</a>
 </footer>
 
+<script>
+  // Fade-up on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Stagger children
+  document.querySelectorAll('.fgrid, .roles-grid, .steps-grid, .strip').forEach(grid => {
+    [...grid.children].forEach((child, i) => {
+      child.style.transitionDelay = (i * 60) + 'ms';
+    });
+  });
+</script>
 </body>
 </html>

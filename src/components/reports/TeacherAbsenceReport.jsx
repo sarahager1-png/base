@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { FileText, Printer, X, CheckCircle, Clock, XCircle, AlertCircle } from 'lucide-react';
 
 const REASON_LABELS = {
@@ -15,8 +15,8 @@ const REASON_LABELS = {
 const STATUS_CONFIG = {
   pending:              { label: 'ממתין לאישור', icon: Clock,        color: '#f59e0b', bg: '#fffbeb' },
   approved:             { label: 'אושר',          icon: CheckCircle,  color: '#10b981', bg: '#ecfdf5' },
-  rejected:             { label: 'נדחה',           icon: XCircle,      color: '#ef4444', bg: '#fef2f2' },
-  awaiting_certificate: { label: 'ממתין אישור רפואי', icon: AlertCircle, color: '#8b5cf6', bg: '#f5f3ff' },
+  rejected:             { label: 'נדחה',           icon: XCircle,      color: '#eab308', bg: '#fefce8' },
+  awaiting_certificate: { label: 'ממתין אישור רפואי', icon: AlertCircle, color: '#eab308', bg: '#f5f3ff' },
 };
 
 function formatDate(d) {
@@ -56,11 +56,11 @@ export default function TeacherAbsenceReport({ user, isOpen, onClose }) {
         <title>דוח היעדרויות – ${user?.full_name}</title>
         <style>
           body { font-family: Arial, sans-serif; direction: rtl; margin: 2cm; color: #1e293b; font-size: 13px; }
-          h1 { color: #4f46e5; margin-bottom: 4px; }
+          h1 { color: #1d4ed8; margin-bottom: 4px; }
           .subtitle { color: #64748b; font-size: 12px; margin-bottom: 20px; }
           .summary { display: flex; gap: 16px; margin-bottom: 24px; }
           .stat { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; flex: 1; text-align: center; }
-          .stat .num { font-size: 24px; font-weight: 900; color: #4f46e5; }
+          .stat .num { font-size: 24px; font-weight: 900; color: #1d4ed8; }
           .stat .lbl { font-size: 11px; color: #64748b; }
           table { width: 100%; border-collapse: collapse; }
           th { background: #f1f5f9; text-align: right; padding: 10px 12px; font-size: 11px; font-weight: 700; color: #475569; border-bottom: 2px solid #e2e8f0; }
@@ -69,7 +69,7 @@ export default function TeacherAbsenceReport({ user, isOpen, onClose }) {
           .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; }
           .badge-approved  { background: #ecfdf5; color: #047857; }
           .badge-pending   { background: #fffbeb; color: #b45309; }
-          .badge-rejected  { background: #fef2f2; color: #b91c1c; }
+          .badge-rejected  { background: #fefce8; color: #92400e; }
           .badge-awaiting  { background: #f5f3ff; color: #6d28d9; }
           .footer { margin-top: 32px; font-size: 11px; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 12px; }
         </style>
@@ -116,7 +116,7 @@ export default function TeacherAbsenceReport({ user, isOpen, onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl" style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
+            <div className="p-2.5 rounded-xl" style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)' }}>
               <FileText className="h-5 w-5 text-white" />
             </div>
             <div>
@@ -127,7 +127,7 @@ export default function TeacherAbsenceReport({ user, isOpen, onClose }) {
           <div className="flex items-center gap-2">
             <button onClick={handlePrint}
                     className="flex items-center gap-2 px-4 py-2 text-white text-sm font-semibold rounded-xl transition-all hover:shadow-md"
-                    style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
+                    style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)' }}>
               <Printer className="h-4 w-4" />
               הדפס / PDF
             </button>
@@ -140,8 +140,8 @@ export default function TeacherAbsenceReport({ user, isOpen, onClose }) {
         {/* Summary */}
         <div className="grid grid-cols-4 gap-3 p-4 border-b border-slate-100 dark:border-slate-700">
           {[
-            { label: 'סה"כ דיווחים', value: total,     color: '#6366f1' },
-            { label: 'ימי היעדרות',  value: totalDays,  color: '#8b5cf6' },
+            { label: 'סה"כ דיווחים', value: total,     color: '#2563eb' },
+            { label: 'ימי היעדרות',  value: totalDays,  color: '#eab308' },
             { label: 'אושרו',        value: approved,   color: '#10b981' },
             { label: 'ממתינים',      value: pending,    color: '#f59e0b' },
           ].map(s => (
@@ -182,7 +182,7 @@ export default function TeacherAbsenceReport({ user, isOpen, onClose }) {
                       <td className="py-3 px-2 text-slate-600 dark:text-slate-300">{a.substitute_teacher_name || '—'}</td>
                       <td className="py-3 px-2">
                         {a.medical_certificate_required
-                          ? <span className={`text-xs font-semibold ${a.medical_certificate_url ? 'text-green-600' : 'text-red-500'}`}>
+                          ? <span className={`text-xs font-semibold ${a.medical_certificate_url ? 'text-green-600' : 'text-yellow-500'}`}>
                               {a.medical_certificate_url ? '✓ הוגש' : '✗ חסר'}
                             </span>
                           : <span className="text-xs text-slate-400">לא נדרש</span>}

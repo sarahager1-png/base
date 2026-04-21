@@ -112,11 +112,11 @@ export default function DevAdmin() {
   if (!authenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center" dir="rtl"
-           style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)' }}>
+           style={{ background: 'linear-gradient(135deg, #0f172a 0%, #0f172a 100%)' }}>
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
-                 style={{ background: 'linear-gradient(135deg, #7c3aed, #4f46e5)' }}>
+                 style={{ background: 'linear-gradient(135deg, #ca8a04, #1d4ed8)' }}>
               <Shield className="h-8 w-8 text-white" />
             </div>
             <h1 className="text-2xl font-black text-white">פאנל מפתח</h1>
@@ -141,10 +141,10 @@ export default function DevAdmin() {
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            {error && <p className="text-red-400 text-xs mb-3">{error}</p>}
+            {error && <p className="text-yellow-600 text-xs mb-3">{error}</p>}
             <button onClick={handleLogin}
               className="w-full py-3 rounded-xl font-bold text-white text-sm"
-              style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)' }}>
+              style={{ background: 'linear-gradient(135deg, #1d4ed8, #ca8a04)' }}>
               כניסה
             </button>
           </div>
@@ -157,41 +157,38 @@ export default function DevAdmin() {
   return (
     <div className="min-h-screen bg-slate-950 text-white" dir="rtl">
       {/* Header */}
-      <div className="border-b border-slate-800 px-6 py-4 flex items-center justify-between">
+      <div className="border-b border-slate-800/60 px-6 py-4 flex items-center justify-between bg-slate-900/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl" style={{ background: 'linear-gradient(135deg, #7c3aed, #4f46e5)' }}>
-            <Shield className="h-5 w-5 text-white" />
+          <div className="p-2.5 rounded-xl" style={{ background: 'linear-gradient(135deg, #1d4ed8, #ca8a04)' }}>
+            <Shield className="h-4 w-4 text-white" />
           </div>
           <div>
-            <h1 className="font-black text-lg">פאנל מפתח — Smart Base</h1>
-            <p className="text-slate-400 text-xs">ניהול בתי ספר ופריסות</p>
+            <h1 className="font-bold text-sm text-white">פאנל מפתח — Smart Base</h1>
+            <p className="text-slate-500 text-xs">ניהול בתי ספר ופריסות</p>
           </div>
         </div>
         <div className="flex gap-2">
           <button onClick={exportSchools}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800 text-sm">
-            <Download className="h-4 w-4" />
-            ייצוא JSON
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 text-slate-400 hover:text-slate-200 hover:bg-slate-800 text-xs font-medium transition-colors">
+            <Download className="h-3.5 w-3.5" />ייצוא JSON
           </button>
           <button onClick={() => setAuthenticated(false)}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800 text-sm">
-            <Lock className="h-4 w-4" />
-            נעל
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 text-slate-400 hover:text-slate-200 hover:bg-slate-800 text-xs font-medium transition-colors">
+            <Lock className="h-3.5 w-3.5" />נעל
           </button>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-8">
+      <div className="max-w-5xl mx-auto px-6 py-6">
 
         {/* Architecture Info */}
-        <div className="rounded-2xl p-5 mb-8 border border-indigo-800"
-             style={{ background: 'rgba(79,70,229,0.1)' }}>
+        <div className="rounded-xl p-4 mb-6 border border-indigo-800/40 bg-indigo-950/30">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="h-5 w-5 text-indigo-400 mt-0.5 flex-shrink-0" />
+            <AlertTriangle className="h-4 w-4 text-indigo-400 mt-0.5 flex-shrink-0" />
             <div>
-              <h3 className="font-bold text-indigo-300 mb-1">ארכיטקטורת בידוד בתי ספר</h3>
-              <p className="text-indigo-200 text-sm leading-relaxed">
-                כל בית ספר מקבל <strong>App ID נפרד ב-base44</strong> = מסד נתונים עצמאי לחלוטין.
+              <h3 className="font-semibold text-indigo-300 text-sm mb-1">ארכיטקטורת בידוד בתי ספר</h3>
+              <p className="text-indigo-200/70 text-xs leading-relaxed">
+                כל בית ספר מקבל <strong className="text-indigo-200">App ID נפרד ב-base44</strong> = מסד נתונים עצמאי לחלוטין.
                 לכל בית ספר מפרסים instance נפרד ב-Vercel עם משתני הסביבה הייחודיים שלו.
                 אין זליגת נתונים בין בתי ספר.
               </p>
@@ -201,15 +198,14 @@ export default function DevAdmin() {
 
         {/* Schools list header */}
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-purple-400" />
+          <h2 className="text-sm font-bold text-slate-300 flex items-center gap-2">
+            <Building2 className="h-4 w-4 text-yellow-500" />
             בתי ספר ({schools.length})
           </h2>
           <button onClick={() => setShowAdd(p => !p)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm"
-            style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)' }}>
-            <Plus className="h-4 w-4" />
-            הוסף בית ספר
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl font-semibold text-sm text-white transition-opacity hover:opacity-90"
+            style={{ background: 'linear-gradient(135deg, #1d4ed8, #ca8a04)' }}>
+            <Plus className="h-4 w-4" />הוסף בית ספר
           </button>
         </div>
 
@@ -236,7 +232,7 @@ export default function DevAdmin() {
                     placeholder={placeholder}
                     value={newSchool[key]}
                     onChange={e => setNewSchool(p => ({ ...p, [key]: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-lg text-white text-sm outline-none bg-slate-800 border border-slate-700 focus:border-purple-500"
+                    className="w-full px-3 py-2 rounded-lg text-white text-sm outline-none bg-slate-800 border border-slate-700 focus:border-yellow-500"
                     style={{ direction: key === 'adminEmail' || key === 'vercelUrl' ? 'ltr' : 'rtl' }}
                   />
                 </div>
@@ -253,7 +249,7 @@ export default function DevAdmin() {
                   placeholder="69794b7749148839a583cd2b"
                   value={newSchool.appId}
                   onChange={e => setNewSchool(p => ({ ...p, appId: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-lg text-white text-sm outline-none bg-slate-800 border border-slate-700 focus:border-purple-500 font-mono"
+                  className="w-full px-3 py-2 rounded-lg text-white text-sm outline-none bg-slate-800 border border-slate-700 focus:border-yellow-500 font-mono"
                   style={{ direction: 'ltr' }}
                 />
               </div>
@@ -267,7 +263,7 @@ export default function DevAdmin() {
                   placeholder="4002c112b24e443bb2433c..."
                   value={newSchool.apiKey}
                   onChange={e => setNewSchool(p => ({ ...p, apiKey: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-lg text-white text-sm outline-none bg-slate-800 border border-slate-700 focus:border-purple-500 font-mono"
+                  className="w-full px-3 py-2 rounded-lg text-white text-sm outline-none bg-slate-800 border border-slate-700 focus:border-yellow-500 font-mono"
                   style={{ direction: 'ltr' }}
                 />
               </div>
@@ -279,12 +275,12 @@ export default function DevAdmin() {
                 placeholder="..."
                 value={newSchool.notes}
                 onChange={e => setNewSchool(p => ({ ...p, notes: e.target.value }))}
-                className="w-full px-3 py-2 rounded-lg text-white text-sm outline-none bg-slate-800 border border-slate-700 focus:border-purple-500"
+                className="w-full px-3 py-2 rounded-lg text-white text-sm outline-none bg-slate-800 border border-slate-700 focus:border-yellow-500"
               />
             </div>
             <button onClick={addSchool} disabled={!newSchool.name}
               className="px-6 py-2.5 rounded-xl font-bold text-sm disabled:opacity-40"
-              style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)' }}>
+              style={{ background: 'linear-gradient(135deg, #1d4ed8, #ca8a04)' }}>
               שמור בית ספר
             </button>
           </div>
@@ -347,7 +343,7 @@ export default function DevAdmin() {
                       {expandedId === school.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     </button>
                     <button onClick={() => deleteSchool(school.id)}
-                      className="p-2 rounded-lg border border-red-900 hover:bg-red-900/30 text-red-500">
+                      className="p-2 rounded-lg border border-yellow-900 hover:bg-yellow-900/30 text-yellow-500">
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
@@ -372,7 +368,7 @@ export default function DevAdmin() {
                             type="text"
                             value={school[key] || ''}
                             onChange={e => updateSchool(school.id, key, e.target.value)}
-                            className="w-full px-3 py-2 rounded-lg text-white text-xs outline-none bg-slate-800 border border-slate-700 focus:border-purple-500 font-mono"
+                            className="w-full px-3 py-2 rounded-lg text-white text-xs outline-none bg-slate-800 border border-slate-700 focus:border-yellow-500 font-mono"
                             style={{ direction: 'ltr' }}
                           />
                         </div>
@@ -424,11 +420,11 @@ export default function DevAdmin() {
                     {/* Deployment steps */}
                     <div className="rounded-xl p-4 border border-slate-700 bg-slate-900">
                       <h4 className="font-bold text-slate-300 text-sm mb-3 flex items-center gap-2">
-                        <RefreshCw className="h-4 w-4 text-purple-400" />
+                        <RefreshCw className="h-4 w-4 text-yellow-600" />
                         שלבי פריסה לבית ספר זה
                       </h4>
                       <ol className="space-y-2 text-sm text-slate-400" style={{ paddingRight: '16px' }}>
-                        <li><strong className="text-slate-300">1.</strong> צור App חדש ב-<a href="https://base44.com" target="_blank" rel="noreferrer" className="text-purple-400 hover:underline">base44.com</a> → העתק את App ID</li>
+                        <li><strong className="text-slate-300">1.</strong> צור App חדש ב-<a href="https://base44.com" target="_blank" rel="noreferrer" className="text-yellow-600 hover:underline">base44.com</a> → העתק את App ID</li>
                         <li><strong className="text-slate-300">2.</strong> ב-App החדש: Settings → API Keys → צור מפתח והעתק</li>
                         <li><strong className="text-slate-300">3.</strong> עדכן כאן את App ID ו-API Key → העתק את vercel.json</li>
                         <li><strong className="text-slate-300">4.</strong> הכנס את vercel.json לתיקיית הקוד של המערכת</li>
@@ -444,23 +440,23 @@ export default function DevAdmin() {
         )}
 
         {/* Current deployment info */}
-        <div className="mt-8 rounded-2xl p-5 border border-slate-700 bg-slate-900">
-          <h3 className="font-bold text-slate-300 mb-3 flex items-center gap-2 text-sm">
-            <Globe className="h-4 w-4 text-blue-400" />
-            הפריסה הנוכחית (מה שפתוח עכשיו)
+        <div className="mt-6 rounded-xl p-4 border border-slate-800 bg-slate-900/60">
+          <h3 className="font-semibold text-slate-400 mb-3 flex items-center gap-2 text-xs uppercase tracking-wider">
+            <Globe className="h-3.5 w-3.5 text-blue-500" />
+            הפריסה הנוכחית
           </h3>
-          <div className="grid grid-cols-3 gap-3 text-xs">
-            <div className="bg-slate-800 rounded-lg p-3">
-              <p className="text-slate-500 mb-1">App ID</p>
-              <p className="font-mono text-slate-300">69794b7749148839a583cd2b</p>
+          <div className="grid grid-cols-3 gap-2 text-xs">
+            <div className="bg-slate-800/60 rounded-lg p-3">
+              <p className="text-slate-600 mb-1 text-[10px] uppercase tracking-wider">App ID</p>
+              <p className="font-mono text-slate-300 text-[11px]">69794b7749148839a583cd2b</p>
             </div>
-            <div className="bg-slate-800 rounded-lg p-3">
-              <p className="text-slate-500 mb-1">כתובת</p>
-              <p className="font-mono text-slate-300 truncate">{window.location.hostname}</p>
+            <div className="bg-slate-800/60 rounded-lg p-3">
+              <p className="text-slate-600 mb-1 text-[10px] uppercase tracking-wider">כתובת</p>
+              <p className="font-mono text-slate-300 text-[11px] truncate">{window.location.hostname}</p>
             </div>
-            <div className="bg-slate-800 rounded-lg p-3">
-              <p className="text-slate-500 mb-1">סביבה</p>
-              <p className="font-mono text-slate-300">{import.meta.env.MODE}</p>
+            <div className="bg-slate-800/60 rounded-lg p-3">
+              <p className="text-slate-600 mb-1 text-[10px] uppercase tracking-wider">סביבה</p>
+              <p className="font-mono text-slate-300 text-[11px]">{import.meta.env.MODE}</p>
             </div>
           </div>
         </div>

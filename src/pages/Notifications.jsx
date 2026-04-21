@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { Bell, Check, Trash2, Filter, AlertTriangle, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -122,8 +122,8 @@ export default function NotificationsPage() {
   };
 
   const priorityColors = {
-    urgent: 'bg-red-100 text-red-700 border-red-200',
-    important: 'bg-amber-100 text-amber-700 border-amber-200',
+    urgent: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+    important: 'bg-yellow-100 text-yellow-700 border-yellow-200',
     normal: 'bg-slate-100 text-slate-700 border-slate-200'
   };
 
@@ -250,7 +250,7 @@ export default function NotificationsPage() {
                                 deleteNotification.mutate(notif.id);
                               }
                             }}
-                            className="p-1.5 hover:bg-red-100 rounded text-red-600 transition-colors"
+                            className="p-1.5 hover:bg-yellow-100 rounded text-yellow-700 transition-colors"
                             title="מחק"
                           >
                             <Trash2 className="h-4 w-4" />

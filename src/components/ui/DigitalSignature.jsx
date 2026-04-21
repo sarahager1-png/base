@@ -12,7 +12,7 @@ export default function DigitalSignature({ onSave, onClose, title = 'חתימה 
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = '#1e1b4b';
+    ctx.strokeStyle = '#0f172a';
     ctx.lineWidth = 2.5;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
@@ -82,7 +82,7 @@ export default function DigitalSignature({ onSave, onClose, title = 'חתימה 
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-slate-200">
           <h3 className="font-bold text-slate-800 flex items-center gap-2 text-lg">
-            <PenLine className="h-5 w-5 text-purple-600" />
+            <PenLine className="h-5 w-5 text-yellow-700" />
             {title}
           </h3>
           <button onClick={onClose} className="p-1.5 hover:bg-slate-100 rounded-lg">
@@ -93,7 +93,7 @@ export default function DigitalSignature({ onSave, onClose, title = 'חתימה 
         {/* Canvas */}
         <div className="p-5">
           <p className="text-sm text-slate-500 mb-3 text-center">חתמי בתיבה למטה עם האצבע או העכבר</p>
-          <div className="relative border-2 border-dashed border-purple-300 rounded-xl overflow-hidden bg-white"
+          <div className="relative border-2 border-dashed border-yellow-300 rounded-xl overflow-hidden bg-white"
                style={{ touchAction: 'none' }}>
             <canvas
               ref={canvasRef}
@@ -111,7 +111,7 @@ export default function DigitalSignature({ onSave, onClose, title = 'חתימה 
             />
             {isEmpty && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <p className="text-purple-200 text-2xl font-light select-none">חתימה</p>
+                <p className="text-yellow-200 text-2xl font-light select-none">חתימה</p>
               </div>
             )}
           </div>
@@ -132,7 +132,7 @@ export default function DigitalSignature({ onSave, onClose, title = 'חתימה 
           <button
             onClick={save}
             disabled={isEmpty}
-            className="flex-1 py-2.5 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
+            className="flex-1 py-2.5 bg-yellow-600 text-white rounded-xl font-bold hover:bg-yellow-700 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
           >
             <Check className="h-4 w-4" />
             אישור חתימה

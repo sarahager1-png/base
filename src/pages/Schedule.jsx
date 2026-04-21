@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { useAuth } from '@/lib/AuthContext';
-import { CalendarDays, Plus, MapPin, Calendar, Clock } from 'lucide-react';
+import { CalendarDays, Plus, MapPin, Calendar, Clock, Upload, TableProperties } from 'lucide-react';
+import ScheduleUpload from '../components/schedule/ScheduleUpload';
+import WeeklyScheduleView from '../components/schedule/WeeklyScheduleView';
 
 const WEEK_DAYS = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
 const _today = new Date();
@@ -12,6 +14,8 @@ const DAYS_IN_MONTH = new Date(_today.getFullYear(), _today.getMonth() + 1, 0).g
 export default function Schedule() {
   const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState(new Date().getDate());
+  const [scheduleTab, setScheduleTab] = useState('weekly');
+  const [scheduleKey, setScheduleKey] = useState(0);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [newEventData, setNewEventData] = useState({ 
     title: '', 
@@ -23,14 +27,6 @@ export default function Schedule() {
 
   const queryClient = useQueryClient();
 
-  const TEACHER_SCHEDULE = {
-    0: { 1: 'הסטוריה - ח׳2', 2: 'הסטוריה - ח׳2', 3: 'פרטני', 4: 'חלון', 5: 'אזרחות - ט׳1', 6: 'אזרחות - ט׳1' },
-    1: { 1: 'חלון', 2: 'הסטוריה - ח׳3', 3: 'הסטוריה - ח׳3', 4: 'ישיבת צוות', 5: 'הסטוריה - ח׳2' },
-    2: { 1: 'אזרחות - ט׳1', 2: 'אזרחות - ט׳1', 3: 'הסטוריה - ח׳2', 4: 'הסטוריה - ח׳2', 5: 'שהייה', 6: 'שהייה' },
-    3: { 1: 'הסטוריה - ח׳3', 2: 'הסטוריה - ח׳3', 3: 'חלון', 4: 'פרטני', 5: 'חינוך - ח׳2' },
-    4: { 1: 'חלון', 2: 'חלון', 3: 'הסטוריה - ח׳2', 4: 'הסטוריה - ח׳2', 5: 'אזרחות - ט׳1' },
-    5: { 1: 'סיכום שבוע - ח׳2', 2: 'פרטני' },
-  };
 
   const { data: events = [] } = useQuery({
     queryKey: ['schoolEvents'],
@@ -59,10 +55,10 @@ export default function Schedule() {
   if (!user) return <div className="p-10 text-center">טוען...</div>;
 
   const colorMap = {
-    social: 'bg-purple-100 text-purple-700',
+    social: 'bg-yellow-100 text-yellow-700',
     pedagogic: 'bg-blue-100 text-blue-700',
-    staff: 'bg-amber-100 text-amber-700',
-    holiday: 'bg-red-100 text-red-800',
+    staff: 'bg-yellow-100 text-yellow-700',
+    holiday: 'bg-yellow-100 text-yellow-800',
     meeting: 'bg-green-100 text-green-700'
   };
 
@@ -130,7 +126,7 @@ export default function Schedule() {
         <div className="flex flex-wrap justify-between items-center gap-4">
           <div>
             <h2 className="text-xl md:text-2xl font-bold text-blue-900 flex items-center gap-2">
-              <CalendarDays className="h-6 w-6 text-amber-500" />
+              <CalendarDays className="h-6 w-6 text-yellow-600" />
               מערכת שעות ויומן
             </h2>
             <p className="text-slate-500">מערכת שעות שבועית ואירועים מיוחדים</p>
@@ -147,65 +143,26 @@ export default function Schedule() {
 
         {/* Weekly Schedule */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
-          <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <Clock className="h-5 w-5 text-blue-500" />
-            מערכת שעות שבועית
-          </h3>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr>
-                  <th className="border border-slate-200 bg-slate-50 p-3 text-sm font-bold text-slate-600">שעה</th>
-                  {['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי'].map(day => (
-                    <th key={day} className="border border-slate-200 bg-slate-50 p-3 text-sm font-bold text-slate-600">{day}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {[1, 2, 3, 4, 5, 6, 7].map(hour => (
-                  <tr key={hour}>
-                    <td className="border border-slate-200 bg-blue-50 p-3 text-center font-bold text-blue-900">{hour}</td>
-                    {[0, 1, 2, 3, 4, 5].map(dayIdx => {
-                      const lesson = TEACHER_SCHEDULE[dayIdx]?.[hour];
-                      const isWindow = lesson === 'חלון';
-                      const isPersonal = lesson === 'פרטני';
-                      const isStay = lesson === 'שהייה';
-                      const isMeeting = lesson === 'ישיבת צוות';
-                      
-                      return (
-                        <td 
-                          key={dayIdx} 
-                          className={`border border-slate-200 p-3 text-center ${
-                            !lesson ? 'bg-slate-50' :
-                            isWindow ? 'bg-slate-100 text-slate-400' :
-                            isPersonal ? 'bg-amber-50 text-amber-700' :
-                            isStay ? 'bg-purple-50 text-purple-700' :
-                            isMeeting ? 'bg-green-50 text-green-700' :
-                            'bg-white'
-                          }`}
-                        >
-                          {lesson ? (
-                            <div className="text-sm">
-                              {lesson.includes(' - ') ? (
-                                <>
-                                  <div className="font-bold">{lesson.split(' - ')[0]}</div>
-                                  <div className="text-xs opacity-70">{lesson.split(' - ')[1]}</div>
-                                </>
-                              ) : (
-                                <span className="text-xs font-medium">{lesson}</span>
-                              )}
-                            </div>
-                          ) : (
-                            <span className="text-slate-300">-</span>
-                          )}
-                        </td>
-                      );
-                    })}
-                  </tr>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+              <TableProperties className="h-5 w-5 text-blue-500" />
+              מערכת שעות שבועית
+            </h3>
+            {canSchedule && (
+              <div className="flex gap-1 bg-slate-100 p-1 rounded-lg">
+                {[{ id: 'weekly', label: 'תצוגה' }, { id: 'import', label: 'יבוא' }].map(t => (
+                  <button key={t.id} onClick={() => setScheduleTab(t.id)}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${
+                      scheduleTab === t.id ? 'bg-white shadow text-blue-700' : 'text-slate-500 hover:text-slate-700'
+                    }`}>{t.label}</button>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            )}
           </div>
+          {scheduleTab === 'import' && canSchedule
+            ? <ScheduleUpload onImported={() => { setScheduleTab('weekly'); setScheduleKey(k => k + 1); }} />
+            : <WeeklyScheduleView key={scheduleKey} email={user?.email} />
+          }
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
@@ -216,9 +173,9 @@ export default function Schedule() {
                 {new Date().toLocaleDateString('he-IL', { month: 'long', year: 'numeric' })}
               </h3>
               <div className="flex gap-2 text-xs">
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500"></span> חג</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500"></span> חג</span>
                 <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500"></span> פדגוגי</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-purple-500"></span> חברתי</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500"></span> חברתי</span>
                 <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500"></span> אישי</span>
               </div>
             </div>

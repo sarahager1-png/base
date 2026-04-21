@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { Mail, Heart, CheckCircle2, Trash2, Clock, MessageCircle, Lightbulb, ThumbsUp } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -11,8 +11,8 @@ export default function MessagesCenter({ user }) {
   const messageTypeConfig = {
     personal: {
       icon: Heart, label: 'הודעה אישית',
-      iconClass: 'text-pink-600 bg-pink-50 border-pink-100',
-      badgeClass: 'text-pink-700 bg-pink-100',
+      iconClass: 'text-yellow-700 bg-yellow-50 border-yellow-100',
+      badgeClass: 'text-yellow-700 bg-yellow-100',
     },
     feedback: {
       icon: ThumbsUp, label: 'משוב',
@@ -21,8 +21,8 @@ export default function MessagesCenter({ user }) {
     },
     suggestion: {
       icon: Lightbulb, label: 'הצעה',
-      iconClass: 'text-amber-600 bg-amber-50 border-amber-100',
-      badgeClass: 'text-amber-700 bg-amber-100',
+      iconClass: 'text-yellow-700 bg-yellow-50 border-yellow-100',
+      badgeClass: 'text-yellow-700 bg-yellow-100',
     },
   };
 
@@ -125,10 +125,10 @@ export default function MessagesCenter({ user }) {
                   )}
                   <button
                     onClick={() => deleteMessage.mutate(message.id)}
-                    className="p-1 hover:bg-red-200 rounded-lg transition-colors"
+                    className="p-1 hover:bg-yellow-200 rounded-lg transition-colors"
                     title="מחק"
                   >
-                    <Trash2 className="h-4 w-4 text-red-600" />
+                    <Trash2 className="h-4 w-4 text-yellow-700" />
                   </button>
                 </div>
               </div>

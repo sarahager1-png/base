@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -296,8 +296,8 @@ export default function JournalManagementPage() {
                       </td>
                       <td className="p-4">
                         <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                          entry.priority === 'urgent' ? 'bg-red-100 text-red-700' :
-                          entry.priority === 'important' ? 'bg-amber-100 text-amber-700' :
+                          entry.priority === 'urgent' ? 'bg-yellow-100 text-yellow-700' :
+                          entry.priority === 'important' ? 'bg-yellow-100 text-yellow-700' :
                           'bg-slate-100 text-slate-600'
                         }`}>
                           {priorityLabels[entry.priority]}
@@ -317,7 +317,7 @@ export default function JournalManagementPage() {
                                 deleteEntry.mutate(entry.id);
                               }
                             }}
-                            className="p-2 hover:bg-red-50 rounded-lg text-red-600 transition-colors"
+                            className="p-2 hover:bg-yellow-50 rounded-lg text-yellow-700 transition-colors"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>

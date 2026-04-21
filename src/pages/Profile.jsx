@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { User, Mail, Phone, Briefcase, Save, CheckCircle, Camera, Key, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 
@@ -70,7 +70,7 @@ export default function Profile() {
 
   if (!user) return (
     <div className="flex items-center justify-center min-h-[300px]">
-      <div className="w-8 h-8 border-4 border-teal-100 border-t-teal-600 rounded-full animate-spin" />
+      <div className="w-8 h-8 border-4 border-green-100 border-t-green-600 rounded-full animate-spin" />
     </div>
   );
 
@@ -79,7 +79,7 @@ export default function Profile() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-          <User className="h-6 w-6 text-teal-600" />
+          <User className="h-6 w-6 text-green-600" />
           הפרופיל שלי
         </h1>
         <p className="text-slate-500 text-sm mt-1">עדכון פרטים אישיים והגדרות חשבון</p>
@@ -92,19 +92,19 @@ export default function Profile() {
                style={{ background: 'linear-gradient(135deg, #0d9488, #22c55e)' }}>
             {user.avatar || user.full_name?.charAt(0) || '?'}
           </div>
-          <div className="absolute -bottom-1 -left-1 h-6 w-6 rounded-full bg-white border-2 border-teal-500 flex items-center justify-center">
-            <Camera className="h-3 w-3 text-teal-600" />
+          <div className="absolute -bottom-1 -left-1 h-6 w-6 rounded-full bg-white border-2 border-green-500 flex items-center justify-center">
+            <Camera className="h-3 w-3 text-green-600" />
           </div>
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-xl font-bold text-slate-800 dark:text-slate-100 truncate">{user.full_name}</p>
-          <p className="text-teal-600 font-medium text-sm">{user.title || roleLabel[user.role] || user.role}</p>
+          <p className="text-green-600 font-medium text-sm">{user.title || roleLabel[user.role] || user.role}</p>
           <div className="flex items-center gap-1.5 mt-1 text-slate-500 text-sm">
             <Mail className="h-3.5 w-3.5 flex-shrink-0" />
             <span className="truncate">{user.email}</span>
           </div>
         </div>
-        <span className="px-3 py-1 rounded-full text-xs font-bold bg-teal-50 text-teal-700 border border-teal-200 flex-shrink-0">
+        <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-200 flex-shrink-0">
           {roleLabel[user.role] || user.role}
         </span>
       </div>
@@ -112,7 +112,7 @@ export default function Profile() {
       {/* Personal Info Form */}
       <form onSubmit={handleSave} className="card-premium p-6 space-y-4">
         <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-          <Briefcase className="h-4 w-4 text-teal-600" />
+          <Briefcase className="h-4 w-4 text-green-600" />
           פרטים אישיים
         </h2>
 
@@ -152,7 +152,7 @@ export default function Profile() {
           />
         </div>
 
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+        {error && <p className="text-yellow-500 text-sm">{error}</p>}
 
         <button
           type="submit"
@@ -170,7 +170,7 @@ export default function Profile() {
       {/* Password Change */}
       <form onSubmit={handlePwSave} className="card-premium p-6 space-y-4">
         <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-          <Key className="h-4 w-4 text-teal-600" />
+          <Key className="h-4 w-4 text-green-600" />
           שינוי סיסמה
         </h2>
 
@@ -220,7 +220,7 @@ export default function Profile() {
           </div>
         </div>
 
-        {pwError && <p className="text-red-500 text-sm">{pwError}</p>}
+        {pwError && <p className="text-yellow-500 text-sm">{pwError}</p>}
 
         <button
           type="submit"

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { Calendar, Clock, AlertCircle, Bell, Users } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -31,8 +31,8 @@ export default function DailyJournal({ date }) {
 
   const priorityConfig = {
     normal: 'border-slate-200',
-    important: 'border-amber-400 bg-amber-50',
-    urgent: 'border-red-400 bg-red-50',
+    important: 'border-yellow-400 bg-yellow-50',
+    urgent: 'border-yellow-400 bg-yellow-50',
   };
 
   return (
@@ -73,7 +73,7 @@ export default function DailyJournal({ date }) {
                         {config.label}
                       </span>
                       {entry.priority === 'urgent' && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-red-200 text-red-800 font-bold flex items-center gap-1">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-200 text-yellow-800 font-bold flex items-center gap-1">
                           <AlertCircle className="h-3 w-3" />
                           דחוף
                         </span>

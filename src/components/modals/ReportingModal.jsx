@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { X, Clock, Map, Timer, Printer, ShoppingCart, Hammer, Monitor, Sparkles } from 'lucide-react';
 import { SubstituteForm, SubstituteHistory } from './forms/SubstituteForm';
 import { OvertimeForm, OvertimeHistory, SpecialOvertimeForm, SpecialOvertimeHistory } from './forms/OvertimeForms';

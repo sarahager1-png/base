@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { Bell, X, Check, AlertTriangle, Clock } from 'lucide-react';
 import { timeAgo } from '@/lib/utils';
 
@@ -67,8 +67,8 @@ export default function NotificationBell({ userEmail }) {
   };
 
   const priorityColors = {
-    urgent: 'bg-red-50 border-red-200',
-    important: 'bg-amber-50 border-amber-200',
+    urgent: 'bg-yellow-50 border-yellow-200',
+    important: 'bg-yellow-50 border-yellow-200',
     normal: 'bg-slate-50 border-slate-200'
   };
 
@@ -92,7 +92,7 @@ export default function NotificationBell({ userEmail }) {
       >
         <Bell className="h-6 w-6 text-blue-600" />
         {unreadCount > 0 && (
-          <span className="absolute -top-2 -right-2 h-6 w-6 bg-red-500 text-white text-sm font-bold rounded-full flex items-center justify-center shadow-lg ring-2 ring-white">
+          <span className="absolute -top-2 -right-2 h-6 w-6 bg-yellow-500 text-white text-sm font-bold rounded-full flex items-center justify-center shadow-lg ring-2 ring-white">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}

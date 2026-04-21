@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { useQuery } from '@tanstack/react-query';
+import { base44 } from '@/api/firebaseClient';
 import {
   Calendar, Stethoscope, Clock, Map, Printer,
-  ShoppingCart, Wrench, Monitor, Shield, Hammer, Timer, Sparkles, Heart, Mail, FileText, Camera
+  ShoppingCart, Wrench, Monitor, Shield, Timer, Sparkles, Heart, FileText, Camera, MessageSquare
 } from 'lucide-react';
 import ReportingModal from '../modals/ReportingModal';
 import AbsenceReportModal from '../modals/AbsenceReportModal';
@@ -13,15 +13,21 @@ import DailyMessageBoard from './DailyMessageBoard';
 import SendMessageModal from '../messages/SendMessageModal';
 import MessagesCenter from '../messages/MessagesCenter';
 import TeacherAbsenceReport from '../reports/TeacherAbsenceReport';
+import WeeklyScheduleView from '../schedule/WeeklyScheduleView';
+import { isEnabled } from '@/lib/featureFlags';
 
-const TEACHER_BASE_SCHEDULE = {
-  0: { 1: 'הסטוריה - ח׳2', 2: 'הסטוריה - ח׳2', 3: 'פרטני', 4: 'חלון', 5: 'אזרחות - ט׳1', 6: 'אזרחות - ט׳1' },
-  1: { 1: 'חלון', 2: 'הסטוריה - ח׳3', 3: 'הסטוריה - ח׳3', 4: 'ישיבת צוות', 5: 'הסטוריה - ח׳2' },
-  2: { 1: 'אזרחות - ט׳1', 2: 'אזרחות - ט׳1', 3: 'הסטוריה - ח׳2', 4: 'הסטוריה - ח׳2', 5: 'שהייה', 6: 'שהייה' },
-  3: { 1: 'הסטוריה - ח׳3', 2: 'הסטוריה - ח׳3', 3: 'חלון', 4: 'פרטני', 5: 'חינוך - ח׳2' },
-  4: { 1: 'חלון', 2: 'חלון', 3: 'הסטוריה - ח׳2', 4: 'הסטוריה - ח׳2', 5: 'אזרחות - ט׳1' },
-  5: { 1: 'סיכום שבוע - ח׳2', 2: 'פרטני' },
-};
+const QUICK_ACTIONS = [
+  { id: 'absence',            label: 'העדרות',          Icon: Stethoscope,  color: 'bg-amber-100 text-amber-700',     border: 'border-amber-200 hover:border-amber-400',  badge: 'חשוב' },
+  { id: 'absence_report',     label: 'דוח היעדרויות',   Icon: FileText,     color: 'bg-blue-100 text-blue-700',       border: 'border-blue-200 hover:border-blue-400',    sub: 'PDF' },
+  { id: 'substitute',         label: 'מילוי מקום',      Icon: Clock,        color: 'bg-emerald-100 text-emerald-700', border: 'border-emerald-200 hover:border-emerald-400' },
+  { id: 'overtime',           label: 'שעות נוספות',     Icon: Timer,        color: 'bg-amber-100 text-amber-700',     border: 'border-amber-200 hover:border-amber-400' },
+  { id: 'special_overtime',   label: 'שעות מיוחדות',    Icon: Sparkles,     color: 'bg-violet-100 text-violet-700',   border: 'border-violet-200 hover:border-violet-400' },
+  { id: 'external',           label: 'פעילות חוץ',      Icon: Map,          color: 'bg-emerald-100 text-emerald-700', border: 'border-emerald-200 hover:border-emerald-400' },
+  { id: 'purchase',           label: 'רכש',              Icon: ShoppingCart, color: 'bg-amber-100 text-amber-700',     border: 'border-amber-200 hover:border-amber-400' },
+  { id: 'maintenance_general',label: 'תחזוקה',           Icon: Wrench,       color: 'bg-slate-100 text-slate-600',     border: 'border-slate-200 hover:border-slate-400' },
+  { id: 'maintenance_pc',     label: 'מחשבים',           Icon: Monitor,      color: 'bg-indigo-100 text-indigo-700',   border: 'border-indigo-200 hover:border-indigo-400' },
+  { id: 'printing',           label: 'צילומים',          Icon: Camera,       color: 'bg-blue-100 text-blue-700',       border: 'border-blue-200 hover:border-blue-400' },
+];
 
 export default function StaffDashboard({ user, setView }) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -34,224 +40,126 @@ export default function StaffDashboard({ user, setView }) {
   const { data: myDuty } = useQuery({
     queryKey: ['duty', user.email, new Date().getDate()],
     queryFn: async () => {
-      const today = new Date().getDate();
-      const duties = await base44.entities.DutyAssignment.filter({ 
-        staff_email: user.email, 
-        day: today 
-      });
+      const duties = await base44.entities.DutyAssignment.filter({ staff_email: user.email, day: new Date().getDate() });
       return duties[0] || null;
     },
   });
 
-  const openFeature = (feature) => {
-    setActiveFeature(feature);
-    setModalOpen(true);
+  const openFeature = (feature) => { setActiveFeature(feature); setModalOpen(true); };
+
+  const handleAction = (id) => {
+    if (id === 'absence')        return setAbsenceModalOpen(true);
+    if (id === 'absence_report') return setAbsenceReportOpen(true);
+    if (id === 'printing')       return setPrintModalOpen(true);
+    openFeature(id);
   };
 
-  const dayIdx = new Date().getDay();
-
   return (
-    <div className="space-y-6 animate-fade-in relative">
-      <ReportingModal 
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        feature={activeFeature}
-        user={user}
-      />
-      <AbsenceReportModal 
-        isOpen={absenceModalOpen}
-        onClose={() => setAbsenceModalOpen(false)}
-        user={user}
-      />
-      <PrintRequestModal 
-        isOpen={printModalOpen}
-        onClose={() => setPrintModalOpen(false)}
-        user={user}
-      />
-      <SendMessageModal 
-        isOpen={messageModalOpen}
-        onClose={() => setMessageModalOpen(false)}
-        user={user}
-        recipientRole="leadership"
-      />
-
+    <div className="space-y-5 animate-fade-in">
+      <ReportingModal isOpen={modalOpen} onClose={() => setModalOpen(false)} feature={activeFeature} user={user} />
+      <AbsenceReportModal isOpen={absenceModalOpen} onClose={() => setAbsenceModalOpen(false)} user={user} />
+      <PrintRequestModal isOpen={printModalOpen} onClose={() => setPrintModalOpen(false)} user={user} />
+      <SendMessageModal isOpen={messageModalOpen} onClose={() => setMessageModalOpen(false)} user={user} recipientRole="leadership" />
       <TeacherAbsenceReport user={user} isOpen={absenceReportOpen} onClose={() => setAbsenceReportOpen(false)} />
 
       <DailyMessageBoard user={user} />
 
-      {/* Today's Journal */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
-        <h3 className="text-base font-bold text-slate-800 mb-5 flex items-center gap-2">
-          <div className="p-2 bg-amber-50 rounded-xl border border-amber-100">
-            <Calendar className="h-4 w-4 text-amber-600" />
-          </div>
-          יומן בית הספר - היום
-        </h3>
-        <DailyJournal date={new Date()} />
-      </div>
-
-      {/* Quick Actions - Top Priority */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-        <button onClick={() => setAbsenceModalOpen(true)} className="relative overflow-hidden flex flex-col items-center p-4 bg-gradient-to-br from-red-50 to-pink-50 rounded-xl shadow-sm border-2 border-red-200 hover:border-red-400 hover:shadow-md transition-all group text-center h-28 justify-center">
-          <div className="absolute top-1 right-1 bg-red-500 text-[9px] text-white font-bold px-2 py-0.5 rounded-full shadow">חשוב</div>
-          <div className="p-2.5 bg-red-100 rounded-full text-red-600 group-hover:scale-110 transition-transform mb-2">
-            <Stethoscope className="h-6 w-6" />
-          </div>
-          <span className="text-xs font-bold text-slate-700 leading-tight">העדרויות</span>
-        </button>
-
-        <button onClick={() => setAbsenceReportOpen(true)} className="flex flex-col items-center p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl shadow-sm border-2 border-indigo-200 hover:border-indigo-400 hover:shadow-md transition-all group text-center h-28 justify-center">
-          <div className="p-2.5 bg-indigo-100 rounded-full text-indigo-600 group-hover:scale-110 transition-transform mb-2">
-            <FileText className="h-6 w-6" />
-          </div>
-          <span className="text-xs font-bold text-slate-700 leading-tight">דוח היעדרויות</span>
-          <span className="text-[10px] text-indigo-500 mt-0.5">הדפסה / PDF</span>
-        </button>
-      
-        <button onClick={() => openFeature('substitute')} className="flex flex-col items-center p-4 bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl shadow-sm border-2 border-purple-200 hover:border-purple-400 hover:shadow-md transition-all group text-center h-28 justify-center">
-          <div className="p-2.5 bg-purple-100 rounded-full text-purple-600 group-hover:scale-110 transition-transform mb-2">
-            <Clock className="h-6 w-6" />
-          </div>
-          <span className="text-xs font-bold text-slate-700 leading-tight">מילוי מקום</span>
-        </button>
-
-        <button onClick={() => openFeature('overtime')} className="flex flex-col items-center p-4 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl shadow-sm border-2 border-yellow-200 hover:border-yellow-400 hover:shadow-md transition-all group text-center h-28 justify-center">
-          <div className="p-2.5 bg-yellow-100 rounded-full text-yellow-700 group-hover:scale-110 transition-transform mb-2">
-            <Timer className="h-6 w-6" />
-          </div>
-          <span className="text-xs font-bold text-slate-700 leading-tight">שעות נוספות</span>
-        </button>
-
-        <button onClick={() => openFeature('external')} className="flex flex-col items-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-sm border-2 border-green-200 hover:border-green-400 hover:shadow-md transition-all group text-center h-28 justify-center">
-          <div className="p-2.5 bg-green-100 rounded-full text-green-600 group-hover:scale-110 transition-transform mb-2">
-            <Map className="h-6 w-6" />
-          </div>
-          <span className="text-xs font-bold text-slate-700 leading-tight">פעילות חוץ</span>
-        </button>
-
-        <button onClick={() => openFeature('purchase')} className="flex flex-col items-center p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl shadow-sm border-2 border-amber-200 hover:border-amber-400 hover:shadow-md transition-all group text-center h-28 justify-center">
-          <div className="p-2.5 bg-amber-100 rounded-full text-amber-600 group-hover:scale-110 transition-transform mb-2">
-            <ShoppingCart className="h-6 w-6" />
-          </div>
-          <span className="text-xs font-bold text-slate-700 leading-tight">רכש</span>
-        </button>
-
-        <button onClick={() => openFeature('maintenance_general')} className="flex flex-col items-center p-4 bg-gradient-to-br from-slate-50 to-gray-50 rounded-xl shadow-sm border-2 border-slate-200 hover:border-slate-400 hover:shadow-md transition-all group text-center h-28 justify-center">
-          <div className="p-2.5 bg-slate-100 rounded-full text-slate-600 group-hover:scale-110 transition-transform mb-2">
-            <Wrench className="h-6 w-6" />
-          </div>
-          <span className="text-xs font-bold text-slate-700 leading-tight">תחזוקה כללית</span>
-        </button>
-
-        <button onClick={() => openFeature('maintenance_pc')} className="flex flex-col items-center p-4 bg-gradient-to-br from-cyan-50 to-teal-50 rounded-xl shadow-sm border-2 border-cyan-200 hover:border-cyan-400 hover:shadow-md transition-all group text-center h-28 justify-center">
-          <div className="p-2.5 bg-cyan-100 rounded-full text-cyan-600 group-hover:scale-110 transition-transform mb-2">
-            <Monitor className="h-6 w-6" />
-          </div>
-          <span className="text-xs font-bold text-slate-700 leading-tight">תחזוקת מחשבים</span>
-        </button>
-
-        <button onClick={() => openFeature('special_overtime')} className="flex flex-col items-center p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl shadow-sm border-2 border-indigo-200 hover:border-indigo-400 hover:shadow-md transition-all group text-center h-28 justify-center">
-          <div className="p-2.5 bg-indigo-100 rounded-full text-indigo-600 group-hover:scale-110 transition-transform mb-2">
-            <Sparkles className="h-6 w-6" />
-          </div>
-          <span className="text-xs font-bold text-slate-700 leading-tight">שעות מיוחדות</span>
-        </button>
-
-        <button onClick={() => setPrintModalOpen(true)} className="flex flex-col items-center p-4 bg-gradient-to-br from-blue-50 to-sky-50 rounded-xl shadow-sm border-2 border-blue-200 hover:border-blue-400 hover:shadow-md transition-all group text-center h-28 justify-center">
-          <div className="p-2.5 bg-blue-100 rounded-full text-blue-600 group-hover:scale-110 transition-transform mb-2">
-            <Camera className="h-6 w-6" />
-          </div>
-          <span className="text-xs font-bold text-slate-700 leading-tight">צילומים</span>
-          <span className="text-[10px] text-blue-500 mt-0.5">שלח לאישור</span>
-        </button>
-      </div>
-
-
-
-      {/* Daily Schedule */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h3 className="font-bold text-slate-800 flex items-center gap-2 text-base">
-              <div className="p-2 bg-blue-50 rounded-xl border border-blue-100">
-                <Calendar className="h-4 w-4 text-blue-600" />
-              </div>
-              מערכת השעות שלי
-            </h3>
-            <p className="text-xs text-slate-500 mt-1">{new Date().toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
-          </div>
-          <button 
-            onClick={() => setView('schedule')}
-            className="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg transition-all border border-blue-200 shadow-sm"
-          >
-            📅 יומן חודשי מלא
-          </button>
-        </div>
-        
-        <div className="flex gap-3 overflow-x-auto pb-3 px-1">
-          {[1, 2, 3, 4, 5, 6, 7].map(hour => {
-            const lesson = TEACHER_BASE_SCHEDULE[dayIdx]?.[hour];
-            const isEmpty = !lesson || ['חלון', 'פרטני'].includes(lesson);
-            
-            return (
-              <div key={hour} className="min-w-[130px] flex-1">
-                <div className="text-center text-xs font-bold text-slate-500 mb-2 bg-slate-100 py-1 rounded-t-lg">שעה {hour}</div>
-                <div className={`p-4 rounded-b-xl border-2 text-center h-24 flex flex-col justify-center items-center gap-1.5 transition-all ${
-                  lesson && !isEmpty
-                    ? 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-md hover:shadow-lg hover:scale-105' 
-                    : lesson 
-                    ? 'bg-slate-50 border-slate-200 opacity-60'
-                    : 'bg-white border-slate-200'
-                }`}>
-                  {lesson ? (
-                    <>
-                      <span className="font-bold text-slate-800 text-sm leading-tight">{lesson.split('-')[0]?.trim()}</span>
-                      {lesson.includes('-') && (
-                        <span className="text-xs text-indigo-600 bg-white px-2.5 py-0.5 rounded-full font-semibold border border-indigo-100">
-                          {lesson.split('-')[1]?.trim()}
-                        </span>
-                      )}
-                    </>
-                  ) : (
-                    <span className="text-slate-300 text-sm">ריק</span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Quick Send Message */}
-      <button
-        onClick={() => setMessageModalOpen(true)}
-        className="w-full p-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-2xl hover:shadow-lg transition-all font-bold text-center flex items-center justify-center gap-2"
-      >
-        <Heart className="h-5 w-5" />
-        שלח הודעה למנהלת / סגנית / יועצת
-      </button>
-
-      {/* Duty Alert */}
+      {/* Duty alert */}
       {myDuty && (
-        <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-100 rounded-full text-amber-600">
-              <Shield className="h-5 w-5" />
-            </div>
-            <div>
-              <h4 className="font-bold text-amber-900">תורנות היום</h4>
-              <p className="text-sm text-amber-800">{myDuty.duty_type} בשעה {myDuty.time}</p>
-            </div>
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-amber-200 bg-amber-50 animate-slide-up">
+          <div className="h-8 w-8 rounded-lg bg-amber-500 flex items-center justify-center flex-shrink-0">
+            <Shield className="h-4 w-4 text-white" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-amber-900">תורנות היום</p>
+            <p className="text-xs text-amber-700">{myDuty.duty_type} בשעה {myDuty.time}</p>
           </div>
         </div>
       )}
 
-      {/* Messages Center */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
-        <MessagesCenter user={user} />
+      {/* Quick actions */}
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+        <div className="flex items-center gap-3 px-5 py-3.5 border-b border-slate-100">
+          <div className="h-7 w-7 rounded-lg bg-slate-900 flex items-center justify-center flex-shrink-0">
+            <Sparkles className="h-3.5 w-3.5 text-white" />
+          </div>
+          <h3 className="text-sm font-bold text-slate-800">פעולות מהירות</h3>
+        </div>
+        <div className="p-4 grid grid-cols-3 sm:grid-cols-5 gap-3">
+          {QUICK_ACTIONS.map(({ id, label, Icon, color, border, badge, sub }) => (
+            <button
+              key={id}
+              onClick={() => handleAction(id)}
+              className={`relative group flex flex-col items-center gap-2 p-3 rounded-xl border-2 bg-white ${border} hover:shadow-md transition-all duration-150`}
+            >
+              {badge && (
+                <span className="absolute top-1.5 right-1.5 text-[9px] font-black bg-red-500 text-white px-1.5 py-0.5 rounded-full">{badge}</span>
+              )}
+              <div className={`h-9 w-9 rounded-xl flex items-center justify-center ${color} group-hover:scale-110 transition-transform duration-150`}>
+                <Icon className="h-4.5 w-4.5" />
+              </div>
+              <span className="text-[11px] font-bold text-slate-700 leading-tight text-center">{label}</span>
+              {sub && <span className="text-[10px] text-slate-400">{sub}</span>}
+            </button>
+          ))}
+        </div>
       </div>
 
+      {/* Schedule */}
+      {isEnabled('schedule') && (
+        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+            <div className="flex items-center gap-3">
+              <div className="h-7 w-7 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0">
+                <Calendar className="h-3.5 w-3.5 text-white" />
+              </div>
+              <h3 className="text-sm font-bold text-slate-800">מערכת השעות — היום</h3>
+            </div>
+            <button onClick={() => setView('schedule')}
+              className="text-[11px] font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 transition-colors">
+              שבועי מלא ↗
+            </button>
+          </div>
+          <div className="p-4">
+            <WeeklyScheduleView email={user?.email} compact />
+          </div>
+        </div>
+      )}
 
+      {/* Journal */}
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+        <div className="flex items-center gap-3 px-5 py-3.5 border-b border-slate-100">
+          <div className="h-7 w-7 rounded-lg bg-amber-500 flex items-center justify-center flex-shrink-0">
+            <Calendar className="h-3.5 w-3.5 text-white" />
+          </div>
+          <h3 className="text-sm font-bold text-slate-800">יומן בית הספר — היום</h3>
+        </div>
+        <div className="p-4">
+          <DailyJournal date={new Date()} />
+        </div>
+      </div>
+
+      {/* Send message */}
+      <button
+        onClick={() => setMessageModalOpen(true)}
+        className="w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl border-2 border-dashed border-slate-200 text-slate-500 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50 transition-all duration-150 font-semibold text-sm"
+      >
+        <MessageSquare className="h-4 w-4" />
+        שלח הודעה למנהלת / סגנית / יועצת
+      </button>
+
+      {/* Messages */}
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+        <div className="flex items-center gap-3 px-5 py-3.5 border-b border-slate-100">
+          <div className="h-7 w-7 rounded-lg bg-violet-600 flex items-center justify-center flex-shrink-0">
+            <Heart className="h-3.5 w-3.5 text-white" />
+          </div>
+          <h3 className="text-sm font-bold text-slate-800">מרכז הודעות</h3>
+        </div>
+        <div className="p-4">
+          <MessagesCenter user={user} />
+        </div>
+      </div>
     </div>
   );
 }

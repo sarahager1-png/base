@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { X, ChevronRight, ChevronLeft } from 'lucide-react';
 
 const TYPE_STYLES = {
-  birthday:     { bg: 'from-pink-500 to-rose-500',      emoji: '🎂', label: 'יום הולדת שמח' },
-  holiday:      { bg: 'from-amber-500 to-orange-500',   emoji: '🎉', label: 'חג שמח' },
-  quote:        { bg: 'from-indigo-500 to-purple-600',  emoji: '💬', label: 'ציטוט היום' },
+  birthday:     { bg: 'from-yellow-500 to-yellow-600',      emoji: '🎂', label: 'יום הולדת שמח' },
+  holiday:      { bg: 'from-yellow-500 to-yellow-500',   emoji: '🎉', label: 'חג שמח' },
+  quote:        { bg: 'from-blue-500 to-yellow-700',  emoji: '💬', label: 'ציטוט היום' },
   announcement: { bg: 'from-slate-700 to-slate-900',    emoji: '📢', label: 'הודעה חשובה' },
-  celebration:  { bg: 'from-emerald-500 to-teal-600',   emoji: '🌟', label: 'ציון מיוחד' },
+  celebration:  { bg: 'from-green-500 to-green-600',   emoji: '🌟', label: 'ציון מיוחד' },
 };
 
 function todayKey() {

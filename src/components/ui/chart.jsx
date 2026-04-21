@@ -46,6 +46,10 @@ const ChartContainer = React.forwardRef(({ id, className, children, config, ...p
 })
 ChartContainer.displayName = "Chart"
 
+// Only allow safe CSS color values (hex, rgb, hsl, named) — prevent CSS injection
+const SAFE_COLOR = /^(#[0-9a-fA-F]{3,8}|rgb\(\d{1,3},\s*\d{1,3},\s*\d{1,3}\)|rgba\([\d,.\s]+\)|hsl\([\d%,.\s]+\)|[a-zA-Z]{2,30})$/
+const SAFE_KEY   = /^[a-zA-Z0-9_-]+$/
+
 const ChartStyle = ({
   id,
   config
@@ -67,8 +71,11 @@ ${colorConfig
 const color =
   itemConfig.theme?.[theme] ||
   itemConfig.color
-return color ? `  --color-${key}: ${color};` : null
+// Validate key and color before injecting into CSS
+if (!color || !SAFE_COLOR.test(color.trim()) || !SAFE_KEY.test(key)) return null
+return `  --color-${key}: ${color};`
 })
+.filter(Boolean)
 .join("\n")}
 }
 `)

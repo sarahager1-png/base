@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import {
   TrendingUp, TrendingDown, Users, ShoppingCart, Wrench,
   Star, Zap, AlertTriangle, CheckCircle, Clock, BarChart2
@@ -11,7 +11,7 @@ function HealthGauge({ score }) {
   const r = 58, cx = 80, cy = 80;
   const circ = Math.PI * r;
   const fill = Math.max(0, Math.min(1, score / 100)) * circ;
-  const color = score >= 85 ? '#22c55e' : score >= 60 ? '#f59e0b' : '#ef4444';
+  const color = score >= 85 ? '#22c55e' : score >= 60 ? '#f59e0b' : '#eab308';
   const label = score >= 85 ? 'מצוין ✨' : score >= 60 ? 'טוב 👍' : 'דורש שיפור ⚠️';
 
   return (
@@ -50,7 +50,7 @@ function BarChart({ data }) {
               className="h-full rounded-full flex items-center justify-end px-2"
               style={{
                 width: `${Math.max(d.value > 0 ? 5 : 0, (d.value / max) * 100)}%`,
-                background: d.color || 'linear-gradient(90deg, #6366f1, #8b5cf6)',
+                background: d.color || 'linear-gradient(90deg, #2563eb, #eab308)',
                 transition: `width ${0.5 + i * 0.15}s cubic-bezier(0.34,1.56,0.64,1)`,
               }}
             >
@@ -86,7 +86,7 @@ function DonutChart({ segments, size = 100 }) {
 /* ── Metric Card ── */
 function MetricCard({ icon: Icon, label, value, sub, trend, color }) {
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : null;
-  const trendCls = trend === 'up' ? 'text-red-500' : 'text-green-500';
+  const trendCls = trend === 'up' ? 'text-yellow-500' : 'text-green-500';
   return (
     <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between mb-3">
@@ -106,9 +106,9 @@ function MetricCard({ icon: Icon, label, value, sub, trend, color }) {
 function InsightItem({ icon: Icon, text, type }) {
   const styles = {
     good:  { bg: 'bg-green-50 dark:bg-green-900/20',  border: 'border-green-200 dark:border-green-800',  icon: 'text-green-600' },
-    warn:  { bg: 'bg-amber-50 dark:bg-amber-900/20',  border: 'border-amber-200 dark:border-amber-800',  icon: 'text-amber-600' },
-    alert: { bg: 'bg-red-50 dark:bg-red-900/20',      border: 'border-red-200 dark:border-red-800',      icon: 'text-red-600' },
-    info:  { bg: 'bg-indigo-50 dark:bg-indigo-900/20',border: 'border-indigo-200 dark:border-indigo-800', icon: 'text-indigo-600' },
+    warn:  { bg: 'bg-yellow-50 dark:bg-yellow-900/20',  border: 'border-yellow-200 dark:border-yellow-800',  icon: 'text-yellow-700' },
+    alert: { bg: 'bg-yellow-50 dark:bg-yellow-900/20',      border: 'border-yellow-200 dark:border-yellow-800',      icon: 'text-yellow-700' },
+    info:  { bg: 'bg-blue-50 dark:bg-blue-900/20',border: 'border-blue-200 dark:border-blue-800', icon: 'text-blue-600' },
   };
   const s = styles[type] || styles.info;
   return (
@@ -148,7 +148,7 @@ export default function InsightsDashboard() {
       const end   = new Date(now); end.setDate(end.getDate() - w * 7);
       const start = new Date(end); start.setDate(start.getDate() - 7);
       const count = absences.filter(x => { const d = new Date(x.created_date || x.date); return d >= start && d < end; }).length;
-      return { label: w === 0 ? 'שבוע זה' : `לפני ${w + 1}ש'`, value: count, color: w === 0 ? 'linear-gradient(90deg,#6366f1,#8b5cf6)' : 'linear-gradient(90deg,#94a3b8,#64748b)' };
+      return { label: w === 0 ? 'שבוע זה' : `לפני ${w + 1}ש'`, value: count, color: w === 0 ? 'linear-gradient(90deg,#2563eb,#eab308)' : 'linear-gradient(90deg,#94a3b8,#64748b)' };
     });
 
     // Day of week breakdown
@@ -210,7 +210,7 @@ export default function InsightsDashboard() {
       purchaseSegments: [
         { label: 'אושר',  value: pApproved.length, color: '#22c55e' },
         { label: 'ממתין', value: pPending.length,  color: '#f59e0b' },
-        { label: 'נדחה',  value: pRejected.length, color: '#ef4444' },
+        { label: 'נדחה',  value: pRejected.length, color: '#eab308' },
       ],
       approvalRate,
       insights,
@@ -222,7 +222,7 @@ export default function InsightsDashboard() {
 
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="p-2.5 rounded-xl" style={{ background: 'linear-gradient(135deg,#6366f1,#4f46e5)' }}>
+        <div className="p-2.5 rounded-xl" style={{ background: 'linear-gradient(135deg,#2563eb,#1d4ed8)' }}>
           <BarChart2 className="h-5 w-5 text-white" />
         </div>
         <div>
@@ -243,7 +243,7 @@ export default function InsightsDashboard() {
 
         <div className="lg:col-span-3 grid grid-cols-2 gap-3">
           <MetricCard
-            icon={Users} color="#6366f1" label="היעדרויות החודש" value={a.absenceCount}
+            icon={Users} color="#2563eb" label="היעדרויות החודש" value={a.absenceCount}
             trend={a.trend === 'up' ? 'up' : a.trend === 'down' ? 'down' : null}
             sub={a.delta > 0 ? `${a.trend === 'down' ? '↓' : '↑'} ${a.delta} לעומת חודש שעבר` : null}
           />
@@ -252,7 +252,7 @@ export default function InsightsDashboard() {
             trend={a.pendingPurchases > 3 ? 'up' : null}
           />
           <MetricCard
-            icon={Wrench} color="#ef4444" label="כרטיסי תחזוקה פתוחים" value={a.openTickets}
+            icon={Wrench} color="#eab308" label="כרטיסי תחזוקה פתוחים" value={a.openTickets}
             trend={a.openTickets > 5 ? 'up' : a.openTickets === 0 ? 'down' : null}
           />
           <MetricCard
@@ -269,7 +269,7 @@ export default function InsightsDashboard() {
             <p className="text-sm font-bold text-slate-700 dark:text-white">היעדרויות לפי שבוע</p>
             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
               a.trend === 'down' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-              a.trend === 'up'   ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'       :
+              a.trend === 'up'   ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-600'       :
               'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400'}`}>
               {a.trend === 'down' ? '↓ ירידה' : a.trend === 'up' ? '↑ עלייה' : '— יציב'}
             </span>
@@ -311,7 +311,7 @@ export default function InsightsDashboard() {
 
         <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-100 dark:border-slate-700 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
-            <Zap className="h-4 w-4 text-indigo-500" />
+            <Zap className="h-4 w-4 text-blue-500" />
             <p className="text-sm font-bold text-slate-700 dark:text-white">תובנות חכמות</p>
           </div>
           <div className="space-y-2">

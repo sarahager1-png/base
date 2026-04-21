@@ -1,14 +1,14 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { Clock, ShoppingCart, Wrench, FileText, Users, Activity } from 'lucide-react';
 
 const STATUS_LABELS = {
   pending:   { label: 'ממתין',   color: '#f59e0b' },
   approved:  { label: 'אושר',    color: '#10b981' },
-  rejected:  { label: 'נדחה',    color: '#ef4444' },
+  rejected:  { label: 'נדחה',    color: '#eab308' },
   open:      { label: 'פתוח',    color: '#3b82f6' },
-  in_progress: { label: 'בטיפול', color: '#8b5cf6' },
+  in_progress: { label: 'בטיפול', color: '#eab308' },
   completed: { label: 'הושלם',   color: '#6b7280' },
   reported:  { label: 'דווח',    color: '#f97316' },
 };
@@ -65,7 +65,7 @@ export default function ActivityTimeline() {
   const events = [
     ...absences.map(a  => ({ date: a.created_date, icon: Clock,        color: '#f59e0b', title: `היעדרות – ${a.employee_name || ''}`, subtitle: a.reason, status: a.status })),
     ...purchases.map(p => ({ date: p.created_date, icon: ShoppingCart, color: '#10b981', title: `בקשת רכש – ${p.item_name || p.title || ''}`, subtitle: p.description, status: p.status })),
-    ...tickets.map(t   => ({ date: t.created_date, icon: Wrench,       color: '#8b5cf6', title: `תקלה – ${t.title || ''}`, subtitle: t.location, status: t.status })),
+    ...tickets.map(t   => ({ date: t.created_date, icon: Wrench,       color: '#eab308', title: `תקלה – ${t.title || ''}`, subtitle: t.location, status: t.status })),
   ]
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, 8);
@@ -73,7 +73,7 @@ export default function ActivityTimeline() {
   return (
     <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2.5 rounded-xl" style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
+        <div className="p-2.5 rounded-xl" style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)' }}>
           <Activity className="h-5 w-5 text-white" />
         </div>
         <div>

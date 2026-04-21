@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
-import { AlertTriangle } from 'lucide-react';
+import { base44 } from '@/api/firebaseClient';
+import { AlertTriangle, ShieldAlert } from 'lucide-react';
 
 const TEACHER_SCHEDULE = {
   0: { 1: 'הסטוריה - ח׳2', 2: 'הסטוריה - ח׳2', 3: 'פרטני', 4: 'חלון', 5: 'אזרחות - ט׳1', 6: 'אזרחות - ט׳1' },
@@ -23,8 +23,21 @@ export function SubstituteForm({ user, onSubmit }) {
     queryFn: () => base44.entities.User.list(),
   });
 
+  // Absences on the selected date — to verify the original teacher actually reported absence
+  const { data: absencesOnDate = [] } = useQuery({
+    queryKey: ['absences-date', selectedDate],
+    queryFn: () => base44.entities.Absence.filter({ start_date: selectedDate }),
+    enabled: !!selectedDate,
+  });
+
   const teachers = allUsers.filter(u =>
     ['teacher', 'coordinator', 'counselor', 'vice_principal'].includes(u.role)
+  );
+
+  // Check if selected teacher has an absence on this date
+  const teacherHasAbsence = !substituteName || !selectedDate || absencesOnDate.some(a =>
+    a.user_name?.trim() === substituteName.trim() ||
+    allUsers.find(u => u.full_name?.trim() === substituteName.trim() && u.email === a.user_email)
   );
 
   const daySchedule = selectedDate ? TEACHER_SCHEDULE[new Date(selectedDate).getDay()] || {} : {};
@@ -67,18 +80,18 @@ export function SubstituteForm({ user, onSubmit }) {
           <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg">
             <p className="text-sm text-slate-700"><span className="font-bold">שעות המערכת שלך היום:</span> {scheduledLessonsCount} שעות</p>
             <p className="text-sm text-slate-700 mt-1"><span className="font-bold">שעות מילוי מקום שבחרת:</span> {selectedLessons.length} שעות</p>
-            <p className={`text-sm font-bold mt-1 ${totalHoursWithSubstitute > 9 ? 'text-red-600' : 'text-green-600'}`}>
+            <p className={`text-sm font-bold mt-1 ${totalHoursWithSubstitute > 9 ? 'text-yellow-700' : 'text-green-600'}`}>
               סה״כ: {totalHoursWithSubstitute} שעות {totalHoursWithSubstitute > 9 && '⚠️ חריגה מ-9 שעות!'}
             </p>
           </div>
 
           {showWarning && (
-            <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
+            <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
               <div className="flex items-start gap-2">
-                <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                <AlertTriangle className="h-5 w-5 text-yellow-700 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-sm font-bold text-red-900">אזהרה: חריגה מ-9 שעות יומיות!</p>
-                  <p className="text-xs text-red-700 mt-1">
+                  <p className="text-sm font-bold text-yellow-900">אזהרה: חריגה מ-9 שעות יומיות!</p>
+                  <p className="text-xs text-yellow-700 mt-1">
                     יש לדווח על היעדרות משעות שהיו חלון/פרטני במערכת שלך, או לבחור פחות שעות מילוי מקום.
                   </p>
                 </div>
@@ -104,12 +117,12 @@ export function SubstituteForm({ user, onSubmit }) {
                         }
                       }}
                       className={`w-full p-3 rounded-lg border-2 text-right transition-all ${
-                        isSelected ? 'border-purple-500 bg-purple-50' : 'border-slate-200 bg-white hover:border-purple-300'
+                        isSelected ? 'border-yellow-500 bg-yellow-50' : 'border-slate-200 bg-white hover:border-yellow-300'
                       }`}
                     >
                       <div className="flex justify-between items-center">
                         <span className="font-bold text-sm">שעה {hourNum}: {lesson}</span>
-                        {isSelected && <span className="text-purple-600 font-bold">✓</span>}
+                        {isSelected && <span className="text-yellow-700 font-bold">✓</span>}
                       </div>
                     </button>
                   );
@@ -138,16 +151,34 @@ export function SubstituteForm({ user, onSubmit }) {
         </div>
       )}
 
+      {/* No absence warning */}
+      {substituteName && selectedDate && !teacherHasAbsence && (
+        <div className="bg-red-50 border border-red-200 p-4 rounded-xl">
+          <div className="flex items-start gap-2">
+            <ShieldAlert className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-bold text-red-800">לא ניתן לדווח — אין היעדרות מתאימה</p>
+              <p className="text-xs text-red-600 mt-1">
+                {substituteName} לא דיווחה על היעדרות בתאריך {selectedDate}.
+                דיווח מ"מ אפשרי רק כאשר קיימת היעדרות מאושרת של המורה המקורית.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <button
         onClick={handleSubmit}
-        disabled={!selectedDate || selectedLessons.length === 0 || !substituteName || showWarning}
+        disabled={!selectedDate || selectedLessons.length === 0 || !substituteName || showWarning || !teacherHasAbsence}
         className={`w-full text-white py-3 rounded-xl font-bold ${
-          !selectedDate || selectedLessons.length === 0 || !substituteName || showWarning
-            ? 'bg-slate-300'
-            : 'bg-purple-600 hover:bg-purple-700'
+          !selectedDate || selectedLessons.length === 0 || !substituteName || showWarning || !teacherHasAbsence
+            ? 'bg-slate-300 cursor-not-allowed'
+            : 'bg-yellow-600 hover:bg-yellow-700'
         }`}
       >
-        {showWarning ? 'לא ניתן לדווח - יותר מ-9 שעות' : 'שלח דיווח'}
+        {showWarning ? 'לא ניתן לדווח - יותר מ-9 שעות'
+          : !teacherHasAbsence && substituteName ? 'לא ניתן — אין היעדרות מתאימה'
+          : 'שלח דיווח'}
       </button>
     </div>
   );

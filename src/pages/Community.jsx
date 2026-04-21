@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { Heart, Calendar, Users, PartyPopper, Coffee, BookOpen } from 'lucide-react';
 
 export default function CommunityPage() {
@@ -11,6 +11,15 @@ export default function CommunityPage() {
       return all.filter(e => e.event_type === 'social');
     },
   });
+
+  const { data: allUsers = [] } = useQuery({
+    queryKey: ['users', 'community'],
+    queryFn: () => base44.entities.User.list(),
+  });
+
+  const staffCount = allUsers.filter(u =>
+    ['teacher', 'assistant', 'counselor', 'coordinator', 'admin', 'vice_principal', 'secretary'].includes(u.role)
+  ).length;
 
   const { data: journalEntries = [] } = useQuery({
     queryKey: ['journal', 'community'],
@@ -30,17 +39,17 @@ export default function CommunityPage() {
     <div className="space-y-6" dir="rtl">
       <div>
         <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-yellow-600 to-yellow-700 bg-clip-text text-transparent mb-2">
             קהילה והווי בית ספרי
           </h1>
           <p className="text-slate-600">אירועים חברתיים, חגיגות והודעות לקהילה</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-pink-100">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-yellow-100">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-pink-100 rounded-full">
-                <PartyPopper className="h-6 w-6 text-pink-600" />
+              <div className="p-3 bg-yellow-100 rounded-full">
+                <PartyPopper className="h-6 w-6 text-yellow-700" />
               </div>
               <div>
                 <p className="text-sm text-slate-500">אירועים קרובים</p>
@@ -49,14 +58,14 @@ export default function CommunityPage() {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-purple-100">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-yellow-100">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-purple-100 rounded-full">
-                <Users className="h-6 w-6 text-purple-600" />
+              <div className="p-3 bg-yellow-100 rounded-full">
+                <Users className="h-6 w-6 text-yellow-700" />
               </div>
               <div>
                 <p className="text-sm text-slate-500">חברי צוות</p>
-                <p className="text-3xl font-bold text-slate-800">-</p>
+                <p className="text-3xl font-bold text-slate-800">{staffCount || '—'}</p>
               </div>
             </div>
           </div>
@@ -77,13 +86,13 @@ export default function CommunityPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
             <h2 className="text-xl font-bold text-blue-900 mb-6 flex items-center gap-2">
-              <PartyPopper className="h-5 w-5 text-pink-500" />
+              <PartyPopper className="h-5 w-5 text-yellow-600" />
               אירועים חברתיים קרובים
             </h2>
             <div className="space-y-4">
               {upcomingEvents.length > 0 ? (
                 upcomingEvents.slice(0, 5).map(event => (
-                  <div key={event.id} className="p-4 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl border border-pink-100">
+                  <div key={event.id} className="p-4 bg-gradient-to-r from-yellow-50 to-yellow-50 rounded-xl border border-yellow-100">
                     <h3 className="font-bold text-slate-800 mb-2">{event.title}</h3>
                     <div className="flex items-center gap-4 text-sm text-slate-600">
                       <span className="flex items-center gap-1">
@@ -108,7 +117,7 @@ export default function CommunityPage() {
 
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
             <h2 className="text-xl font-bold text-blue-900 mb-6 flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-purple-500" />
+              <BookOpen className="h-5 w-5 text-yellow-600" />
               הודעות ועדכונים
             </h2>
             <div className="space-y-4">
@@ -118,8 +127,8 @@ export default function CommunityPage() {
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="font-bold text-slate-800">{entry.title}</h3>
                       <span className={`text-xs px-2 py-1 rounded-full ${
-                        entry.priority === 'urgent' ? 'bg-red-100 text-red-700' :
-                        entry.priority === 'important' ? 'bg-amber-100 text-amber-700' :
+                        entry.priority === 'urgent' ? 'bg-yellow-100 text-yellow-700' :
+                        entry.priority === 'important' ? 'bg-yellow-100 text-yellow-700' :
                         'bg-slate-100 text-slate-600'
                       }`}>
                         {entry.priority === 'urgent' ? 'דחוף' :

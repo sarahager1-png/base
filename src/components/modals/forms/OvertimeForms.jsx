@@ -30,7 +30,7 @@ export function OvertimeForm({ onSubmit }) {
       </div>
       <button
         onClick={() => onSubmit(formData)}
-        className="w-full bg-amber-600 text-white py-3 rounded-xl font-bold hover:bg-amber-700"
+        className="w-full bg-yellow-600 text-white py-3 rounded-xl font-bold hover:bg-yellow-700"
       >
         שלח דיווח
       </button>
@@ -41,9 +41,9 @@ export function OvertimeForm({ onSubmit }) {
 export function OvertimeHistory({ history }) {
   return (
     <div className="space-y-4">
-      <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
-        <p className="text-sm font-bold text-amber-900">יתרת שעות נוספות: 40 שעות</p>
-        <p className="text-xs text-amber-700 mt-1">מתוך מכסה שנתית</p>
+      <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+        <p className="text-sm font-bold text-yellow-900">יתרת שעות נוספות: 40 שעות</p>
+        <p className="text-xs text-yellow-700 mt-1">מתוך מכסה שנתית</p>
       </div>
       <div className="space-y-2">
         {history.map(ot => (
@@ -113,7 +113,7 @@ export function SpecialOvertimeForm({ onSubmit }) {
             );
           })}
         </div>
-        <p className="text-sm font-bold text-indigo-600 mt-2">סה״כ: {totalHours} שעות</p>
+        <p className="text-sm font-bold text-blue-600 mt-2">סה״כ: {totalHours} שעות</p>
       </div>
 
       <div>
@@ -128,7 +128,7 @@ export function SpecialOvertimeForm({ onSubmit }) {
         onClick={handleSubmit}
         disabled={!formData.activity_type || weekDates.length === 0}
         className={`w-full text-white py-3 rounded-xl font-bold ${
-          !formData.activity_type || weekDates.length === 0 ? 'bg-slate-300' : 'bg-indigo-600 hover:bg-indigo-700'
+          !formData.activity_type || weekDates.length === 0 ? 'bg-slate-300' : 'bg-blue-600 hover:bg-blue-700'
         }`}
       >
         שלח דיווח

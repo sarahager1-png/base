@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="bg" x1="10%" y1="90%" x2="90%" y2="10%">
+      <stop offset="0%" stop-color="#1a8cb5"/>
+      <stop offset="100%" stop-color="#77cc60"/>
+    </linearGradient>
+    <clipPath id="rr">
+      <rect width="200" height="200" rx="44" ry="44"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="200" height="200" rx="44" ry="44" fill="url(#bg)"/>
+
+  <!-- Dark navy triangular areas at bottom corners -->
+  <g clip-path="url(#rr)">
+    <polygon points="0,148 100,178 200,148 200,200 0,200" fill="#0d2840"/>
+  </g>
+
+  <!-- 3D white chevron/stack layers -->
+  <polygon points="60,178 100,169 140,178 100,187" fill="white" opacity="0.45"/>
+  <polygon points="63,170 100,161 137,170 100,179" fill="white" opacity="0.65"/>
+  <polygon points="66,162 100,153 134,162 100,171" fill="white" opacity="0.9"/>
+
+  <!-- Light rays -->
+  <line x1="100" y1="13" x2="100" y2="27" stroke="white" stroke-width="5" stroke-linecap="round"/>
+  <line x1="130" y1="19" x2="123" y2="31" stroke="white" stroke-width="5" stroke-linecap="round"/>
+  <line x1="153" y1="41" x2="143" y2="49" stroke="white" stroke-width="5" stroke-linecap="round"/>
+  <line x1="70" y1="19" x2="77" y2="31" stroke="white" stroke-width="5" stroke-linecap="round"/>
+  <line x1="47" y1="41" x2="57" y2="49" stroke="white" stroke-width="5" stroke-linecap="round"/>
+  <line x1="142" y1="28" x2="134" y2="38" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <line x1="58" y1="28" x2="66" y2="38" stroke="white" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Lightbulb circle -->
+  <circle cx="100" cy="82" r="40" fill="none" stroke="white" stroke-width="6.5"/>
+
+  <!-- Bulb bottom curve to neck -->
+  <path d="M76,116 Q78,123 100,126 Q122,123 124,116" fill="none" stroke="white" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Neck / base lines -->
+  <line x1="82" y1="127" x2="118" y2="127" stroke="white" stroke-width="5.5" stroke-linecap="round"/>
+  <line x1="82" y1="135" x2="118" y2="135" stroke="white" stroke-width="5.5" stroke-linecap="round"/>
+  <line x1="87" y1="143" x2="113" y2="143" stroke="white" stroke-width="5.5" stroke-linecap="round"/>
+
+  <!-- Open book inside bulb -->
+  <!-- Left page -->
+  <path d="M100,68 L73,77 L73,100 L100,93 Z" fill="white"/>
+  <!-- Right page -->
+  <path d="M100,68 L127,77 L127,100 L100,93 Z" fill="white"/>
+  <!-- Book spine -->
+  <rect x="97.5" y="68" width="5" height="25" rx="1" fill="#2a9fb8"/>
+  <!-- Page lines on left -->
+  <line x1="80" y1="82" x2="97" y2="78" stroke="#2a9fb8" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+  <line x1="80" y1="88" x2="97" y2="85" stroke="#2a9fb8" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+  <line x1="80" y1="94" x2="97" y2="92" stroke="#2a9fb8" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+  <!-- Page lines on right -->
+  <line x1="120" y1="82" x2="103" y2="78" stroke="#2a9fb8" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+  <line x1="120" y1="88" x2="103" y2="85" stroke="#2a9fb8" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+  <line x1="120" y1="94" x2="103" y2="92" stroke="#2a9fb8" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+</svg>

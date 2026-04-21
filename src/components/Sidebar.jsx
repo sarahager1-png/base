@@ -1,34 +1,14 @@
 import React, { useState } from 'react';
 import {
   Home, Calendar, CheckSquare, Clock, Users, UserPlus,
-  Printer, Settings, Heart, LogOut, X, Bell, ChevronRight, Sparkles, HelpCircle, BarChart2,
-  Sun, Moon, Monitor, UserCircle, FolderOpen, Shield
+  Printer, Settings, Heart, LogOut, X, Bell, HelpCircle, BarChart2,
+  Sun, Moon, Monitor, UserCircle, FolderOpen, Shield, BarChart3, SlidersHorizontal
 } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
+import { useQuery } from '@tanstack/react-query';
 import { useAccessibility } from '@/lib/AccessibilityContext';
 import { useTheme } from '@/lib/ThemeContext';
-
-const NAV_COLORS = {
-  dashboard:          { from: '#0d9488', to: '#22c55e' },
-  notifications:      { from: '#f59e0b', to: '#d97706' },
-  journal:            { from: '#10b981', to: '#059669' },
-  'journal-management': { from: '#06b6d4', to: '#0891b2' },
-  schedule:           { from: '#3b82f6', to: '#2563eb' },
-  tasks:              { from: '#8b5cf6', to: '#7c3aed' },
-  attendance:         { from: '#ef4444', to: '#dc2626' },
-  hr:                 { from: '#f97316', to: '#ea580c' },
-  onboarding:         { from: '#14b8a6', to: '#0d9488' },
-  printing:           { from: '#6366f1', to: '#4f46e5' },
-  maintenance:        { from: '#64748b', to: '#475569' },
-  'duty-management':  { from: '#ec4899', to: '#db2777' },
-  'room-management':  { from: '#84cc16', to: '#65a30d' },
-  community:          { from: '#f43f5e', to: '#e11d48' },
-  analytics:          { from: '#06b6d4', to: '#0891b2' },
-  'file-management':  { from: '#3b82f6', to: '#1d4ed8' },
-  help:               { from: '#64748b', to: '#475569' },
-  profile:            { from: '#0d9488', to: '#22c55e' },
-  'dev-admin':        { from: '#7c3aed', to: '#4f46e5' },
-};
+import { isEnabled } from '@/lib/featureFlags';
 
 export default function Sidebar({ activeView, setView, user, isOpen, closeSidebar, onLogout, onUserGenderChange }) {
   const [savingGender, setSavingGender] = useState(false);
@@ -36,9 +16,9 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
   const { theme, setTheme } = useTheme();
 
   const THEME_OPTIONS = [
-    { key: 'light', icon: Sun,     label: 'בהיר' },
+    { key: 'light',  icon: Sun,     label: 'בהיר' },
     { key: 'system', icon: Monitor, label: 'מערכת' },
-    { key: 'dark',  icon: Moon,    label: 'כהה' },
+    { key: 'dark',   icon: Moon,    label: 'כהה' },
   ];
 
   const handleGenderToggle = async () => {
@@ -52,155 +32,191 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
       setSavingGender(false);
     }
   };
+
   const menuItems = [
-    { id: 'dashboard',           label: 'לוח בקרה ראשי',   icon: Home,       roles: ['all'] },
-    { id: 'notifications',       label: 'התראות',           icon: Bell,       roles: ['all'] },
-    { id: 'journal',             label: 'יומן בית הספר',   icon: Calendar,   roles: ['all'] },
-    { id: 'journal-management',  label: 'ניהול יומן',       icon: Calendar,   roles: ['admin', 'vice_principal'] },
-    { id: 'schedule',            label: 'לוח זמנים',        icon: Calendar,   roles: ['teacher', 'admin', 'vice_principal', 'secretary', 'assistant', 'counselor', 'coordinator'] },
-    { id: 'tasks',               label: 'משימות ואישורים',  icon: CheckSquare, roles: ['all'] },
-    { id: 'attendance',          label: 'היעדרויות ודיווח', icon: Clock,      roles: ['teacher', 'admin', 'vice_principal', 'secretary', 'assistant', 'substitute', 'counselor', 'coordinator'] },
-    { id: 'hr',                  label: 'ניהול צוות',       icon: Users,      roles: ['admin', 'vice_principal', 'secretary'] },
-    { id: 'onboarding',          label: 'טפסי קליטה',       icon: UserPlus,   roles: ['substitute', 'admin', 'vice_principal'] },
-    { id: 'printing',            label: 'מרכז צילומים',     icon: Printer,    roles: ['admin', 'vice_principal', 'secretary', 'teacher', 'assistant', 'counselor', 'coordinator'] },
-    { id: 'maintenance',         label: 'תפעול ורכש',       icon: Settings,   roles: ['admin', 'vice_principal', 'secretary', 'maintenance', 'teacher', 'counselor', 'coordinator'] },
-    { id: 'duty-management',     label: 'ניהול תורנויות',   icon: Settings,   roles: ['admin', 'vice_principal', 'coordinator'] },
-    { id: 'room-management',     label: 'ניהול חדרים',      icon: Home,       roles: ['all'] },
-    { id: 'community',           label: 'קהילה והווי',      icon: Heart,      roles: ['all'] },
-    { id: 'analytics',           label: 'אנליטיקס ותובנות', icon: BarChart2,  roles: ['admin', 'vice_principal'] },
-    { id: 'file-management',     label: 'ניהול קבצים',       icon: FolderOpen, roles: ['all'] },
-    { id: 'help',                label: 'מרכז עזרה',         icon: HelpCircle, roles: ['all'] },
-    { id: 'profile',             label: 'הפרופיל שלי',       icon: UserCircle, roles: ['all'] },
-    { id: 'dev-admin',           label: 'פאנל מפתח',          icon: Shield,     roles: ['admin'] },
+    { id: 'dashboard',          label: 'לוח בקרה',        icon: Home,              roles: ['all'],           group: 'main' },
+    { id: 'notifications',      label: 'התראות',           icon: Bell,              roles: ['all'],           group: 'main' },
+    { id: 'journal',            label: 'יומן בית הספר',   icon: Calendar,          roles: ['all'],           group: 'main' },
+    { id: 'tasks',              label: 'משימות ואישורים',  icon: CheckSquare,       roles: ['all'],           group: 'main' },
+    { id: 'journal-management', label: 'ניהול יומן',       icon: Calendar,          roles: ['admin', 'vice_principal'], group: 'manage' },
+    { id: 'schedule',           label: 'לוח זמנים',        icon: Calendar,          roles: ['teacher', 'admin', 'vice_principal', 'secretary', 'assistant', 'counselor', 'coordinator'], flag: 'schedule', group: 'manage' },
+    { id: 'attendance',         label: 'היעדרויות',        icon: Clock,             roles: ['teacher', 'admin', 'vice_principal', 'secretary', 'assistant', 'substitute', 'counselor', 'coordinator'], group: 'manage' },
+    { id: 'hr',                 label: 'ניהול צוות',       icon: Users,             roles: ['admin', 'vice_principal', 'secretary'], group: 'manage' },
+    { id: 'onboarding',         label: 'טפסי קליטה',       icon: UserPlus,          roles: ['substitute', 'admin', 'vice_principal'], group: 'manage' },
+    { id: 'duty-management',    label: 'ניהול תורנויות',   icon: Settings,          roles: ['admin', 'vice_principal', 'coordinator'], flag: 'duties', group: 'manage' },
+    { id: 'room-management',    label: 'ניהול חדרים',      icon: Home,              roles: ['all'], flag: 'rooms', group: 'manage' },
+    { id: 'printing',           label: 'מרכז צילומים',     icon: Printer,           roles: ['admin', 'vice_principal', 'secretary', 'teacher', 'assistant', 'counselor', 'coordinator'], group: 'ops' },
+    { id: 'maintenance',        label: 'תפעול ורכש',       icon: Settings,          roles: ['admin', 'vice_principal', 'secretary', 'maintenance', 'teacher', 'counselor', 'coordinator'], group: 'ops' },
+    { id: 'community',          label: 'קהילה והווי',      icon: Heart,             roles: ['all'], flag: 'community', group: 'ops' },
+    { id: 'file-management',    label: 'ניהול קבצים',       icon: FolderOpen,        roles: ['all'], flag: 'files', group: 'ops' },
+    { id: 'reports',            label: 'דוחות ויצוא',      icon: BarChart3,         roles: ['admin', 'vice_principal', 'coordinator', 'secretary'], flag: 'reports', group: 'insights' },
+    { id: 'analytics',          label: 'אנליטיקס',         icon: BarChart2,         roles: ['admin', 'vice_principal'], group: 'insights' },
+    { id: 'settings',           label: 'הגדרות מערכת',     icon: SlidersHorizontal, roles: ['admin', 'vice_principal'], group: 'system' },
+    { id: 'help',               label: 'מרכז עזרה',         icon: HelpCircle,        roles: ['all'],           group: 'system' },
+    { id: 'profile',            label: 'הפרופיל שלי',       icon: UserCircle,        roles: ['all'],           group: 'system' },
+    { id: 'school-admin',       label: 'ניהול פיתוח',       icon: Shield,            roles: ['super_admin'],   group: 'system' },
   ];
 
+  const GROUP_LABELS = {
+    main:     'ראשי',
+    manage:   'ניהול',
+    ops:      'תפעול',
+    insights: 'נתונים',
+    system:   'מערכת',
+  };
+
+  const { data: notifData = [] } = useQuery({
+    queryKey: ['notifications', user?.email],
+    queryFn: () => base44.entities.Notification.filter({ user_email: user.email }),
+    enabled: !!user?.email,
+    refetchInterval: 30000,
+  });
+  const unreadCount = notifData.filter(n => !n.read).length;
+
+  const effectiveRole = user?.role === 'super_admin' ? 'admin' : user?.role;
+
   const filtered = menuItems.filter(item =>
-    item.roles.includes('all') || item.roles.includes(user?.role)
+    (item.roles.includes('all') || item.roles.includes(effectiveRole) || item.roles.includes(user?.role)) &&
+    (!item.flag || isEnabled(item.flag))
   );
+
+  // Group items
+  const groups = ['main', 'manage', 'ops', 'insights', 'system'];
+  const grouped = groups
+    .map(g => ({ group: g, items: filtered.filter(i => i.group === g) }))
+    .filter(g => g.items.length > 0);
 
   return (
     <aside className={`
       fixed inset-y-0 right-0 z-50 w-64 transform transition-all duration-300 ease-in-out
       ${isOpen ? 'translate-x-0' : 'translate-x-full'} lg:relative lg:translate-x-0
-      flex flex-col
-      bg-gradient-to-b from-slate-900 via-slate-850 to-slate-900
-      shadow-2xl
-    `}
-    style={{ background: 'linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)' }}
-    >
-      {/* Top close button (mobile) */}
-      <div className="flex items-center justify-between px-5 pt-5 pb-4 lg:hidden border-b border-white/10">
-        <span className="text-white font-bold text-base tracking-wide">תפריט ניווט</span>
-        <button onClick={closeSidebar} className="p-1.5 rounded-lg hover:bg-white/10 transition-colors">
-          <X className="h-5 w-5 text-slate-300" />
+      flex flex-col shrink-0
+      bg-white border-l border-slate-200/70
+    `}>
+      {/* Mobile close */}
+      <div className="flex items-center justify-between px-4 pt-4 pb-3 lg:hidden border-b border-slate-100">
+        <div className="flex items-center gap-2">
+          <img src="/logo-smartbase.jpeg" alt="" className="h-7 w-7 rounded-lg object-cover object-top" />
+          <span className="text-slate-800 font-bold text-sm">תפריט</span>
+        </div>
+        <button onClick={closeSidebar} className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 transition-colors">
+          <X className="h-4 w-4" />
         </button>
       </div>
 
-      {/* Brand */}
-      <div className="px-5 pt-6 pb-5 border-b border-white/10">
-        <div>
-          <p className="text-white font-bold text-sm leading-tight tracking-wide">SMART BASE</p>
-          <p className="text-slate-400 text-[10px] leading-tight">מערכת ניהול חכמה</p>
-        </div>
-      </div>
-
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-0.5">
-        {filtered.map((item) => {
-          const isActive = activeView === item.id;
-          const colors = NAV_COLORS[item.id] || { from: '#6366f1', to: '#4f46e5' };
-          return (
-            <button
-              key={item.id}
-              onClick={() => { setView(item.id); closeSidebar(); }}
-              className={`
-                w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-right group relative overflow-hidden
-                ${isActive ? 'text-white shadow-lg' : 'text-slate-400 hover:text-white hover:bg-white/5'}
-              `}
-              style={isActive ? {
-                background: `linear-gradient(135deg, ${colors.from}22, ${colors.to}33)`,
-                boxShadow: `0 4px 15px ${colors.from}30`
-              } : {}}
-            >
-              {isActive && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full"
-                     style={{ background: `linear-gradient(180deg, ${colors.from}, ${colors.to})` }} />
-              )}
-              <div className={`p-1.5 rounded-lg transition-all duration-200 flex-shrink-0`}
-                   style={isActive ? {
-                     background: `linear-gradient(135deg, ${colors.from}, ${colors.to})`,
-                     boxShadow: `0 2px 8px ${colors.from}60`
-                   } : {}}>
-                <item.icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-300'}`} />
-              </div>
-              <span className={`text-sm font-medium flex-1 ${isActive ? 'text-white' : ''}`}>{item.label}</span>
-              {isActive && <ChevronRight className="h-3.5 w-3.5 text-white/50 flex-shrink-0" />}
-            </button>
-          );
-        })}
+      <nav className="flex-1 overflow-y-auto py-3 px-3 scrollbar-thin">
+        {grouped.map(({ group, items }, gi) => (
+          <div key={group} className={gi > 0 ? 'mt-4' : ''}>
+            {/* Section label */}
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2 mb-1.5">
+              {GROUP_LABELS[group]}
+            </p>
+
+            <div className="space-y-0.5">
+              {items.map((item) => {
+                const isActive = activeView === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => { setView(item.id); closeSidebar(); }}
+                    className={`
+                      relative w-full flex items-center gap-2.5 px-3 py-2 rounded-xl
+                      transition-all duration-150 text-right group
+                      ${isActive
+                        ? 'bg-blue-50 text-blue-700'
+                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                      }
+                    `}
+                  >
+                    {/* Active left indicator */}
+                    {isActive && (
+                      <span className="absolute right-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-blue-600 rounded-full" />
+                    )}
+
+                    {/* Icon */}
+                    <div className={`
+                      h-7 w-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-150
+                      ${isActive
+                        ? 'bg-blue-600 shadow-sm shadow-blue-200'
+                        : 'bg-slate-100 group-hover:bg-slate-200'
+                      }
+                    `}>
+                      <item.icon className={`h-3.5 w-3.5 ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-700'}`} />
+                    </div>
+
+                    <span className={`text-[13px] flex-1 leading-tight ${isActive ? 'font-semibold' : 'font-medium'}`}>
+                      {item.label}
+                    </span>
+                    {item.id === 'notifications' && unreadCount > 0 && (
+                      <span className="min-w-[20px] h-5 px-1 rounded-full bg-yellow-500 text-white text-[10px] font-bold flex items-center justify-center shadow-sm">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
-      {/* User + Logout */}
-      <div className="p-4 border-t border-white/10 space-y-3">
+      {/* Bottom section */}
+      <div className="p-3 border-t border-slate-100 space-y-2">
+        {/* User card */}
         {user && (
-          <div className="px-3 py-2.5 rounded-xl bg-white/5 space-y-2">
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-lg flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
-                   style={{ background: 'linear-gradient(135deg, #0d9488, #22c55e)' }}>
-                {user.avatar || user.full_name?.charAt(0)}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-white text-xs font-semibold truncate">{user.full_name}</p>
-                <p className="text-slate-500 text-[10px] truncate">{user.title || gTitle(user.role)}</p>
-              </div>
+          <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-100">
+            <div className="h-8 w-8 rounded-lg flex items-center justify-center text-sm font-black text-white flex-shrink-0 bg-blue-600 shadow-sm shadow-blue-200">
+              {user.full_name?.charAt(0)}
             </div>
-            {/* Gender Toggle */}
-            <div className="flex items-center gap-2 pt-1">
-              <span className="text-slate-500 text-[10px]">מגדר:</span>
-              <button
-                onClick={handleGenderToggle}
-                disabled={savingGender}
-                className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold transition-all disabled:opacity-50"
-                style={{
-                  background: user.gender === 'male' ? 'rgba(13,148,136,0.3)' : 'rgba(236,72,153,0.3)',
-                  color: user.gender === 'male' ? '#5eead4' : '#f9a8d4',
-                  border: `1px solid ${user.gender === 'male' ? 'rgba(13,148,136,0.4)' : 'rgba(236,72,153,0.4)'}`,
-                }}
-                title="לחצו לשינוי מגדר"
-              >
-                {user.gender === 'male' ? '👨 בן' : '👩 בת'}
-              </button>
-              <span className="text-slate-600 text-[9px]">לחצו לשינוי</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-slate-800 text-xs font-bold truncate">{user.full_name}</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <p className="text-slate-400 text-[10px] truncate">{user.title || gTitle(user.role, user.gender)}</p>
+                <button
+                  onClick={handleGenderToggle}
+                  disabled={savingGender}
+                  className="text-[10px] px-1.5 py-0.5 rounded-md font-bold transition-all disabled:opacity-50 flex-shrink-0"
+                  style={{
+                    background: user.gender === 'male' ? 'rgba(13,148,136,0.12)' : 'rgba(236,72,153,0.12)',
+                    color: user.gender === 'male' ? '#0d9488' : '#ec4899',
+                  }}
+                  title="לחצי לשינוי מגדר"
+                >
+                  {user.gender === 'male' ? 'בן' : 'בת'}
+                </button>
+              </div>
             </div>
           </div>
         )}
+
         {/* Theme selector */}
-        <div className="flex items-center gap-1 px-1 py-1 rounded-xl bg-white/5">
+        <div className="flex items-center gap-0.5 p-0.5 rounded-xl bg-slate-100">
           {THEME_OPTIONS.map(({ key, icon: Icon, label }) => (
             <button
               key={key}
               onClick={() => setTheme(key)}
               title={label}
-              className={`flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg transition-all duration-200 text-[10px] font-medium ${
+              className={`flex-1 flex items-center justify-center py-1.5 rounded-lg transition-all duration-150 ${
                 theme === key
-                  ? 'bg-white/15 text-white shadow-sm'
-                  : 'text-slate-500 hover:text-slate-300'
+                  ? 'bg-white text-slate-700 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-600'
               }`}
             >
               <Icon className="h-3.5 w-3.5" />
-              <span className="hidden xl:inline">{label}</span>
             </button>
           ))}
         </div>
 
+        {/* Logout */}
         <button
           onClick={onLogout}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl w-full transition-all duration-200 text-slate-400 hover:text-red-400 hover:bg-red-500/10 group"
+          className="flex items-center gap-2.5 px-3 py-2 rounded-xl w-full text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all duration-150 group"
         >
-          <div className="p-1.5 rounded-lg group-hover:bg-red-500/10 transition-colors">
-            <LogOut className="h-4 w-4" />
+          <div className="h-7 w-7 rounded-lg bg-slate-100 group-hover:bg-red-100 flex items-center justify-center flex-shrink-0 transition-colors">
+            <LogOut className="h-3.5 w-3.5 group-hover:text-red-500 transition-colors" />
           </div>
-          <span className="text-sm font-medium">יציאה מהמערכת</span>
+          <span className="text-[13px] font-medium">יציאה מהמערכת</span>
         </button>
       </div>
     </aside>

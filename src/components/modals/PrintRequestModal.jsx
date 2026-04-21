@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { X } from 'lucide-react';
 import { toast } from 'sonner';
+import { useApprovalSettings } from '@/hooks/useApprovalSettings';
 
 export default function PrintRequestModal({ isOpen, onClose, user }) {
+  const { require_print_approval } = useApprovalSettings();
   const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     file: null,
@@ -63,7 +65,7 @@ export default function PrintRequestModal({ isOpen, onClose, user }) {
         transparency_count: formData.print_type === 'transparency' ? formData.transparency_count : 0,
         double_sided: formData.double_sided,
         urgent: formData.urgent,
-        status: 'pending'
+        status: require_print_approval ? 'pending' : 'approved'
       });
 
       queryClient.invalidateQueries({ queryKey: ['prints'] });
@@ -180,8 +182,8 @@ export default function PrintRequestModal({ isOpen, onClose, user }) {
 
           {/* Transparency count - shown only when transparency is selected */}
           {isTransparency && (
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-              <label className="text-xs font-bold text-amber-800 block mb-2">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+              <label className="text-xs font-bold text-yellow-800 block mb-2">
                 🔲 כמות דפים שקופים
               </label>
               <Input
@@ -189,10 +191,10 @@ export default function PrintRequestModal({ isOpen, onClose, user }) {
                 min="1"
                 value={formData.transparency_count}
                 onChange={(e) => setFormData({ ...formData, transparency_count: parseInt(e.target.value) || 0 })}
-                className="bg-white border-amber-300"
+                className="bg-white border-yellow-300"
                 placeholder="מספר דפים שקופים"
               />
-              <p className="text-[10px] text-amber-600 mt-1">
+              <p className="text-[10px] text-yellow-700 mt-1">
                 דפים שקופים נספרים בנפרד ממכסת הצילומים הרגילה
               </p>
             </div>
@@ -246,9 +248,9 @@ export default function PrintRequestModal({ isOpen, onClose, user }) {
             {isTransparency ? (
               <>
                 <p className="text-sm text-slate-600">
-                  סה״כ דפים שקופים: <span className="font-bold text-amber-600">{formData.transparency_count}</span>
+                  סה״כ דפים שקופים: <span className="font-bold text-yellow-700">{formData.transparency_count}</span>
                 </p>
-                <p className="text-xs text-amber-600 font-medium">🔲 שקפיות - נספרות בנפרד מהמכסה הרגילה</p>
+                <p className="text-xs text-yellow-700 font-medium">🔲 שקפיות - נספרות בנפרד מהמכסה הרגילה</p>
               </>
             ) : (
               <>
@@ -260,10 +262,10 @@ export default function PrintRequestModal({ isOpen, onClose, user }) {
                   </span>
                 </p>
                 {formData.paper_size === 'special' && (
-                  <p className="text-xs text-amber-600 font-medium">⚠️ גודל מיוחד - דורש אישור מיוחד</p>
+                  <p className="text-xs text-yellow-700 font-medium">⚠️ גודל מיוחד - דורש אישור מיוחד</p>
                 )}
                 {formData.color_mode === 'color' && (
-                  <p className="text-xs text-purple-600 font-medium">🎨 הדפסה צבעונית</p>
+                  <p className="text-xs text-yellow-700 font-medium">🎨 הדפסה צבעונית</p>
                 )}
               </>
             )}

@@ -113,13 +113,13 @@ export default function CommandPalette({ isOpen, onClose, onNavigate, user }) {
                       onClick={() => { onNavigate(item.id); onClose(); }}
                       onMouseEnter={() => setSelected(idx)}
                       className={`w-full flex items-center gap-3 px-4 py-2.5 transition-all text-right
-                        ${selected === idx ? 'bg-indigo-600/30 text-white' : 'text-slate-300 hover:bg-white/5'}`}
+                        ${selected === idx ? 'bg-blue-600/30 text-white' : 'text-slate-300 hover:bg-white/5'}`}
                     >
-                      <div className={`p-1.5 rounded-lg flex-shrink-0 ${selected === idx ? 'bg-indigo-500/30' : 'bg-white/5'}`}>
+                      <div className={`p-1.5 rounded-lg flex-shrink-0 ${selected === idx ? 'bg-blue-500/30' : 'bg-white/5'}`}>
                         <item.icon className="h-4 w-4" />
                       </div>
                       <span className="text-sm flex-1">{item.label}</span>
-                      {selected === idx && <ChevronLeft className="h-3.5 w-3.5 text-indigo-400 flex-shrink-0" />}
+                      {selected === idx && <ChevronLeft className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />}
                     </button>
                   );
                 })}

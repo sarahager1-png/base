@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/firebaseClient';
 import { Users, Phone, MapPin, Clock, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -43,10 +43,11 @@ export default function MeetingsList({ user }) {
     <div className="space-y-6">
       {/* Upcoming Meetings */}
       <div>
-        <h3 className="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
-          <Clock className="h-5 w-5 text-blue-500" />
-          פגישות קרובות ({upcomingMeetings.length})
-        </h3>
+        <div className="flex items-center gap-2 mb-3">
+          <div className="p-1.5 rounded-lg bg-blue-100"><Clock className="h-3.5 w-3.5 text-blue-600" /></div>
+          <h3 className="text-sm font-bold text-slate-800">פגישות קרובות</h3>
+          <span className="text-xs font-semibold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">{upcomingMeetings.length}</span>
+        </div>
         {upcomingMeetings.length > 0 ? (
           <div className="space-y-3">
             {upcomingMeetings.map(meeting => (
@@ -101,7 +102,10 @@ export default function MeetingsList({ user }) {
       {/* Past Meetings */}
       {pastMeetings.length > 0 && (
         <div>
-          <h3 className="text-sm font-bold text-slate-500 mb-3">פגישות אחרונות</h3>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-1.5 rounded-lg bg-slate-100"><CheckCircle className="h-3.5 w-3.5 text-slate-500" /></div>
+            <h3 className="text-sm font-bold text-slate-600">פגישות אחרונות</h3>
+          </div>
           <div className="space-y-2">
             {pastMeetings.map(meeting => (
               <div key={meeting.id} className="p-3 bg-slate-50 rounded-lg border border-slate-200 flex justify-between items-center">

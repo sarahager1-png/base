@@ -77,7 +77,7 @@ export function PurchaseForm({ onSubmit }) {
         </select>
       </div>
       <button onClick={() => onSubmit(formData)}
-        className="w-full bg-amber-500 text-white py-3 rounded-xl font-bold hover:bg-amber-600">
+        className="w-full bg-yellow-500 text-white py-3 rounded-xl font-bold hover:bg-yellow-600">
         שלח למנהלת
       </button>
     </div>
