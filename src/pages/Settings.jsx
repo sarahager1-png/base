@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings, MessageCircle, Bell, School, Save, CheckCircle, Eye, EyeOff, AlertTriangle, Shield, ToggleLeft, ToggleRight, ClipboardCheck, Mail } from 'lucide-react';
+import { Settings, MessageCircle, Bell, School, Save, CheckCircle, Eye, EyeOff, AlertTriangle, Shield, ToggleLeft, ToggleRight, ClipboardCheck, Mail, Plus, X, ChevronDown, ChevronUp, Clock } from 'lucide-react';
 import FeatureFlags from '../components/settings/FeatureFlags';
 import { getWAConfig, saveWAConfig, sendWhatsApp } from '../lib/whatsapp';
 import { getEmailConfig, saveEmailConfig, sendEmail, isEmailConfigured } from '../lib/email';
@@ -119,6 +119,251 @@ function CoordinatorPermissions() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Special Roles Manager
+// ─────────────────────────────────────────────────────────────────────────────
+const BUILTIN_SPECIAL_ROLES = [
+  { id: 'security_coordinator', label: 'רכזת ביטחון ובטיחות', desc: 'שיבוץ ועריכת תורנויות, הגדרת סוגי תורנויות', icon: '🛡️', builtin: true },
+  { id: 'room_manager',         label: 'אחראית חדרים',        desc: 'הגדרת חדרי ספח ושחרור שיבוצים',            icon: '🏫', builtin: true },
+  { id: 'equipment_manager',    label: 'אחראית ציוד / לבורנטית', desc: 'הגדרת ציוד משותף ושחרור שיבוצים',      icon: '🔧', builtin: true },
+  { id: 'photo_manager',        label: 'אחראית צילומים',      desc: 'אישור ודחיית בקשות צילום',                 icon: '🖨️', builtin: true },
+  { id: 'tech_coordinator',     label: 'רכזת טכנולוגיה',      desc: 'קבלת תקלות מחשבים וטיפול בהן',             icon: '💻', builtin: true },
+  { id: 'ab_bayit',             label: 'אב הבית',             desc: 'קבלת ליקויי תחזוקה וסימון ביצוע',          icon: '🔨', builtin: true },
+];
+
+const EMOJI_OPTIONS = ['⭐','📋','🎯','🔑','📌','🗂️','🧩','📣','🛠️','🎓','📊','🏷️'];
+
+function SpecialRolesManager() {
+  const qc = useQueryClient();
+  const { user: currentUser } = useAuth();
+  const [saving,   setSaving]   = useState(null);
+  const [showLog,  setShowLog]  = useState(false);
+  const [newRole,  setNewRole]  = useState(null); // null or { label:'', desc:'', icon:'⭐' }
+
+  const { data: users = [] } = useQuery({
+    queryKey: ['all-users-special-roles'],
+    queryFn: () => base44.entities.User.list(),
+  });
+
+  const { data: customRolesSetting = [] } = useQuery({
+    queryKey: ['custom-special-roles'],
+    queryFn: () => base44.entities.InstitutionSettings.filter({ type: 'custom_special_roles' }),
+  });
+  const customRolesRecord = customRolesSetting[0] || null;
+  const customRoles = React.useMemo(() => {
+    try { return customRolesRecord?.roles ? JSON.parse(customRolesRecord.roles) : []; }
+    catch { return []; }
+  }, [customRolesRecord]);
+
+  const allRoles = [...BUILTIN_SPECIAL_ROLES, ...customRoles];
+
+  const { data: roleLogs = [] } = useQuery({
+    queryKey: ['role-change-log'],
+    queryFn: () => base44.entities.InstitutionSettings.filter({ type: 'role_change_log' }),
+    enabled: showLog,
+  });
+  const sortedLog = [...roleLogs].sort((a,b) => (b.changed_at||'') > (a.changed_at||'') ? 1 : -1);
+
+  const saveCustomRoles = useMutation({
+    mutationFn: (roles) => {
+      const data = { type: 'custom_special_roles', roles: JSON.stringify(roles) };
+      if (customRolesRecord?.id) return base44.entities.InstitutionSettings.update(customRolesRecord.id, data);
+      return base44.entities.InstitutionSettings.create(data);
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['custom-special-roles'] }); setNewRole(null); toast.success('תפקיד נשמר'); },
+    onError: () => toast.error('שגיאה בשמירה'),
+  });
+
+  const toggleRole = async (u, roleId) => {
+    setSaving(`${u.id}_${roleId}`);
+    try {
+      const current = Array.isArray(u.special_roles) ? u.special_roles : [];
+      const adding = !current.includes(roleId);
+      const next = adding ? [...current, roleId] : current.filter(r => r !== roleId);
+      await base44.entities.User.update(u.id, { special_roles: next });
+      await Promise.allSettled([
+        base44.firestoreUsers.update(u.id, { special_roles: next }),
+        base44.firestoreStaff.update(u.id, { special_roles: next }),
+      ]);
+      // Save log entry
+      const role = allRoles.find(r => r.id === roleId);
+      try {
+        await base44.entities.InstitutionSettings.create({
+          type: 'role_change_log',
+          user_id: u.id,
+          user_name: u.full_name,
+          role_id: roleId,
+          role_label: role?.label || roleId,
+          action: adding ? 'added' : 'removed',
+          changed_by: currentUser?.full_name || currentUser?.email || 'מנהלת',
+          changed_at: new Date().toISOString(),
+        });
+      } catch { /* log failure is non-critical */ }
+      qc.invalidateQueries({ queryKey: ['all-users-special-roles', 'role-change-log'] });
+      toast.success(adding ? `${u.full_name} הוגדרה כ${role?.label}` : 'תפקיד הוסר');
+    } catch { toast.error('שגיאה בשמירה'); }
+    setSaving(null);
+  };
+
+  const deleteCustomRole = (roleId) => {
+    const next = customRoles.filter(r => r.id !== roleId);
+    saveCustomRoles.mutate(next);
+  };
+
+  return (
+    <div dir="rtl" className="space-y-6 mt-8 pt-8 border-t border-slate-100">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-amber-50 rounded-xl"><Shield className="h-5 w-5 text-amber-600" /></div>
+          <div>
+            <h3 className="font-bold text-slate-800 text-lg">תפקידים מיוחדים</h3>
+            <p className="text-xs text-slate-500">שיוך תפקידים מיוחדים למורות — כל תפקיד מפעיל יכולות ייחודיות במערכת.</p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowLog(l => !l)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors ${showLog ? 'bg-slate-100 text-slate-700 border-slate-200' : 'text-slate-500 border-slate-200 hover:bg-slate-50'}`}>
+            <Clock className="h-3.5 w-3.5" />{showLog ? 'הסתר לוג' : 'לוג שינויים'}
+          </button>
+          <button
+            onClick={() => setNewRole({ id: `custom_${Date.now()}`, label: '', desc: '', icon: '⭐', builtin: false })}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition-colors">
+            <Plus className="h-3.5 w-3.5" /> תפקיד חדש
+          </button>
+        </div>
+      </div>
+
+      {/* New custom role form */}
+      {newRole && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="font-bold text-slate-700 text-sm">תפקיד חדש מותאם אישית</p>
+            <button onClick={() => setNewRole(null)}><X className="h-4 w-4 text-slate-400" /></button>
+          </div>
+          <div className="grid grid-cols-2 gap-2.5">
+            <div className="col-span-2">
+              <input
+                autoFocus
+                className="w-full px-3 py-2.5 border border-slate-200 bg-white rounded-xl text-sm outline-none focus:border-amber-400"
+                placeholder="שם התפקיד (לדוגמה: רכזת ספרייה)"
+                value={newRole.label}
+                onChange={e => setNewRole(r => ({ ...r, label: e.target.value }))} />
+            </div>
+            <div className="col-span-2">
+              <input
+                className="w-full px-3 py-2.5 border border-slate-200 bg-white rounded-xl text-sm outline-none focus:border-amber-400"
+                placeholder="תיאור קצר (אופציונלי)"
+                value={newRole.desc}
+                onChange={e => setNewRole(r => ({ ...r, desc: e.target.value }))} />
+            </div>
+            <div className="col-span-2">
+              <p className="text-xs font-bold text-slate-500 mb-1.5">בחרי אייקון</p>
+              <div className="flex flex-wrap gap-1.5">
+                {EMOJI_OPTIONS.map(e => (
+                  <button key={e} onClick={() => setNewRole(r => ({ ...r, icon: e }))}
+                    className={`w-9 h-9 rounded-xl text-lg transition-all ${newRole.icon === e ? 'bg-amber-200 ring-2 ring-amber-400' : 'bg-white border border-slate-200 hover:border-amber-300'}`}>
+                    {e}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={() => saveCustomRoles.mutate([...customRoles, newRole])}
+            disabled={!newRole.label.trim() || saveCustomRoles.isPending}
+            className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-sm disabled:opacity-50 transition-colors">
+            {saveCustomRoles.isPending ? 'שומר...' : 'שמור תפקיד'}
+          </button>
+        </div>
+      )}
+
+      {/* Roles grid */}
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        {allRoles.map(role => {
+          const assigned = users.filter(u => Array.isArray(u.special_roles) && u.special_roles.includes(role.id));
+          return (
+            <div key={role.id} className="bg-slate-50 rounded-xl border border-slate-100 p-4">
+              <div className="flex items-start gap-2 mb-2">
+                <span className="text-xl flex-shrink-0">{role.icon}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1">
+                    <p className="font-semibold text-slate-800 text-sm truncate">{role.label}</p>
+                    {!role.builtin && (
+                      <button onClick={() => { if(confirm('למחוק תפקיד?')) deleteCustomRole(role.id); }}
+                        className="flex-shrink-0 text-slate-300 hover:text-red-500 transition-colors">
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-0.5 leading-tight">{role.desc}</p>
+                </div>
+              </div>
+              {assigned.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2 mb-2">
+                  {assigned.map(u => (
+                    <span key={u.id} className="flex items-center gap-1 bg-amber-100 text-amber-800 text-[11px] font-semibold px-2 py-0.5 rounded-full">
+                      {u.full_name?.split(' ')[0]}
+                      <button onClick={() => toggleRole(u, role.id)} disabled={saving === `${u.id}_${role.id}`}
+                        className="hover:text-red-600 transition-colors ml-0.5">×</button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              <select
+                className="w-full text-xs px-2 py-1.5 border border-slate-200 bg-white rounded-lg outline-none focus:border-amber-400 mt-1"
+                value=""
+                onChange={async (e) => {
+                  const u = users.find(x => x.id === e.target.value);
+                  if (u) await toggleRole(u, role.id);
+                }}>
+                <option value="">+ הוסף מורה לתפקיד</option>
+                {users
+                  .filter(u => !['admin','vice_principal','super_admin'].includes(u.role) && !(Array.isArray(u.special_roles) && u.special_roles.includes(role.id)))
+                  .map(u => <option key={u.id} value={u.id}>{u.full_name}</option>)}
+              </select>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Role change log */}
+      {showLog && (
+        <div className="bg-white border border-slate-100 rounded-xl overflow-hidden shadow-sm">
+          <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-slate-400" />
+              <p className="font-bold text-slate-700 text-sm">לוג שינויי תפקידים</p>
+            </div>
+            <span className="text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">{roleLogs.length} שינויים</span>
+          </div>
+          {sortedLog.length === 0 ? (
+            <p className="text-center text-slate-400 text-sm py-10">אין שינויים מתועדים עדיין</p>
+          ) : (
+            <div className="divide-y divide-slate-50 max-h-64 overflow-y-auto">
+              {sortedLog.map((entry, i) => (
+                <div key={i} className="flex items-center gap-3 px-4 py-2.5">
+                  <span className={`flex-shrink-0 text-lg`}>{entry.action === 'added' ? '➕' : '➖'}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-slate-700">
+                      <span className="font-semibold">{entry.user_name}</span>
+                      {entry.action === 'added' ? ' הוגדרה כ' : ' הוסר תפקיד '}
+                      <span className="font-semibold text-amber-700">{entry.role_label}</span>
+                    </p>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      ע"י {entry.changed_by} · {entry.changed_at ? new Date(entry.changed_at).toLocaleString('he-IL', { day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -301,7 +546,12 @@ export default function SettingsPage() {
         {tab === 'features' && <FeatureFlags />}
 
         {/* ── Coordinators ── */}
-        {tab === 'coordinators' && <CoordinatorPermissions />}
+        {tab === 'coordinators' && (
+          <div>
+            <CoordinatorPermissions />
+            <SpecialRolesManager />
+          </div>
+        )}
 
         {/* ── Approvals ── */}
         {tab === 'approvals' && <ApprovalSettings />}

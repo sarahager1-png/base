@@ -77,29 +77,21 @@ export default function ProfileSetupModal({ user, onComplete }) {
   const finish = async () => {
     setSaving(true);
     try {
-      const payload = {
-        full_name:   form.full_name.trim(),
-        phone:       form.phone.trim(),
-        home_class:  form.home_class.trim(),
-        subject:     form.subject.trim(),
+      const patch = {
+        full_name:        form.full_name.trim(),
+        phone:            form.phone.trim(),
+        home_class:       (form.home_class || '').trim(),
+        subject:          (form.subject || '').trim(),
         profile_complete: true,
-        role:        user.role,
-        email:       user.email,
       };
-      const existing = await base44.entities.User.filter({ email: user.email });
-      if (existing[0]) {
-        await base44.entities.User.update(existing[0].id, payload);
-      } else {
-        await base44.entities.User.create(payload);
-      }
-      await base44.auth.updateMe({
-        full_name:  payload.full_name,
-        phone:      payload.phone,
-        home_class: payload.home_class,
-        subject:    payload.subject,
-      });
+      // User may be in 'users' or 'staff' collection — update both silently
+      await Promise.allSettled([
+        base44.firestoreUsers.update(user.id, patch),
+        base44.firestoreStaff.update(user.id, patch),
+      ]);
+      await base44.auth.updateMe(patch);
       markProfileDone(user.email);
-      onComplete(payload);
+      onComplete(patch);
     } catch {
       setError('שגיאה בשמירה. אנא נסי שוב.');
     }

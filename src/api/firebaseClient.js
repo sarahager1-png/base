@@ -274,6 +274,41 @@ const firestoreRooms = {
   },
 };
 
+/* ── Room Bookings — localStorage primary, Firestore sync attempt ── */
+const BOOKINGS_LS_KEY = 'smartbase_bookings_v1';
+const _lsBookings  = () => { try { return JSON.parse(localStorage.getItem(BOOKINGS_LS_KEY)) || []; } catch { return []; } };
+const _saveBookings = (arr) => localStorage.setItem(BOOKINGS_LS_KEY, JSON.stringify(arr));
+
+const firestoreRoomBookings = {
+  list: async () => {
+    try {
+      const docs = await fsList('room_bookings');
+      if (docs.length > 0) { _saveBookings(docs); return docs; }
+    } catch {}
+    return _lsBookings();
+  },
+  filter: async (filters = {}) => {
+    const all = await firestoreRoomBookings.list();
+    return all.filter(item =>
+      Object.entries(filters).every(([k, v]) => String(item[k]) === String(v))
+    );
+  },
+  create: async (data) => {
+    const id   = genId();
+    const item = { ...data, id, created_date: new Date().toISOString() };
+    _saveBookings([..._lsBookings(), item]);
+    try { await fsReq('room_bookings', 'POST', { fields: objToFields(item) }, `documentId=${id}`); } catch {}
+    return item;
+  },
+  update: async (id, data) => {
+    const all = _lsBookings();
+    const idx = all.findIndex(b => b.id === id);
+    if (idx >= 0) { all[idx] = { ...all[idx], ...data }; _saveBookings(all); }
+    try { await fsPatch(`room_bookings/${id}`, data); } catch {}
+    return { id, ...data };
+  },
+};
+
 /* ── Entities ── */
 const entities = {
   Absence:               createEntity('Absence'),
@@ -345,6 +380,7 @@ export const base44 = {
   firestoreSchools,
   firestoreStaff,
   firestoreRooms,
+  firestoreRoomBookings,
   integrations: {
     Core: {
       UploadFile: async ({ file }) => {

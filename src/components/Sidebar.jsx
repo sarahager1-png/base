@@ -43,10 +43,10 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
     { id: 'attendance',         label: 'היעדרויות',        icon: Clock,             roles: ['teacher', 'admin', 'vice_principal', 'secretary', 'assistant', 'substitute', 'counselor', 'coordinator'], group: 'manage' },
     { id: 'hr',                 label: 'ניהול צוות',       icon: Users,             roles: ['admin', 'vice_principal', 'secretary'], group: 'manage' },
     { id: 'onboarding',         label: 'טפסי קליטה',       icon: UserPlus,          roles: ['substitute', 'admin', 'vice_principal'], group: 'manage' },
-    { id: 'duty-management',    label: 'ניהול תורנויות',   icon: Settings,          roles: ['admin', 'vice_principal', 'coordinator'], flag: 'duties', group: 'manage' },
+    { id: 'duty-management',    label: 'ניהול תורנויות',   icon: Settings,          roles: ['admin', 'vice_principal', 'coordinator'], special_role: 'security_coordinator', flag: 'duties', group: 'manage' },
     { id: 'room-management',    label: 'ניהול חדרים',      icon: Home,              roles: ['all'], flag: 'rooms', group: 'manage' },
     { id: 'printing',           label: 'מרכז צילומים',     icon: Printer,           roles: ['admin', 'vice_principal', 'secretary', 'teacher', 'assistant', 'counselor', 'coordinator'], group: 'ops' },
-    { id: 'maintenance',        label: 'תפעול ורכש',       icon: Settings,          roles: ['admin', 'vice_principal', 'secretary', 'maintenance', 'teacher', 'counselor', 'coordinator'], group: 'ops' },
+    { id: 'maintenance',        label: 'תפעול ורכש',       icon: Settings,          roles: ['admin', 'vice_principal', 'secretary', 'maintenance', 'teacher', 'counselor', 'coordinator'], special_role: 'ab_bayit', group: 'ops' },
     { id: 'community',          label: 'קהילה והווי',      icon: Heart,             roles: ['all'], flag: 'community', group: 'ops' },
     { id: 'file-management',    label: 'ניהול קבצים',       icon: FolderOpen,        roles: ['all'], flag: 'files', group: 'ops' },
     { id: 'reports',            label: 'דוחות ויצוא',      icon: BarChart3,         roles: ['admin', 'vice_principal', 'coordinator', 'secretary'], flag: 'reports', group: 'insights' },
@@ -75,8 +75,11 @@ export default function Sidebar({ activeView, setView, user, isOpen, closeSideba
 
   const effectiveRole = user?.role === 'super_admin' ? 'admin' : user?.role;
 
+  const userSpecialRoles = Array.isArray(user?.special_roles) ? user.special_roles : [];
+
   const filtered = menuItems.filter(item =>
-    (item.roles.includes('all') || item.roles.includes(effectiveRole) || item.roles.includes(user?.role)) &&
+    (item.roles.includes('all') || item.roles.includes(effectiveRole) || item.roles.includes(user?.role) ||
+     (item.special_role && userSpecialRoles.includes(item.special_role))) &&
     (!item.flag || isEnabled(item.flag))
   );
 

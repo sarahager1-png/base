@@ -322,6 +322,7 @@ function DashboardInner() {
         />
 
         <main className="flex-1 pb-24 lg:pb-10 min-w-0 p-5 lg:p-7">
+          <RoleSetupReminder user={user} onNavigate={setCurrentView} />
           {currentView === 'dashboard' && (
             <>
               {((['admin', 'super_admin'].includes(user.role)) && !viewAsRole) && (
@@ -409,6 +410,38 @@ function DashboardInner() {
       )}
 
       <MobileNav activeView={currentView} setView={setCurrentView} userEmail={user.email} />
+    </div>
+  );
+}
+
+function RoleSetupReminder({ user, onNavigate }) {
+  const isManager = ['admin','vice_principal','secretary'].includes(user?.role);
+  if (!isManager) return null;
+
+  const DISMISSED_KEY = `role_reminder_dismissed_${user?.email}`;
+  const [dismissed, setDismissed] = React.useState(() => !!localStorage.getItem(DISMISSED_KEY));
+  if (dismissed) return null;
+
+  const dismiss = () => { localStorage.setItem(DISMISSED_KEY, '1'); setDismissed(true); };
+
+  return (
+    <div className="mb-5 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3.5 flex items-start gap-3" dir="rtl">
+      <span className="text-xl flex-shrink-0 mt-0.5">⚠️</span>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-bold text-amber-900">הגדרת תפקידים מיוחדים</p>
+        <p className="text-xs text-amber-700 mt-0.5">
+          הגדרת תפקידים מותאמים (רכזת ביטחון, אחראית חדרים וכו') היא תנאי לכך שהפונקציות המיוחדות יופיעו אצלן.
+        </p>
+      </div>
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <button onClick={() => { onNavigate('settings'); dismiss(); }}
+          className="text-xs bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1.5 rounded-xl transition-colors whitespace-nowrap">
+          הגדרי עכשיו
+        </button>
+        <button onClick={dismiss} className="text-amber-400 hover:text-amber-600 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
     </div>
   );
 }

@@ -1,523 +1,652 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/firebaseClient';
-import { ChevronRight, ChevronLeft, Plus, X, Trash2, Edit2, Settings, Layers, Calendar, ToggleLeft, ToggleRight, FileSpreadsheet } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Plus, X, Trash2, Edit2, ToggleLeft, ToggleRight, FileSpreadsheet, CalendarDays, BookOpen, Layers, Clock, BarChart2 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { toast } from 'sonner';
 import { notify } from '@/lib/notify';
 import * as XLSX from 'xlsx';
 
-// ── Constants ─────────────────────────────────────────────────────────────────
-const DAYS = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי'];
-const HOURS = [1, 2, 3, 4, 5, 6, 7];
-const CANCEL_HOURS = 24; // teacher can cancel up to this many hours before
+const DAYS       = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי'];
+const DAYS_SHORT = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳'];
+const HOURS      = [8, 9, 10, 11, 12, 13, 14];
+const CANCEL_HOURS = 24;
 
-const RESOURCE_EMOJI = { room: '🏫', equipment: '🔧' };
+const fmtHour   = (h) => `${String(h).padStart(2,'0')}:00`;
+const fmtPeriod = (h) => `שעה ${HOURS.indexOf(h) + 1}`;
+const EMOJI    = { room: '🏫', equipment: '🔧' };
+const TYPE_LABEL = { room: 'חדר', equipment: 'ציוד' };
 
-// ── Date helpers ──────────────────────────────────────────────────────────────
 function weekStart(date) {
-  const d = new Date(date);
-  d.setHours(0, 0, 0, 0);
-  const day = d.getDay(); // 0=Sun
-  d.setDate(d.getDate() - day);
-  return d;
+  const d = new Date(date); d.setHours(0,0,0,0);
+  d.setDate(d.getDate() - d.getDay()); return d;
 }
-function addDays(date, n) {
-  const d = new Date(date);
-  d.setDate(d.getDate() + n);
-  return d;
-}
-function toISO(date) { return date.toISOString().split('T')[0]; }
-function fmtDate(d) { return new Date(d).toLocaleDateString('he-IL', { day: 'numeric', month: 'numeric' }); }
+function addDays(date, n) { const d = new Date(date); d.setDate(d.getDate()+n); return d; }
+function toISO(d) { return d.toISOString().split('T')[0]; }
+function fmtDate(d) { return new Date(d).toLocaleDateString('he-IL',{day:'numeric',month:'numeric'}); }
 function hebDay(d) { return DAYS[new Date(d).getDay()] || ''; }
 
-// ── Resource form defaults ────────────────────────────────────────────────────
-const EMPTY_RESOURCE = { name: '', resource_type: 'room', capacity: '', quantity: 1, notes: '', active: true };
-
-// ── Main page ─────────────────────────────────────────────────────────────────
 export default function RoomManagementPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const specialRoles = Array.isArray(user?.special_roles) ? user.special_roles : [];
+  const isAdmin   = ['admin','vice_principal'].includes(user?.role) || specialRoles.includes('room_manager') || specialRoles.includes('equipment_manager');
+  const canManage = !!user;
 
-  const isAdmin = ['admin', 'vice_principal'].includes(user?.role);
+  const [weekOf,        setWeekOf]        = useState(() => weekStart(new Date()));
+  const [selDay,        setSelDay]        = useState(new Date().getDay() < 5 ? new Date().getDay() : 0);
+  const [tab,           setTab]           = useState('calendar');
+  const [bookingTarget, setBookingTarget] = useState(null);
+  const [releaseTarget, setReleaseTarget] = useState(null);
+  const [resourceForm,  setResourceForm]  = useState(null);
+  const [filterType,    setFilterType]    = useState('all');
+  const [quickHour,     setQuickHour]     = useState(null); // מצב חיפוש מהיר לפי שעה
 
-  const [weekOf, setWeekOf]       = useState(() => weekStart(new Date()));
-  const [selectedDay, setSelectedDay] = useState(new Date().getDay() < 5 ? new Date().getDay() : 0);
-  const [tab, setTab]             = useState('calendar'); // calendar | rooms | equipment | mine
-  const [bookingTarget, setBookingTarget] = useState(null);  // { resource, date, hour }
-  const [releaseTarget, setReleaseTarget] = useState(null);  // booking to release
-  const [resourceForm, setResourceForm]   = useState(null);  // null = hidden, obj = form
+  const selDate  = toISO(addDays(weekOf, selDay));
+  const todayISO = toISO(new Date());
+  const isThisWeek = toISO(weekStart(new Date())) === toISO(weekOf);
 
-  const selectedDate = toISO(addDays(weekOf, selectedDay));
+  const { data: resources = [] } = useQuery({ queryKey: ['rooms-v2'],         queryFn: () => base44.firestoreRooms.list() });
+  const { data: bookings  = [] } = useQuery({ queryKey: ['room-bookings-v2'], queryFn: () => base44.firestoreRoomBookings.filter({ status: 'active' }) });
 
-  // Queries
-  const { data: resources = [] } = useQuery({
-    queryKey: ['rooms-v2'],
-    queryFn: () => base44.entities.Room.list(),
-  });
+  const activeRes  = resources.filter(r => r.active !== false);
+  const visibleRes = activeRes.filter(r =>
+    filterType === 'all'       ? true :
+    filterType === 'room'      ? r.resource_type !== 'equipment' :
+    r.resource_type === 'equipment'
+  );
+  const rooms     = activeRes.filter(r => r.resource_type !== 'equipment');
+  const equipment = activeRes.filter(r => r.resource_type === 'equipment');
 
-  const { data: bookings = [] } = useQuery({
-    queryKey: ['room-bookings-v2'],
-    queryFn: () => base44.entities.RoomBooking.filter({ status: 'active' }),
-  });
-
-  const activeResources = resources.filter(r => r.active !== false);
-  const rooms      = activeResources.filter(r => r.resource_type !== 'equipment');
-  const equipment  = activeResources.filter(r => r.resource_type === 'equipment');
-  const allResources = [...rooms, ...equipment];
-
-  // Bookings for selected date (keyed by resource_id + hour)
   const dayBookings = useMemo(() => {
     const map = {};
-    bookings.forEach(b => {
-      if (b.date === selectedDate) map[`${b.resource_id}_${b.hour_number}`] = b;
-    });
+    bookings.forEach(b => { if (b.date === selDate) map[`${b.resource_id}_${b.hour_number}`] = b; });
     return map;
-  }, [bookings, selectedDate]);
+  }, [bookings, selDate]);
 
-  // My upcoming bookings
   const myBookings = useMemo(() =>
     bookings.filter(b => b.teacher_email === user?.email)
-      .sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : a.hour_number - b.hour_number),
+      .sort((a,b) => a.date < b.date ? -1 : a.date > b.date ? 1 : a.hour_number - b.hour_number),
     [bookings, user?.email]);
 
-  // ── Mutations ──────────────────────────────────────────────────────────────
+  const todayTotal = bookings.filter(b => b.date === todayISO).length;
+  const weekTotal  = bookings.filter(b => {
+    const d = new Date(b.date); return d >= weekOf && d <= addDays(weekOf, 4);
+  }).length;
+
   const createBooking = useMutation({
     mutationFn: async ({ resource, date, hour, classN, subject, notes }) => {
-      const key = `${resource.id}_${hour}`;
-      // Re-check live conflict
-      const existing = await base44.entities.RoomBooking.filter({ resource_id: resource.id, date, hour_number: hour, status: 'active' });
-      if (existing.length > 0) throw new Error('המשבצת נתפסה זה עתה, אנא בחרי שעה אחרת');
-      return base44.entities.RoomBooking.create({
-        resource_id:   resource.id,
-        resource_name: resource.name,
-        date, hour_number: hour,
-        teacher_email: user.email,
-        teacher_name:  user.full_name,
-        class_name:    classN,
-        subject:       subject || '',
-        notes:         notes || '',
-        status:        'active',
-      });
+      const ex = await base44.firestoreRoomBookings.filter({ resource_id: resource.id, date, hour_number: hour, status: 'active' });
+      if (ex.length > 0) throw new Error('המשבצת נתפסה זה עתה');
+      return base44.firestoreRoomBookings.create({ resource_id: resource.id, resource_name: resource.name, date, hour_number: hour, teacher_email: user.email, teacher_name: user.full_name, class_name: classN, subject: subject||'', notes: notes||'', status: 'active' });
     },
     onSuccess: async (_, vars) => {
       qc.invalidateQueries({ queryKey: ['room-bookings-v2'] });
-      toast.success(`שובצת בהצלחה ב${vars.resource.name}, ${fmtDate(vars.date)}, שעה ${vars.hour}`);
-      await notify({
-        user_email: user.email,
-        phone:      user.phone,
-        type:       'booking_confirm',
-        title:      'אישור שיבוץ',
-        message:    `שובצת ב${vars.resource.name}, ${hebDay(vars.date)} ${fmtDate(vars.date)}, שעה ${vars.hour}, כיתה ${vars.classN}.`,
-        link:       'room-management',
-      }).catch(() => {});
+      toast.success(`שובצת: ${vars.resource.name} ${fmtHour(vars.hour)}`);
+      await notify({ user_email: user.email, phone: user.phone, type: 'booking_confirm', title: 'אישור שיבוץ', message: `שובצת ב${vars.resource.name}, ${hebDay(vars.date)} ${fmtDate(vars.date)}, ${fmtHour(vars.hour)}, כיתה ${vars.classN}.`, link: 'room-management' }).catch(()=>{});
       setBookingTarget(null);
     },
     onError: (e) => toast.error(e.message),
   });
 
   const releaseBooking = useMutation({
-    mutationFn: async ({ booking, reason }) => {
-      return base44.entities.RoomBooking.update(booking.id, {
-        status: 'released',
-        released_by: user.full_name,
-        release_reason: reason,
-        released_date: new Date().toISOString(),
-      });
-    },
+    mutationFn: ({ booking, reason }) => base44.firestoreRoomBookings.update(booking.id, { status:'released', released_by: user.full_name, release_reason: reason, released_date: new Date().toISOString() }),
     onSuccess: async (_, vars) => {
       qc.invalidateQueries({ queryKey: ['room-bookings-v2'] });
       toast.success('השיבוץ שוחרר');
-      await notify({
-        user_email: vars.booking.teacher_email,
-        type:       'booking_released',
-        title:      'שיבוץ בוטל על ידי המנהלת',
-        message:    `השיבוץ שלך ב${vars.booking.resource_name}, ${fmtDate(vars.booking.date)}, שעה ${vars.booking.hour_number} בוטל. סיבה: ${vars.reason}`,
-        link:       'room-management',
-      }).catch(() => {});
+      await notify({ user_email: vars.booking.teacher_email, type: 'booking_released', title: 'שיבוץ בוטל', message: `השיבוץ שלך ב${vars.booking.resource_name}, ${fmtDate(vars.booking.date)}, ${fmtHour(vars.booking.hour_number)} בוטל. סיבה: ${vars.reason}`, link: 'room-management' }).catch(()=>{});
       setReleaseTarget(null);
     },
-    onError: () => toast.error('שגיאה בשחרור'),
+    onError: () => toast.error('שגיאה'),
   });
 
-  const cancelOwnBooking = useMutation({
-    mutationFn: (booking) => base44.entities.RoomBooking.update(booking.id, { status: 'released', released_by: user.full_name, release_reason: 'ביטול עצמי', released_date: new Date().toISOString() }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['room-bookings-v2'] }); toast.success('השיבוץ בוטל'); },
-    onError: () => toast.error('שגיאה'),
+  const cancelOwn = useMutation({
+    mutationFn: (b) => base44.firestoreRoomBookings.update(b.id, { status:'released', released_by: user.full_name, release_reason:'ביטול עצמי', released_date: new Date().toISOString() }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['room-bookings-v2'] }); toast.success('השיבוץ בוטל'); setReleaseTarget(null); },
   });
 
   const saveResource = useMutation({
-    mutationFn: (data) => data.id
-      ? base44.entities.Room.update(data.id, data)
-      : base44.entities.Room.create(data),
+    mutationFn: (d) => d.id ? base44.firestoreRooms.update(d.id, d) : base44.firestoreRooms.create(d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['rooms-v2'] }); setResourceForm(null); toast.success('נשמר'); },
     onError: () => toast.error('שגיאה'),
   });
-
   const deleteResource = useMutation({
-    mutationFn: (id) => base44.entities.Room.delete(id),
+    mutationFn: (id) => base44.firestoreRooms.delete(id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['rooms-v2'] }); toast.success('נמחק'); },
   });
+  const toggleActive = (r) => base44.firestoreRooms.update(r.id, { active: !r.active }).then(() => qc.invalidateQueries({ queryKey: ['rooms-v2'] }));
 
-  const toggleActive = (res) =>
-    base44.entities.Room.update(res.id, { active: !res.active }).then(() => qc.invalidateQueries({ queryKey: ['rooms-v2'] }));
+  const canCancelOwn = (b) => new Date(b.date+'T08:00') - new Date() > CANCEL_HOURS * 3_600_000;
 
-  // ── Excel export ──────────────────────────────────────────────────────────
   function exportExcel() {
-    const rows = bookings.filter(b => b.status === 'active').map(b => ({
-      'משאב': b.resource_name, 'תאריך': b.date, 'יום': hebDay(b.date),
-      'שעה': b.hour_number, 'מורה': b.teacher_name, 'כיתה': b.class_name,
-      'מקצוע': b.subject || '', 'הערות': b.notes || '',
-    }));
-    const ws = XLSX.utils.json_to_sheet(rows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'שיבוצים');
-    XLSX.writeFile(wb, `bookings-${toISO(new Date())}.xlsx`);
-    toast.success('Excel הורד');
+    const ws = XLSX.utils.json_to_sheet(bookings.map(b => ({ 'משאב': b.resource_name, 'תאריך': b.date, 'יום': hebDay(b.date), 'שעה': fmtHour(b.hour_number), 'מורה': b.teacher_name, 'כיתה': b.class_name, 'מקצוע': b.subject||'', 'הערות': b.notes||'' })));
+    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'שיבוצים');
+    XLSX.writeFile(wb, `bookings-${toISO(new Date())}.xlsx`); toast.success('Excel הורד');
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
-  const canCancelOwn = (b) => {
-    const msLeft = new Date(b.date + 'T08:00') - new Date();
-    return msLeft > CANCEL_HOURS * 3_600_000;
-  };
+  const bookingReport = useMemo(() => {
+    const byRes = {};
+    bookings.forEach(b => {
+      if (!byRes[b.resource_name]) byRes[b.resource_name] = { name: b.resource_name, total: 0, byTeacher: {} };
+      byRes[b.resource_name].total++;
+      byRes[b.resource_name].byTeacher[b.teacher_name] = (byRes[b.resource_name].byTeacher[b.teacher_name]||0) + 1;
+    });
+    return Object.values(byRes).sort((a,b) => b.total - a.total);
+  }, [bookings]);
 
-  const inp = 'w-full px-3 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-400';
+  const teacherReport = useMemo(() => {
+    const byT = {};
+    bookings.forEach(b => {
+      if (!byT[b.teacher_name]) byT[b.teacher_name] = { name: b.teacher_name, total: 0 };
+      byT[b.teacher_name].total++;
+    });
+    return Object.values(byT).sort((a,b) => b.total - a.total);
+  }, [bookings]);
 
-  const weekLabel = `${fmtDate(weekOf)} – ${fmtDate(addDays(weekOf, 4))}`;
+  const TABS = [
+    { id: 'calendar', label: 'לוח שיבוצים',   icon: CalendarDays },
+    { id: 'mine',     label: 'שלי',            icon: BookOpen, badge: myBookings.length || null },
+    ...(isAdmin ? [{ id: 'reports', label: 'דוחות', icon: BarChart2 }] : []),
+    ...(canManage ? [{ id: 'manage', label: 'ניהול', icon: Layers }] : []),
+  ];
 
   return (
-    <div className="space-y-5" dir="rtl">
-      {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <div className="space-y-4" dir="rtl">
+
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">שיבוץ חדרים וציוד</h1>
-          <p className="text-sm text-slate-500">בחרי משאב, תאריך ושעה</p>
+          <h1 className="text-xl font-bold text-slate-800">שיבוץ חדרים וציוד</h1>
+          <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-2">
+            <span>השבוע: <strong className="text-slate-600">{weekTotal}</strong></span>
+            {todayTotal > 0 && <span className="text-blue-600 font-semibold">· היום: {todayTotal}</span>}
+          </p>
         </div>
-        {isAdmin && (
-          <button onClick={exportExcel}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-xl shadow-sm">
-            <FileSpreadsheet className="h-4 w-4" />Excel
-          </button>
+        <div className="flex items-center gap-2">
+          {isAdmin && (
+            <button onClick={exportExcel} className="flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm transition-colors">
+              <FileSpreadsheet className="h-3.5 w-3.5" /> Excel
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ── Nav bar: tabs + week nav together ── */}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex gap-1 bg-slate-100 p-1 rounded-xl">
+          {TABS.map(t => (
+            <button key={t.id} onClick={() => setTab(t.id)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-base font-semibold transition-all ${tab===t.id ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+              <t.icon className="h-5 w-5" />
+              {t.label}
+              {t.badge ? <span className="bg-blue-500 text-white text-xs font-bold px-2 rounded-full leading-none py-0.5">{t.badge}</span> : null}
+            </button>
+          ))}
+        </div>
+
+        {tab === 'calendar' && (
+          <div className="flex items-center gap-1.5">
+            <button onClick={() => setWeekOf(w => addDays(w,-7))} className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
+              <ChevronRight className="h-4 w-4 text-slate-500" />
+            </button>
+            <span className="text-xs font-semibold text-slate-600 min-w-[96px] text-center">
+              {fmtDate(weekOf)}–{fmtDate(addDays(weekOf,4))}
+            </span>
+            <button onClick={() => setWeekOf(w => addDays(w,7))} className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
+              <ChevronLeft className="h-4 w-4 text-slate-500" />
+            </button>
+            {!isThisWeek && (
+              <button onClick={() => { setWeekOf(weekStart(new Date())); setSelDay(new Date().getDay() < 5 ? new Date().getDay() : 0); }}
+                className="text-xs text-blue-600 hover:bg-blue-50 px-2 py-1 rounded-lg font-semibold transition-colors">
+                היום
+              </button>
+            )}
+          </div>
         )}
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 bg-white p-1 rounded-xl border border-slate-200 w-fit flex-wrap">
-        {[
-          { id: 'calendar', label: '📅 לוח שיבוצים' },
-          { id: 'mine',     label: '🙋 שיבוצים שלי' },
-          ...(isAdmin ? [
-            { id: 'rooms',     label: '🏫 חדרים' },
-            { id: 'equipment', label: '🔧 ציוד' },
-          ] : []),
-        ].map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${tab === t.id ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {/* ── Calendar tab ─────────────────────────────────────────────── */}
+      {/* ══════════════ CALENDAR TAB ══════════════ */}
       {tab === 'calendar' && (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-          {/* Week nav */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-            <button onClick={() => setWeekOf(w => addDays(w, -7))}
-              className="p-2 hover:bg-slate-100 rounded-lg"><ChevronRight className="h-5 w-5" /></button>
-            <span className="text-sm font-bold text-slate-700">{weekLabel}</span>
-            <button onClick={() => setWeekOf(w => addDays(w, 7))}
-              className="p-2 hover:bg-slate-100 rounded-lg"><ChevronLeft className="h-5 w-5" /></button>
-          </div>
+        <div className="space-y-3">
 
-          {/* Day tabs */}
-          <div className="flex border-b border-slate-100">
-            {DAYS.map((d, i) => {
-              const date = toISO(addDays(weekOf, i));
-              const hasBooking = bookings.some(b => b.date === date && b.status === 'active');
+          {/* Day selector */}
+          <div className="grid grid-cols-5 gap-2">
+            {DAYS_SHORT.map((d, i) => {
+              const date  = toISO(addDays(weekOf, i));
+              const count = bookings.filter(b => b.date === date).length;
+              const isToday = date === todayISO;
               return (
-                <button key={i} onClick={() => setSelectedDay(i)}
-                  className={`flex-1 py-3 text-sm font-bold transition-colors relative ${
-                    selectedDay === i ? 'bg-blue-600 text-white' : 'text-slate-500 hover:bg-slate-50'
+                <button key={i} onClick={() => setSelDay(i)}
+                  className={`py-3 px-1 rounded-xl text-center transition-all relative ${
+                    selDay===i
+                      ? 'bg-blue-600 text-white shadow-md shadow-blue-200'
+                      : isToday
+                      ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                      : 'bg-white text-slate-600 border border-slate-200 hover:border-blue-200 hover:text-blue-600'
                   }`}>
-                  <span>{d}</span>
-                  <br />
-                  <span className="text-[10px] font-normal">{fmtDate(date)}</span>
-                  {hasBooking && selectedDay !== i && (
-                    <span className="absolute top-1.5 left-1.5 w-1.5 h-1.5 bg-blue-400 rounded-full" />
+                  <p className="text-base font-bold">{d}</p>
+                  <p className={`text-xs mt-0.5 ${selDay===i ? 'text-blue-200' : 'text-slate-400'}`}>{fmtDate(date)}</p>
+                  {count > 0 && (
+                    <span className={`absolute -top-1.5 -left-1.5 min-w-[18px] h-[18px] text-[10px] font-bold px-1 rounded-full flex items-center justify-center ${selDay===i ? 'bg-white text-blue-600' : 'bg-blue-100 text-blue-600'}`}>
+                      {count}
+                    </span>
                   )}
                 </button>
               );
             })}
           </div>
 
-          {/* Grid */}
-          {allResources.length === 0 ? (
-            <div className="py-16 text-center text-slate-400 text-sm">
-              {isAdmin ? 'הוסיפי חדרים וציוד בטאבים למעלה' : 'אין משאבים מוגדרים עדיין'}
+          {/* Filter chips */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs text-slate-400 font-medium">סנן:</span>
+            {[['all','הכל'],['room','🏫 חדרים'],['equipment','🔧 ציוד']].map(([v,l]) => (
+              <button key={v} onClick={() => setFilterType(v)}
+                className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all ${filterType===v ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-500 border-slate-200 hover:border-blue-300 hover:text-blue-600'}`}>
+                {l}
+              </button>
+            ))}
+          </div>
+
+          {/* Quick hour search */}
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-bold text-slate-700">מה פנוי בשעה?</p>
+              {quickHour !== null && (
+                <button onClick={() => setQuickHour(null)} className="text-xs text-slate-400 hover:text-slate-600 flex items-center gap-1">
+                  <X className="h-3.5 w-3.5" /> הצג הכל
+                </button>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {HOURS.map(h => {
+                const freeCount = visibleRes.filter(r => !dayBookings[`${r.id}_${h}`]).length;
+                return (
+                  <button key={h} onClick={() => setQuickHour(quickHour === h ? null : h)}
+                    className={`flex flex-col items-center px-3 py-2 rounded-xl border-2 transition-all min-w-[64px] ${
+                      quickHour === h
+                        ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-200'
+                        : freeCount === 0
+                        ? 'bg-slate-50 border-slate-100 text-slate-300'
+                        : 'bg-white border-slate-200 text-slate-700 hover:border-blue-300 hover:text-blue-600'
+                    }`}>
+                    <span className="text-sm font-bold">{fmtPeriod(h)}</span>
+                    <span className={`text-[11px] mt-0.5 ${quickHour===h ? 'text-blue-200' : freeCount===0 ? 'text-slate-300' : 'text-emerald-600 font-semibold'}`}>
+                      {freeCount === 0 ? 'תפוס' : `${freeCount} פנויים`}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            {quickHour !== null && (
+              <p className="mt-3 text-sm text-slate-500">
+                חדרים פנויים ב<strong className="text-blue-600">{fmtPeriod(quickHour)}</strong>:
+              </p>
+            )}
+          </div>
+
+          {/* Resource cards */}
+          {quickHour !== null && visibleRes.filter(r => !dayBookings[`${r.id}_${quickHour}`]).length === 0 && (
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm py-10 text-center">
+              <p className="text-slate-400 text-sm">אין משאבים פנויים ב{fmtPeriod(quickHour)}</p>
+            </div>
+          )}
+          {visibleRes.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm py-16 text-center">
+              <p className="text-slate-400 text-sm">
+                {activeRes.length === 0
+                  ? (canManage ? <>עברי לטאב <strong>ניהול</strong> להוספת חדרים וציוד</> : 'אין משאבים מוגדרים')
+                  : 'אין משאבים בסינון זה'}
+              </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100">
-                    <th className="text-right px-4 py-3 text-xs font-bold text-slate-500 min-w-[130px]">משאב</th>
-                    {HOURS.map(h => (
-                      <th key={h} className="px-2 py-3 text-xs font-bold text-slate-500 text-center min-w-[80px]">שעה {h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {allResources.map(res => (
-                    <tr key={res.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
-                      <td className="px-4 py-2">
-                        <div className="flex items-center gap-2">
-                          <span>{RESOURCE_EMOJI[res.resource_type] || '🏫'}</span>
-                          <div>
-                            <p className="font-semibold text-slate-800 text-xs">{res.name}</p>
-                            {res.capacity && <p className="text-[10px] text-slate-400">עד {res.capacity}</p>}
-                            {res.quantity > 1 && <p className="text-[10px] text-slate-400">{res.quantity} יחידות</p>}
-                          </div>
-                        </div>
-                      </td>
-                      {HOURS.map(h => {
-                        const booking = dayBookings[`${res.id}_${h}`];
-                        const isOwn   = booking?.teacher_email === user?.email;
-                        return (
-                          <td key={h} className="px-1 py-1.5 text-center">
-                            {booking ? (
-                              <button
-                                onClick={() => isAdmin ? setReleaseTarget(booking) : (isOwn ? setReleaseTarget(booking) : null)}
-                                className={`w-full rounded-lg px-1 py-1.5 text-[11px] font-semibold leading-tight transition-colors ${
-                                  isOwn
-                                    ? 'bg-blue-100 text-blue-800 hover:bg-blue-200'
-                                    : isAdmin
-                                    ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                                    : 'bg-red-100 text-red-700 cursor-default'
-                                }`}>
-                                {booking.teacher_name.split(' ')[0]}
-                                <br />
-                                <span className="text-[10px] opacity-75">{booking.class_name}</span>
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => setBookingTarget({ resource: res, date: selectedDate, hour: h })}
-                                className="w-full h-10 rounded-lg border border-dashed border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-colors text-slate-300 hover:text-blue-400 text-lg">
-                                +
-                              </button>
-                            )}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="space-y-2.5">
+              {visibleRes
+                .filter(r => quickHour === null || !dayBookings[`${r.id}_${quickHour}`])
+                .map(res => (
+                <ResourceCard
+                  key={res.id}
+                  res={res}
+                  hours={quickHour !== null ? [quickHour] : HOURS}
+                  dayBookings={dayBookings}
+                  userEmail={user?.email}
+                  isAdmin={isAdmin}
+                  selDate={selDate}
+                  onBook={(hour) => setBookingTarget({ resource: res, date: selDate, hour })}
+                  onRelease={(b) => setReleaseTarget(b)}
+                />
+              ))}
             </div>
           )}
 
           {/* Legend */}
-          <div className="px-4 py-3 border-t border-slate-100 flex items-center gap-4 text-xs text-slate-400">
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-blue-100 inline-block" />השיבוץ שלי</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-100 inline-block" />תפוס</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded border border-dashed border-slate-200 inline-block" />פנוי — לחצי לשיבוץ</span>
+          <div className="flex items-center gap-4 flex-wrap px-1">
+            {[['bg-blue-500','text-white','שיבוץ שלי'],['bg-rose-50 border border-rose-200','text-rose-700','תפוס'],['bg-white border-2 border-dashed border-slate-200','text-slate-400','פנוי']].map(([bg,tc,label]) => (
+              <span key={label} className="flex items-center gap-1.5 text-[11px] text-slate-400">
+                <span className={`w-5 h-5 rounded-lg ${bg} ${tc} flex items-center justify-center text-[8px] font-bold`}>
+                  {label === 'פנוי' ? '+' : '✓'}
+                </span>
+                {label}
+              </span>
+            ))}
           </div>
         </div>
       )}
 
-      {/* ── My bookings tab ───────────────────────────────────────────── */}
+      {/* ══════════════ MY BOOKINGS TAB ══════════════ */}
       {tab === 'mine' && (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm">
-          <div className="px-5 py-4 border-b border-slate-100">
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
             <h2 className="font-bold text-slate-800">השיבוצים שלי</h2>
+            <span className="text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">{myBookings.length} פעילים</span>
           </div>
-          <div className="p-5 space-y-2">
-            {myBookings.length === 0 && <p className="text-slate-400 text-sm text-center py-8">אין שיבוצים פעילים</p>}
-            {myBookings.map(b => {
-              const cancellable = canCancelOwn(b);
-              return (
-                <div key={b.id} className="flex items-center justify-between bg-slate-50 rounded-xl px-4 py-3 border border-slate-100">
-                  <div>
-                    <p className="font-semibold text-slate-800 text-sm">{b.resource_name}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      {hebDay(b.date)} {fmtDate(b.date)} · שעה {b.hour_number} · כיתה {b.class_name}
-                      {b.subject ? ` · ${b.subject}` : ''}
-                    </p>
+          {myBookings.length === 0 ? (
+            <p className="text-slate-400 text-sm text-center py-14">אין שיבוצים פעילים</p>
+          ) : (
+            <div className="divide-y divide-slate-50">
+              {myBookings.map(b => {
+                const cancellable = canCancelOwn(b);
+                const isToday = b.date === todayISO;
+                return (
+                  <div key={b.id} className="flex items-center gap-3 px-4 py-3.5 hover:bg-slate-50 transition-colors">
+                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${isToday ? 'bg-blue-100' : 'bg-slate-100'}`}>
+                      {EMOJI[b.resource_type] || '🏫'}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-slate-800 text-sm truncate">{b.resource_name}</p>
+                      <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-0.5 flex-wrap">
+                        {isToday
+                          ? <span className="text-blue-600 font-semibold bg-blue-50 px-1.5 py-0.5 rounded-md">היום</span>
+                          : <span>{hebDay(b.date)} {fmtDate(b.date)}</span>}
+                        <Clock className="h-3 w-3 text-slate-300 flex-shrink-0" />
+                        <span className="font-medium text-slate-500">{fmtPeriod(b.hour_number)}</span>
+                        <span>·</span>
+                        <span>כיתה {b.class_name}</span>
+                        {b.subject && <><span>·</span><span>{b.subject}</span></>}
+                      </div>
+                    </div>
+                    {cancellable ? (
+                      <button onClick={() => cancelOwn.mutate(b)}
+                        className="flex-shrink-0 text-xs text-red-500 hover:bg-red-50 px-3 py-1.5 rounded-lg font-semibold transition-colors border border-transparent hover:border-red-100">
+                        ביטול
+                      </button>
+                    ) : (
+                      <span className="flex-shrink-0 text-[10px] text-slate-300 bg-slate-50 px-2 py-1 rounded-lg">נעול</span>
+                    )}
                   </div>
-                  {cancellable ? (
-                    <button onClick={() => cancelOwnBooking.mutate(b)}
-                      className="text-xs text-red-500 hover:bg-red-50 px-3 py-1.5 rounded-lg font-medium">
-                      בטלי
-                    </button>
-                  ) : (
-                    <span className="text-[10px] text-slate-300">מתחת ל-{CANCEL_HOURS}ש׳</span>
-                  )}
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ══════════════ MANAGE TAB ══════════════ */}
+      {tab === 'manage' && canManage && (
+        <div className="space-y-4">
+          {[{ type:'room', list: rooms, label:'חדר', plural:'חדרים', emoji:'🏫' },
+            { type:'equipment', list: equipment, label:'ציוד', plural:'ציוד', emoji:'🔧' }
+          ].map(({ type, list, label, plural, emoji }) => (
+            <div key={type} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+              <div className="px-4 py-3.5 border-b border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">{emoji}</span>
+                  <h2 className="font-bold text-slate-800">{plural}</h2>
+                  <span className="text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">{list.length}</span>
                 </div>
-              );
-            })}
+                <button
+                  onClick={() => setResourceForm(resourceForm?.resource_type === type && !resourceForm?.id ? null : { name:'', resource_type: type, capacity:'', quantity:1, notes:'', active:true })}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-colors">
+                  <Plus className="h-3.5 w-3.5" /> הוסף {label}
+                </button>
+              </div>
+
+              {resourceForm?.resource_type === type && (
+                <div className="mx-4 my-3 bg-blue-50 rounded-xl border border-blue-100 p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-sm font-bold text-slate-700">{resourceForm.id ? 'עריכה' : `${label} חדש`}</p>
+                    <button onClick={() => setResourceForm(null)}><X className="h-4 w-4 text-slate-400" /></button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <div className="col-span-2">
+                      <input
+                        className="w-full px-3 py-2.5 border border-slate-200 bg-white rounded-xl text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50"
+                        value={resourceForm.name||''} onChange={e => setResourceForm(f=>({...f, name:e.target.value}))}
+                        placeholder={type==='equipment' ? 'מקרן, מחשב נייד...' : 'ספרייה, חדר אמנות...'}
+                        autoFocus />
+                    </div>
+                    {type==='room' ? (
+                      <input type="number" placeholder="קיבולת (תלמידים)" className="w-full px-3 py-2.5 border border-slate-200 bg-white rounded-xl text-sm outline-none focus:border-blue-400"
+                        value={resourceForm.capacity||''} onChange={e => setResourceForm(f=>({...f, capacity:e.target.value}))} />
+                    ) : (
+                      <input type="number" min="1" placeholder="כמות יחידות" className="w-full px-3 py-2.5 border border-slate-200 bg-white rounded-xl text-sm outline-none focus:border-blue-400"
+                        value={resourceForm.quantity||1} onChange={e => setResourceForm(f=>({...f, quantity:parseInt(e.target.value)||1}))} />
+                    )}
+                    <input className="w-full px-3 py-2.5 border border-slate-200 bg-white rounded-xl text-sm outline-none focus:border-blue-400"
+                      value={resourceForm.notes||''} onChange={e => setResourceForm(f=>({...f, notes:e.target.value}))}
+                      placeholder="הערות..." />
+                  </div>
+                  <button
+                    onClick={() => { if (!resourceForm.name?.trim()) return; saveResource.mutate({ ...resourceForm, resource_type: type }); }}
+                    disabled={saveResource.isPending || !resourceForm.name?.trim()}
+                    className="mt-3 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm disabled:opacity-50 transition-colors">
+                    {saveResource.isPending ? 'שומר...' : 'שמור'}
+                  </button>
+                </div>
+              )}
+
+              <div className="divide-y divide-slate-50">
+                {list.length === 0 && (
+                  <p className="text-center text-slate-400 text-sm py-10">לחצי "הוסף {label}" למעלה</p>
+                )}
+                {list.map(r => (
+                  <div key={r.id} className={`flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors ${r.active===false ? 'opacity-40' : ''}`}>
+                    <span className="text-xl flex-shrink-0">{emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-slate-800 text-sm truncate">{r.name}</p>
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        {r.capacity ? `עד ${r.capacity} תלמידים` : ''}
+                        {r.quantity > 1 ? ` ${r.quantity} יחידות` : ''}
+                        {r.notes ? ` · ${r.notes}` : ''}
+                        {r.active===false ? ' · לא פעיל' : ''}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-0.5 flex-shrink-0">
+                      <button onClick={() => toggleActive(r)} title={r.active===false ? 'הפעל' : 'השבת'}
+                        className="p-2 rounded-xl hover:bg-slate-100 transition-colors">
+                        {r.active===false
+                          ? <ToggleLeft className="h-5 w-5 text-slate-300" />
+                          : <ToggleRight className="h-5 w-5 text-green-500" />}
+                      </button>
+                      <button onClick={() => setResourceForm({...r})} className="p-2 text-blue-400 hover:bg-blue-50 rounded-xl transition-colors">
+                        <Edit2 className="h-4 w-4" />
+                      </button>
+                      <button onClick={() => { if (confirm('למחוק?')) deleteResource.mutate(r.id); }} className="p-2 text-red-400 hover:bg-red-50 rounded-xl transition-colors">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ══════════════ REPORTS TAB ══════════════ */}
+      {tab === 'reports' && isAdmin && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* By resource */}
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+              <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h2 className="font-bold text-slate-800">ניצול לפי משאב</h2>
+                <span className="text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">{bookings.length} שיבוצים</span>
+              </div>
+              {bookingReport.length === 0
+                ? <p className="text-center text-slate-400 text-sm py-12">אין נתונים</p>
+                : (
+                  <div className="p-4 space-y-3">
+                    {bookingReport.map(r => {
+                      const maxTotal = Math.max(...bookingReport.map(x=>x.total), 1);
+                      return (
+                        <div key={r.name}>
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="text-sm font-semibold text-slate-700 truncate">{r.name}</p>
+                            <span className="text-xs font-bold text-blue-700 flex-shrink-0 mr-2">{r.total}</span>
+                          </div>
+                          <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div className="h-full bg-blue-500 rounded-full" style={{ width: `${Math.round((r.total/maxTotal)*100)}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+            </div>
+
+            {/* By teacher */}
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+              <div className="px-5 py-4 border-b border-slate-100">
+                <h2 className="font-bold text-slate-800">שיבוצים לפי מורה</h2>
+              </div>
+              {teacherReport.length === 0
+                ? <p className="text-center text-slate-400 text-sm py-12">אין נתונים</p>
+                : (
+                  <div className="divide-y divide-slate-50">
+                    {teacherReport.map((t,i) => (
+                      <div key={t.name} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors">
+                        <span className="text-xs font-bold text-slate-400 w-5 flex-shrink-0">{i+1}</span>
+                        <p className="flex-1 text-sm font-semibold text-slate-800 truncate">{t.name}</p>
+                        <span className="text-xs font-bold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full">{t.total}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+            </div>
+          </div>
+
+          {/* Excel export */}
+          <div className="flex justify-end">
+            <button onClick={exportExcel}
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-sm transition-colors">
+              <FileSpreadsheet className="h-4 w-4" /> ייצוא Excel מלא
+            </button>
           </div>
         </div>
       )}
 
-      {/* ── Resources management (admin) ──────────────────────────────── */}
-      {(tab === 'rooms' || tab === 'equipment') && isAdmin && (
-        <ResourceManager
-          resources={resources.filter(r => tab === 'equipment' ? r.resource_type === 'equipment' : r.resource_type !== 'equipment')}
-          type={tab === 'equipment' ? 'equipment' : 'room'}
-          form={resourceForm}
-          setForm={setResourceForm}
-          onSave={(data) => saveResource.mutate({ ...data, resource_type: tab === 'equipment' ? 'equipment' : 'room' })}
-          onDelete={(id) => { if (confirm('למחוק?')) deleteResource.mutate(id); }}
-          onToggle={toggleActive}
-          saving={saveResource.isPending}
-        />
-      )}
-
-      {/* ── Booking modal ─────────────────────────────────────────────── */}
       {bookingTarget && (
-        <BookingModal
-          target={bookingTarget}
-          onClose={() => setBookingTarget(null)}
-          onSubmit={(classN, subject, notes) =>
-            createBooking.mutate({ ...bookingTarget, classN, subject, notes })}
-          pending={createBooking.isPending}
-        />
+        <BookingModal target={bookingTarget} onClose={() => setBookingTarget(null)}
+          onSubmit={(c,s,n) => createBooking.mutate({...bookingTarget, classN:c, subject:s, notes:n})}
+          pending={createBooking.isPending} />
       )}
 
-      {/* ── Release modal ─────────────────────────────────────────────── */}
       {releaseTarget && (
-        <ReleaseModal
-          booking={releaseTarget}
-          isAdmin={isAdmin}
+        <ReleaseModal booking={releaseTarget} isAdmin={isAdmin}
           isOwn={releaseTarget.teacher_email === user?.email}
           canCancel={canCancelOwn(releaseTarget)}
           onClose={() => setReleaseTarget(null)}
           onRelease={(reason) => releaseBooking.mutate({ booking: releaseTarget, reason })}
-          onCancelOwn={() => { cancelOwnBooking.mutate(releaseTarget); setReleaseTarget(null); }}
-          pending={releaseBooking.isPending || cancelOwnBooking.isPending}
-        />
+          onCancelOwn={() => cancelOwn.mutate(releaseTarget)}
+          pending={releaseBooking.isPending || cancelOwn.isPending} />
       )}
     </div>
   );
 }
 
-// ── Resource manager component ─────────────────────────────────────────────────
-function ResourceManager({ resources, type, form, setForm, onSave, onDelete, onToggle, saving }) {
-  const label = type === 'equipment' ? 'ציוד' : 'חדר';
-  const empty = { ...{ name: '', capacity: '', quantity: 1, notes: '', active: true }, resource_type: type };
-  const inp = 'w-full px-3 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-400';
-
+function ResourceCard({ res, hours, dayBookings, userEmail, isAdmin, selDate, onBook, onRelease }) {
+  const freeCount = hours.filter(h => !dayBookings[`${res.id}_${h}`]).length;
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="font-bold text-slate-800">ניהול {label === 'חדר' ? 'חדרים' : 'ציוד'}</h2>
-        <button onClick={() => setForm(form ? null : { ...empty })}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl">
-          <Plus className="h-4 w-4" />{label} חדש/{type === 'equipment' ? 'ה' : ''}
-        </button>
+    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="flex items-center gap-3 px-4 py-3.5 border-b border-slate-50">
+        <span className="text-2xl leading-none">{EMOJI[res.resource_type] || '🏫'}</span>
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-slate-800 text-base">{res.name}</p>
+          {(res.capacity || res.notes) && (
+            <p className="text-xs text-slate-400 truncate mt-0.5">
+              {res.capacity ? `עד ${res.capacity} תלמידים` : ''}{res.notes ? ` · ${res.notes}` : ''}
+            </p>
+          )}
+        </div>
+        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${freeCount === 0 ? 'bg-rose-50 text-rose-500' : 'bg-emerald-50 text-emerald-600'}`}>
+          {freeCount === 0 ? 'תפוס' : `${freeCount} פנויות`}
+        </span>
       </div>
+      <div className="px-3 py-3 flex flex-wrap gap-2">
+        {hours.map(h => {
+          const b     = dayBookings[`${res.id}_${h}`];
+          const isOwn = b?.teacher_email === userEmail;
+          if (b) {
+            return (
+              <button key={h}
+                onClick={() => (isAdmin || isOwn) ? onRelease(b) : null}
+                title={`${b.teacher_name} · כיתה ${b.class_name}`}
+                className={`flex flex-col items-center justify-center rounded-xl transition-all px-3 py-3 min-w-[72px] ${
+                  isOwn
+                    ? 'bg-blue-500 hover:bg-blue-600 text-white shadow-sm shadow-blue-200 cursor-pointer'
+                    : isAdmin
+                    ? 'bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 cursor-pointer'
+                    : 'bg-slate-50 text-slate-400 border border-slate-100 cursor-default'
+                }`}>
+                <span className="text-sm font-bold leading-none">{fmtPeriod(h)}</span>
+                <span className="text-xs mt-1 leading-none opacity-80 truncate max-w-[64px]">
+                  {isOwn ? `כ׳${b.class_name}` : b.teacher_name.split(' ')[0]}
+                </span>
+              </button>
+            );
+          }
+          return (
+            <button key={h}
+              onClick={() => onBook(h)}
+              className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 hover:border-blue-400 hover:bg-blue-50 transition-all px-3 py-3 min-w-[72px] group">
+              <span className="text-sm font-bold text-slate-300 group-hover:text-blue-500 leading-none transition-colors">{fmtPeriod(h)}</span>
+              <Plus className="h-4 w-4 text-slate-200 group-hover:text-blue-400 mt-1 transition-colors" />
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
-      {form && (
-        <div className="bg-blue-50 rounded-2xl border border-blue-200 p-5">
-          <div className="flex justify-between mb-4">
-            <h3 className="font-bold text-slate-700">{form.id ? 'עריכה' : `${label} חדש`}</h3>
-            <button onClick={() => setForm(null)}><X className="h-4 w-4 text-slate-400" /></button>
+function BookingModal({ target, onClose, onSubmit, pending }) {
+  const [classN,   setClassN]   = useState('');
+  const [subject,  setSubject]  = useState('');
+  const [notes,    setNotes]    = useState('');
+  const inp = 'w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 bg-white';
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm" dir="rtl">
+        <div className="bg-gradient-to-l from-blue-600 to-blue-500 px-5 py-4 rounded-t-2xl flex items-start justify-between">
+          <div>
+            <p className="text-blue-200 text-xs font-medium mb-0.5">{EMOJI[target.resource.resource_type] || '🏫'} {TYPE_LABEL[target.resource.resource_type] || 'חדר'}</p>
+            <h3 className="font-bold text-white text-lg leading-tight">{target.resource.name}</h3>
+            <p className="text-blue-100 text-sm mt-1 flex items-center gap-1">
+              <Clock className="h-3.5 w-3.5" />
+              {hebDay(target.date)} {fmtDate(target.date)} · {fmtPeriod(target.hour)}
+            </p>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="col-span-2">
-              <label className="text-xs font-bold text-slate-500 block mb-1">שם *</label>
-              <input className={inp} value={form.name || ''} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder={type === 'equipment' ? 'עגלת מחשבים ניידים' : 'חדר ספורט'} />
-            </div>
-            {type === 'room' && (
-              <div>
-                <label className="text-xs font-bold text-slate-500 block mb-1">קיבולת</label>
-                <input type="number" className={inp} value={form.capacity || ''} onChange={e => setForm(f => ({ ...f, capacity: e.target.value }))} placeholder="30" />
-              </div>
-            )}
-            {type === 'equipment' && (
-              <div>
-                <label className="text-xs font-bold text-slate-500 block mb-1">כמות יחידות</label>
-                <input type="number" min="1" className={inp} value={form.quantity || 1} onChange={e => setForm(f => ({ ...f, quantity: parseInt(e.target.value) || 1 }))} />
-              </div>
-            )}
-            <div className={type === 'room' ? '' : 'col-span-1'}>
-              <label className="text-xs font-bold text-slate-500 block mb-1">הערות</label>
-              <input className={inp} value={form.notes || ''} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} placeholder="מיקום, הוראות שימוש..." />
-            </div>
-          </div>
-          <button onClick={() => { if (!form.name?.trim()) { return; } onSave(form); }} disabled={saving || !form.name?.trim()}
-            className="mt-4 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl disabled:opacity-50 text-sm">
-            {saving ? 'שומר...' : 'שמור'}
+          <button onClick={onClose} className="p-1.5 hover:bg-white/20 rounded-xl transition-colors">
+            <X className="h-5 w-5 text-white" />
           </button>
         </div>
-      )}
-
-      <div className="space-y-2">
-        {resources.length === 0 && <p className="text-slate-400 text-sm text-center py-8">אין {label === 'חדר' ? 'חדרים' : 'ציוד'} — הוסיפי למעלה</p>}
-        {resources.map(r => (
-          <div key={r.id} className={`flex items-center justify-between bg-white rounded-xl border px-4 py-3 ${r.active === false ? 'opacity-50 border-slate-100' : 'border-slate-100 shadow-sm'}`}>
-            <div>
-              <p className="font-semibold text-slate-800 text-sm">{RESOURCE_EMOJI[r.resource_type]} {r.name}</p>
-              <p className="text-xs text-slate-400">
-                {r.capacity ? `קיבולת ${r.capacity}` : ''}
-                {r.quantity > 1 ? ` · ${r.quantity} יחידות` : ''}
-                {r.notes ? ` · ${r.notes}` : ''}
-              </p>
-            </div>
-            <div className="flex items-center gap-1">
-              <button onClick={() => onToggle(r)} title={r.active === false ? 'הפעל' : 'השבת'}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600">
-                {r.active === false ? <ToggleLeft className="h-5 w-5" /> : <ToggleRight className="h-5 w-5 text-green-500" />}
-              </button>
-              <button onClick={() => setForm({ ...r })} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg">
-                <Edit2 className="h-4 w-4" />
-              </button>
-              <button onClick={() => onDelete(r.id)} className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg">
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ── Booking modal ──────────────────────────────────────────────────────────────
-function BookingModal({ target, onClose, onSubmit, pending }) {
-  const [classN, setClassN]   = useState('');
-  const [subject, setSubject] = useState('');
-  const [notes, setNotes]     = useState('');
-  const inp = 'w-full px-3 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-400';
-
-  return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6" dir="rtl">
-        <div className="flex justify-between items-center mb-4">
+        <div className="p-5 space-y-3">
           <div>
-            <h3 className="font-bold text-slate-800">שיבוץ {target.resource.name}</h3>
-            <p className="text-xs text-slate-400 mt-0.5">{hebDay(target.date)} {fmtDate(target.date)} · שעה {target.hour}</p>
-          </div>
-          <button onClick={onClose}><X className="h-5 w-5 text-slate-400" /></button>
-        </div>
-        <div className="space-y-3">
-          <div>
-            <label className="text-xs font-bold text-slate-500 block mb-1">כיתה *</label>
+            <label className="text-xs font-bold text-slate-500 block mb-1.5">כיתה <span className="text-red-400">*</span></label>
             <input className={inp} value={classN} onChange={e => setClassN(e.target.value)} placeholder="ח׳2" autoFocus />
           </div>
           <div>
-            <label className="text-xs font-bold text-slate-500 block mb-1">מקצוע / נושא</label>
+            <label className="text-xs font-bold text-slate-500 block mb-1.5">מקצוע / נושא</label>
             <input className={inp} value={subject} onChange={e => setSubject(e.target.value)} placeholder="מתמטיקה" />
           </div>
           <div>
-            <label className="text-xs font-bold text-slate-500 block mb-1">הערות</label>
+            <label className="text-xs font-bold text-slate-500 block mb-1.5">הערות</label>
             <input className={inp} value={notes} onChange={e => setNotes(e.target.value)} placeholder="הוראות מיוחדות..." />
           </div>
-          <button onClick={() => { if (!classN.trim()) { return; } onSubmit(classN, subject, notes); }}
+          <button onClick={() => { if (!classN.trim()) return; onSubmit(classN, subject, notes); }}
             disabled={pending || !classN.trim()}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl disabled:opacity-50 text-sm mt-2">
-            {pending ? 'שומר...' : 'אשרי שיבוץ'}
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold rounded-xl text-sm transition-colors shadow-sm shadow-blue-200 mt-2">
+            {pending ? 'שומר...' : '✓  אשרי שיבוץ'}
           </button>
         </div>
       </div>
@@ -525,55 +654,54 @@ function BookingModal({ target, onClose, onSubmit, pending }) {
   );
 }
 
-// ── Release modal ──────────────────────────────────────────────────────────────
 function ReleaseModal({ booking: b, isAdmin, isOwn, canCancel, onClose, onRelease, onCancelOwn, pending }) {
   const [reason, setReason] = useState('');
-
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6" dir="rtl">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-slate-800">פרטי שיבוץ</h3>
-          <button onClick={onClose}><X className="h-5 w-5 text-slate-400" /></button>
-        </div>
-        <div className="bg-slate-50 rounded-xl p-4 space-y-1.5 text-sm mb-4">
-          <p><span className="text-slate-500">משאב:</span> <span className="font-semibold">{b.resource_name}</span></p>
-          <p><span className="text-slate-500">תאריך:</span> {hebDay(b.date)} {fmtDate(b.date)}, שעה {b.hour_number}</p>
-          <p><span className="text-slate-500">מורה:</span> {b.teacher_name}</p>
-          <p><span className="text-slate-500">כיתה:</span> {b.class_name}</p>
-          {b.subject && <p><span className="text-slate-500">מקצוע:</span> {b.subject}</p>}
-          {b.notes && <p><span className="text-slate-500">הערות:</span> {b.notes}</p>}
-        </div>
-
-        {isAdmin && (
-          <div className="space-y-3">
-            <div>
-              <label className="text-xs font-bold text-red-500 block mb-1">סיבת שחרור *</label>
-              <input
-                className="w-full px-3 py-2 border border-red-200 rounded-lg text-sm outline-none focus:border-red-400"
-                value={reason} onChange={e => setReason(e.target.value)}
-                placeholder="מורה בחופש, טעות בשיבוץ..." />
-            </div>
-            <button onClick={() => { if (!reason.trim()) return; onRelease(reason); }}
-              disabled={pending || !reason.trim()}
-              className="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl disabled:opacity-50 text-sm">
-              {pending ? 'משחרר...' : 'שחרר משבצת'}
-            </button>
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm" dir="rtl">
+        <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <h3 className="font-bold text-slate-800">פרטי שיבוץ</h3>
+            <p className="text-xs text-slate-400 mt-0.5">{b.resource_name}</p>
           </div>
-        )}
+          <button onClick={onClose} className="p-1.5 hover:bg-slate-100 rounded-xl"><X className="h-4 w-4 text-slate-400" /></button>
+        </div>
+        <div className="p-5 space-y-4">
+          <div className="bg-slate-50 rounded-xl p-4 space-y-2.5">
+            {[['📍','משאב',b.resource_name],['📅','תאריך',`${hebDay(b.date)} ${fmtDate(b.date)}`],['⏰','שעה',fmtPeriod(b.hour_number)],['👩‍🏫','מורה',b.teacher_name],['🎓','כיתה',b.class_name + (b.subject ? ` · ${b.subject}` : '')]].map(([em,lbl,val]) => (
+              <div key={lbl} className="flex items-start gap-2 text-sm">
+                <span>{em}</span>
+                <span className="text-slate-400 w-14 flex-shrink-0 text-xs pt-0.5">{lbl}</span>
+                <span className="font-semibold text-slate-700 text-xs">{val}</span>
+              </div>
+            ))}
+          </div>
 
-        {isOwn && !isAdmin && (
-          canCancel
-            ? <button onClick={onCancelOwn} disabled={pending}
-                className="w-full py-2.5 bg-red-100 hover:bg-red-200 text-red-700 font-bold rounded-xl text-sm disabled:opacity-50">
-                {pending ? 'מבטל...' : 'בטלי שיבוץ'}
+          {isAdmin && (
+            <div className="space-y-2">
+              <input
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-red-400 focus:ring-2 focus:ring-red-50 bg-white"
+                value={reason} onChange={e => setReason(e.target.value)}
+                placeholder="סיבת שחרור (חובה)..." autoFocus />
+              <button onClick={() => { if (!reason.trim()) return; onRelease(reason); }}
+                disabled={pending || !reason.trim()}
+                className="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl disabled:opacity-50 text-sm transition-colors">
+                {pending ? 'משחרר...' : 'שחרר משבצת'}
               </button>
-            : <p className="text-xs text-center text-slate-400">לא ניתן לבטל — פחות מ-{CANCEL_HOURS} שעות לפני</p>
-        )}
-
-        {!isOwn && !isAdmin && (
-          <p className="text-xs text-center text-slate-400">רק המנהלת יכולה לשחרר משבצת זו</p>
-        )}
+            </div>
+          )}
+          {isOwn && !isAdmin && (
+            canCancel
+              ? <button onClick={onCancelOwn} disabled={pending}
+                  className="w-full py-2.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-xl text-sm disabled:opacity-50 border border-red-100 transition-colors">
+                  {pending ? 'מבטל...' : 'בטלי שיבוץ'}
+                </button>
+              : <p className="text-xs text-center text-slate-400 py-2">לא ניתן לבטל — פחות מ-{CANCEL_HOURS} שעות לפני השיבוץ</p>
+          )}
+          {!isOwn && !isAdmin && (
+            <p className="text-xs text-center text-slate-400 py-2">רק המנהלת יכולה לשחרר משבצת זו</p>
+          )}
+        </div>
       </div>
     </div>
   );
