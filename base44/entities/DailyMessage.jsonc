@@ -1,0 +1,22 @@
+{
+  "name": "DailyMessage",
+  "type": "object",
+  "properties": {
+    "content": {
+      "type": "string",
+      "description": "\u05ea\u05d5\u05db\u05df \u05d4\u05d4\u05d5\u05d3\u05e2\u05d4"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "\u05d4\u05d0\u05dd \u05e4\u05e2\u05d9\u05dc"
+    },
+    "created_by_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05d9\u05d5\u05e6\u05e8"
+    }
+  },
+  "required": [
+    "content"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "name": "DutyAssignment",
+  "type": "object",
+  "properties": {
+    "staff_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05de\u05d5\u05e8\u05d4/\u05e1\u05d9\u05d9\u05e2\u05ea"
+    },
+    "staff_email": {
+      "type": "string",
+      "description": "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc"
+    },
+    "day": {
+      "type": "number",
+      "description": "\u05d9\u05d5\u05dd \u05d1\u05d7\u05d5\u05d3\u05e9"
+    },
+    "duty_type": {
+      "type": "string",
+      "description": "\u05e1\u05d5\u05d2 \u05ea\u05d5\u05e8\u05e0\u05d5\u05ea"
+    },
+    "time": {
+      "type": "string",
+      "description": "\u05e9\u05e2\u05d4"
+    },
+    "month": {
+      "type": "number",
+      "description": "\u05d7\u05d5\u05d3\u05e9"
+    },
+    "year": {
+      "type": "number",
+      "description": "\u05e9\u05e0\u05d4"
+    }
+  },
+  "required": [
+    "staff_name",
+    "staff_email",
+    "day",
+    "duty_type",
+    "time"
+  ]
+}

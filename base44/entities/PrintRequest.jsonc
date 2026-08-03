@@ -1,0 +1,96 @@
+{
+  "name": "PrintRequest",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05d4\u05de\u05d1\u05e7\u05e9"
+    },
+    "user_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05de\u05d1\u05e7\u05e9"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05e7\u05d5\u05d1\u05e5 PDF"
+    },
+    "file_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05e7\u05d5\u05d1\u05e5"
+    },
+    "subject": {
+      "type": "string",
+      "description": "\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "class_name": {
+      "type": "string",
+      "description": "\u05db\u05d9\u05ea\u05d4"
+    },
+    "copies": {
+      "type": "number",
+      "description": "\u05db\u05de\u05d5\u05ea \u05e2\u05d5\u05ea\u05e7\u05d9\u05dd"
+    },
+    "pages_per_copy": {
+      "type": "number",
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05e2\u05de\u05d5\u05d3\u05d9\u05dd \u05d1\u05e7\u05d5\u05d1\u05e5",
+      "default": 1
+    },
+    "total_pages": {
+      "type": "number",
+      "description": "\u05e1\u05d4\u05f4\u05db \u05d3\u05e4\u05d9\u05dd (\u05e2\u05d5\u05ea\u05e7\u05d9\u05dd \u00d7 \u05e2\u05de\u05d5\u05d3\u05d9\u05dd)"
+    },
+    "paper_size": {
+      "type": "string",
+      "enum": [
+        "A4",
+        "A3",
+        "special"
+      ],
+      "default": "A4",
+      "description": "\u05d2\u05d5\u05d3\u05dc \u05d3\u05e3"
+    },
+    "color_mode": {
+      "type": "string",
+      "enum": [
+        "black_white",
+        "color"
+      ],
+      "default": "black_white",
+      "description": "\u05e6\u05d1\u05e2\u05d5\u05e0\u05d9/\u05e9\u05d7\u05d5\u05e8-\u05dc\u05d1\u05df"
+    },
+    "urgent": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d3\u05d7\u05d5\u05e3?"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "printing",
+        "completed"
+      ],
+      "default": "pending",
+      "description": "\u05e1\u05d8\u05d8\u05d5\u05e1 \u05d4\u05d3\u05e4\u05e1\u05d4"
+    },
+    "approved_by": {
+      "type": "string",
+      "description": "\u05de\u05d9 \u05d0\u05d9\u05e9\u05e8"
+    },
+    "approval_date": {
+      "type": "string",
+      "format": "date",
+      "description": "\u05ea\u05d0\u05e8\u05d9\u05da \u05d0\u05d9\u05e9\u05d5\u05e8"
+    }
+  },
+  "required": [
+    "user_email",
+    "user_name",
+    "file_url",
+    "file_name",
+    "subject",
+    "class_name",
+    "copies"
+  ]
+}

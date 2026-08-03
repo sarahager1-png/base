@@ -1,0 +1,56 @@
+{
+  "name": "Message",
+  "type": "object",
+  "properties": {
+    "sender_email": {
+      "type": "string",
+      "description": "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05d4\u05e9\u05d5\u05dc\u05d7"
+    },
+    "sender_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05e9\u05d5\u05dc\u05d7"
+    },
+    "sender_role": {
+      "type": "string",
+      "description": "\u05ea\u05e4\u05e7\u05d9\u05d3 \u05d4\u05e9\u05d5\u05dc\u05d7"
+    },
+    "recipient_email": {
+      "type": "string",
+      "description": "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05d4\u05e0\u05de\u05e2\u05df"
+    },
+    "recipient_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05e0\u05de\u05e2\u05df"
+    },
+    "recipient_role": {
+      "type": "string",
+      "description": "\u05ea\u05e4\u05e7\u05d9\u05d3 \u05d4\u05e0\u05de\u05e2\u05df"
+    },
+    "content": {
+      "type": "string",
+      "description": "\u05ea\u05d5\u05db\u05df \u05d4\u05d4\u05d5\u05d3\u05e2\u05d4"
+    },
+    "is_read": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05e7\u05e8\u05d0\u05d5 \u05d0\u05ea \u05d4\u05d4\u05d5\u05d3\u05e2\u05d4"
+    },
+    "message_type": {
+      "type": "string",
+      "enum": [
+        "personal",
+        "feedback",
+        "suggestion"
+      ],
+      "default": "personal",
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05d4\u05d5\u05d3\u05e2\u05d4"
+    }
+  },
+  "required": [
+    "sender_email",
+    "sender_name",
+    "recipient_email",
+    "recipient_name",
+    "content"
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "name": "SubstituteReport",
+  "type": "object",
+  "properties": {
+    "reporter_email": {
+      "type": "string",
+      "description": "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05d4\u05de\u05d3\u05d5\u05d5\u05d7 (\u05de\u05de\u05f4\u05de)"
+    },
+    "reporter_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05de\u05d3\u05d5\u05d5\u05d7"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "\u05ea\u05d0\u05e8\u05d9\u05da"
+    },
+    "original_teacher": {
+      "type": "string",
+      "description": "\u05d1\u05de\u05e7\u05d5\u05dd \u05de\u05d9"
+    },
+    "hours_count": {
+      "type": "number",
+      "description": "\u05db\u05de\u05d5\u05ea \u05e9\u05e2\u05d5\u05ea"
+    },
+    "class_name": {
+      "type": "string",
+      "description": "\u05db\u05d9\u05ea\u05d4"
+    },
+    "subject": {
+      "type": "string",
+      "description": "\u05e0\u05d5\u05e9\u05d0"
+    },
+    "offset_hour_type": {
+      "type": "string",
+      "enum": [
+        "none",
+        "stay",
+        "individual"
+      ],
+      "default": "none",
+      "description": "\u05e1\u05d5\u05d2 \u05e9\u05e2\u05d4 \u05dc\u05e7\u05d9\u05d6\u05d5\u05d6 \u05d1\u05de\u05e7\u05e8\u05d4 \u05e9\u05dc \u05d7\u05e8\u05d9\u05d2\u05d4"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "reported",
+        "approved",
+        "paid"
+      ],
+      "default": "reported",
+      "description": "\u05e1\u05d8\u05d8\u05d5\u05e1"
+    }
+  },
+  "required": [
+    "reporter_email",
+    "reporter_name",
+    "date",
+    "hours_count"
+  ]
+}

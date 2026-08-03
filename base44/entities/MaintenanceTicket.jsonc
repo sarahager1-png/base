@@ -1,0 +1,57 @@
+{
+  "name": "MaintenanceTicket",
+  "type": "object",
+  "properties": {
+    "reporter_email": {
+      "type": "string",
+      "description": "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05d4\u05de\u05d3\u05d5\u05d5\u05d7"
+    },
+    "reporter_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05de\u05d3\u05d5\u05d5\u05d7"
+    },
+    "ticket_type": {
+      "type": "string",
+      "enum": [
+        "general",
+        "computer"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05e7\u05e8\u05d9\u05d0\u05d4"
+    },
+    "location": {
+      "type": "string",
+      "description": "\u05de\u05d9\u05e7\u05d5\u05dd"
+    },
+    "issue": {
+      "type": "string",
+      "description": "\u05ea\u05d9\u05d0\u05d5\u05e8 \u05d4\u05d1\u05e2\u05d9\u05d4"
+    },
+    "urgency": {
+      "type": "string",
+      "enum": [
+        "normal",
+        "urgent",
+        "safety"
+      ],
+      "default": "normal",
+      "description": "\u05d3\u05d7\u05d9\u05e4\u05d5\u05ea"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "in_progress",
+        "completed"
+      ],
+      "default": "open",
+      "description": "\u05e1\u05d8\u05d8\u05d5\u05e1"
+    }
+  },
+  "required": [
+    "reporter_email",
+    "reporter_name",
+    "ticket_type",
+    "location",
+    "issue"
+  ]
+}

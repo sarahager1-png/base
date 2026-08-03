@@ -1,0 +1,64 @@
+{
+  "name": "SpecialOvertimeReport",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05d4\u05de\u05d3\u05d5\u05d5\u05d7"
+    },
+    "user_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05de\u05d3\u05d5\u05d5\u05d7"
+    },
+    "activity_type": {
+      "type": "string",
+      "enum": [
+        "tzomchim",
+        "duty"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05e4\u05e2\u05d9\u05dc\u05d5\u05ea - \u05e6\u05d5\u05de\u05d7\u05d9\u05dd \u05d0\u05d5 \u05ea\u05d5\u05e8\u05e0\u05d5\u05ea"
+    },
+    "dates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "hours": {
+            "type": "number"
+          }
+        }
+      },
+      "description": "\u05e8\u05e9\u05d9\u05de\u05ea \u05ea\u05d0\u05e8\u05d9\u05db\u05d9\u05dd \u05d5\u05e9\u05e2\u05d5\u05ea"
+    },
+    "total_hours": {
+      "type": "number",
+      "description": "\u05e1\u05d4\u05f4\u05db \u05e9\u05e2\u05d5\u05ea"
+    },
+    "details": {
+      "type": "string",
+      "description": "\u05e4\u05e8\u05d8\u05d9\u05dd \u05e0\u05d5\u05e1\u05e4\u05d9\u05dd"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected",
+        "paid"
+      ],
+      "default": "pending",
+      "description": "\u05e1\u05d8\u05d8\u05d5\u05e1"
+    }
+  },
+  "required": [
+    "user_email",
+    "user_name",
+    "activity_type",
+    "dates",
+    "total_hours"
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "name": "FileManagement",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05d4\u05e2\u05d5\u05d1\u05d3 \u05e9\u05d4\u05e2\u05dc\u05d4 \u05d0\u05ea \u05d4\u05e7\u05d5\u05d1\u05e5"
+    },
+    "user_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05e2\u05d5\u05d1\u05d3"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05e7\u05d5\u05d1\u05e5"
+    },
+    "file_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05e7\u05d5\u05d1\u05e5"
+    },
+    "file_type": {
+      "type": "string",
+      "enum": [
+        "pdf",
+        "image",
+        "document",
+        "spreadsheet",
+        "video",
+        "other"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05e7\u05d5\u05d1\u05e5"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "onboarding",
+        "print_request",
+        "maintenance",
+        "purchase",
+        "meeting",
+        "general"
+      ],
+      "description": "\u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4"
+    },
+    "file_size": {
+      "type": "number",
+      "description": "\u05d2\u05d5\u05d3\u05dc \u05e7\u05d5\u05d1\u05e5 \u05d1\u05d1\u05ea\u05d9\u05dd"
+    },
+    "version": {
+      "type": "number",
+      "default": 1,
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05d2\u05e8\u05e1\u05d4"
+    },
+    "previous_version_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d2\u05e8\u05e1\u05d4 \u05e7\u05d5\u05d3\u05de\u05ea"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "\u05ea\u05d2\u05d9\u05d5\u05ea \u05dc\u05d7\u05d9\u05e4\u05d5\u05e9"
+    },
+    "description": {
+      "type": "string",
+      "description": "\u05ea\u05d9\u05d0\u05d5\u05e8 \u05e7\u05d5\u05d1\u05e5"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "\u05d4\u05d0\u05dd \u05d4\u05e7\u05d5\u05d1\u05e5 \u05e4\u05e2\u05d9\u05dc"
+    },
+    "related_entity_type": {
+      "type": "string",
+      "description": "\u05e1\u05d5\u05d2 \u05d9\u05d9\u05e9\u05d5\u05ea \u05e7\u05e9\u05d5\u05e8\u05d4 (Absence, PrintRequest \u05d5\u05db\u05d5')"
+    },
+    "related_entity_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d9\u05d9\u05e9\u05d5\u05ea \u05e7\u05e9\u05d5\u05e8\u05d4"
+    }
+  },
+  "required": [
+    "user_email",
+    "user_name",
+    "file_url",
+    "file_name",
+    "file_type",
+    "category"
+  ]
+}

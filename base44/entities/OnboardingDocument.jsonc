@@ -1,0 +1,54 @@
+{
+  "name": "OnboardingDocument",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05d4\u05e2\u05d5\u05d1\u05d3 \u05d4\u05d7\u05d3\u05e9"
+    },
+    "user_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05e2\u05d5\u05d1\u05d3"
+    },
+    "document_type": {
+      "type": "string",
+      "enum": [
+        "id_card",
+        "form_101",
+        "bank_details",
+        "tax_coordination",
+        "other"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05de\u05e1\u05de\u05da"
+    },
+    "is_additional_work": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05d6\u05d5 \u05e2\u05d1\u05d5\u05d3\u05d4 \u05e0\u05d5\u05e1\u05e4\u05ea \u05e9\u05d3\u05d5\u05e8\u05e9\u05ea \u05ea\u05d0\u05d5\u05dd \u05de\u05e1"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05e7\u05d5\u05d1\u05e5"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending",
+      "description": "\u05e1\u05d8\u05d8\u05d5\u05e1 \u05d0\u05d9\u05e9\u05d5\u05e8"
+    },
+    "reviewed_by": {
+      "type": "string",
+      "description": "\u05de\u05d9 \u05d0\u05d9\u05e9\u05e8/\u05d3\u05d7\u05d4"
+    }
+  },
+  "required": [
+    "user_email",
+    "user_name",
+    "document_type",
+    "file_url"
+  ]
+}

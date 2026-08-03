@@ -1,0 +1,63 @@
+{
+  "name": "InstitutionSettings",
+  "type": "object",
+  "properties": {
+    "institution_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05de\u05d5\u05e1\u05d3"
+    },
+    "absences_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "\u05d4\u05d3\u05e4\u05e1\u05d4 \u05d4\u05d9\u05e2\u05d3\u05e8\u05d5\u05d9\u05d5\u05ea"
+    },
+    "substitutes_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "\u05d3\u05d9\u05d5\u05d5\u05d7 \u05de\u05d9\u05dc\u05d5\u05d9 \u05de\u05e7\u05d5\u05dd"
+    },
+    "purchases_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "\u05d1\u05e7\u05e9\u05d5\u05ea \u05e8\u05db\u05e9"
+    },
+    "printing_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "\u05d4\u05d3\u05e4\u05e1\u05d5\u05ea"
+    },
+    "maintenance_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "\u05d3\u05d9\u05d5\u05d5\u05d7\u05d9 \u05ea\u05d7\u05d6\u05d5\u05e7\u05d4"
+    },
+    "meetings_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "\u05d9\u05d5\u05de\u05df \u05e4\u05d2\u05d9\u05e9\u05d5\u05ea"
+    },
+    "birthdays_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "\u05ea\u05d0\u05e8\u05d9\u05db\u05d9 \u05dc\u05d9\u05d3\u05d4"
+    },
+    "overtime_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "\u05e9\u05e2\u05d5\u05ea \u05e0\u05d5\u05e1\u05e4\u05d5\u05ea"
+    },
+    "journal_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "\u05d9\u05d5\u05de\u05df \u05d1\u05d9\u05ea \u05e1\u05e4\u05e8"
+    },
+    "messages_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "\u05d4\u05d5\u05d3\u05e2\u05d5\u05ea \u05e6\u05d5\u05d5\u05ea"
+    }
+  },
+  "required": [
+    "institution_name"
+  ]
+}
